@@ -3,10 +3,10 @@ import { RootStackParamList } from './model/RootStackParamList'
 import Main from './creens/Main';
 import SettingsDevice from './creens/SettingsDevice';
 import DeviceCalibration from './creens/DeviceCalibration';
-// import AssessmentSelection from './creens/AssessmentSelection';
-// import RangeOfMotion from './creens/RangeOfMotion';
+import AssessmentSelection from './creens/AssessmentSelection';
+import RangeOfMotion from './creens/RangeOfMotion';
 import BLEScanner from "./creens/BLEScanner";
-// import RangeOfMotionSummary from './creens/RangeOfMotionSummary';
+import RangeOfMotionSummary from './creens/RangeOfMotionSummary';
 // import { SQLiteProvider } from 'expo-sqlite';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -31,14 +31,14 @@ const Navigatior = () => {
 					headerShown: false
 				}} >
 			</Stack.Screen>
-			{/* <Stack.Screen
+			<Stack.Screen
 				name="AssessmentSelection"
 				component={AssessmentSelection}
 				options={{
 					title: '',
 				}} >
-			</Stack.Screen> */}
-			{/* <Stack.Screen
+			</Stack.Screen>
+			<Stack.Screen
 				name="RangeOfMotion"
 				component={RangeOfMotion}
 				options={{
@@ -51,7 +51,7 @@ const Navigatior = () => {
 				options={{
 					title: '',
 				}} >
-			</Stack.Screen> */}
+			</Stack.Screen>
 			<Stack.Screen
 				name="SettingsDevice"
 				component={SettingsDevice}

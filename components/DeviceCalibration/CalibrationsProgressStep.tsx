@@ -2,7 +2,7 @@ import { styled } from "nativewind";
 import { View, Text } from "react-native";
 import type { StepProps } from '../../model/CalibrationStepProps';
 import { CircleCheckBig } from "lucide-react-native";
-import CalibrationSpinning from "../CalibrationSpinning";
+import CalibrationSpinning from "./CalibrationSpinning";
 
 const LuCircleBig = styled(CircleCheckBig);
 

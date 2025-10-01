@@ -1,6 +1,6 @@
 import { styled } from "nativewind";
 import type { StepProps } from '../model/CalibrationStepProps';
-import CalibrationSpinning from "../components/CalibrationSpinning";
+import CalibrationSpinning from "../components/DeviceCalibration/CalibrationSpinning";
 import { CircleCheckBig, Hand, RotateCcw, RotateCw, ArrowUpDown, BluetoothSearching } from "lucide-react-native";
 
 const LuBleSearch = styled(BluetoothSearching);

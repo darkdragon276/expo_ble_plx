@@ -1,7 +1,7 @@
 import { styled } from "nativewind";
 import { View, Text } from "react-native";
 import { CircleCheckBig } from "lucide-react-native";
-import CalibrationSpinning from "../../CalibrationSpinning";
+import CalibrationSpinning from "../CalibrationSpinning";
 import React from "react";
 import { c_cpl } from "../../../dummy/calibrationStepData";
 
