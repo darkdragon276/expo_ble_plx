@@ -64,6 +64,7 @@ export default function BLEScanner() {
 				console.error("Error to cleanup BleManager:", cleanupError);
 			}
 		};
+
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -141,8 +142,8 @@ export default function BLEScanner() {
 		}
 	};
 
-	const onPressGotoSettings = () => {
-		navigation.navigate("SettingsDevice")
+	const onPressGotoMain = () => {
+		navigation.navigate("Main")
 	}
 
 	const renderItem = ({ item }: { item: ScannedDevice }) => (
@@ -180,9 +181,9 @@ export default function BLEScanner() {
 				</TouchableOpacity>
 			</View>
 			<TouchableOpacity
-				onPress={onPressGotoSettings}
+				onPress={onPressGotoMain}
 			>
-				<Text style={styles.title}>Goto Main Creen</Text>
+				<Text style={[styles.button, styles.buttonClear]}>Goto Main Creen</Text>
 			</TouchableOpacity>
 			<FlatList
 				data={deviceList}

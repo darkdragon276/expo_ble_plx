@@ -1,22 +1,32 @@
-import { StyleSheet, Text, View, Image, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Image, Pressable, Modal, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 //import { Ionicons, Feather } from '@expo/vector-icons';
-import { useState } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Feather from 'react-native-vector-icons/Feather';
+import { useEffect, useState } from 'react';
+import MainCardDevices from '../components/Main/MainCardDevices';
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from '../model/RootStackParamList';
-//import { styled } from "nativewind";
+
+//temp code
+import { devices } from '../dummy/devices';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
-//const View = styled(View)
-
 const Main = () => {
 	const navigation = useNavigation<NavigationProp>();
+	const dv = devices
+
+	const [selected, setSelected] = useState(dv[0]);
 	const [open, setOpen] = useState(false);
 
 	const onPressGotoSettings = () => {
 		navigation.navigate("SettingsDevice")
+	}
+
+	const onPressGotoROM = () => {
+		navigation.navigate("AssessmentSelection")
 	}
 
 	return (
@@ -39,7 +49,7 @@ const Main = () => {
 								},
 							]}
 						>
-							{/* <Ionicons name="settings-outline" size={25} color="gray"></Ionicons> */}
+							<Ionicons name="settings-outline" size={25} color="gray"></Ionicons>
 						</Pressable>
 					</View>
 				</View>
@@ -48,14 +58,14 @@ const Main = () => {
 			<View className="p-4">
 				{/* Blue action button */}
 				<Pressable
-					onPress={onPressGotoSettings}
+					onPress={onPressGotoROM}
 					className="bg-blue-600 rounded-2xl px-4 py-4 shadow-lg"
 					android_ripple={{ color: "rgba(255,255,255,0.12)" }}
 				>
 					<View className="flex-row items-center">
 						{/* small icon circle */}
 						<View className="w-10 h-10 rounded-xl bg-blue-500 items-center justify-center mr-4 shadow">
-							{/* <Feather name="activity" size={15} color="white" /> */}
+							<Feather name="activity" size={15} color="white" />
 						</View>
 
 						{/* text block */}
@@ -77,7 +87,62 @@ const Main = () => {
 
 				{/* Spacer */}
 				<View className="h-4" />
+
+				{/* Card for device status (contains combobox) */}
+				<MainCardDevices
+					devices={selected}
+					setOpen={() => setOpen(true)}
+				>
+				</MainCardDevices>
 			</View>
+
+			{/* Modal for selecting device */}
+			<Modal
+				visible={open}
+				animationType="fade"
+				transparent
+				onRequestClose={() => setOpen(false)}
+			>
+				<Pressable
+					style={{ flex: 1 }}
+					onPressOut={() => setOpen(false)}
+					className="bg-black/30 justify-end"
+				>
+					<View className="bg-white rounded-t-2xl p-4">
+						<Text className="text-gray-700 font-semibold mb-3">Select device</Text>
+
+						<FlatList
+							data={devices}
+							keyExtractor={(item) => item.id}
+							renderItem={({ item }) => (
+								<Pressable
+									onPress={() => {
+										setSelected(item);
+										setOpen(false);
+									}}
+									className="px-3 py-3 rounded-xl mb-2"
+								>
+									<View className="flex-row items-center">
+										<View className={`w-2 h-2 rounded-full bg-${item.color}-500 mr-2`} />
+										<Text className="text-gray-700">{item.name}</Text>
+										<View className="w-4" />
+										{item.id === selected.id ? (
+											<Ionicons className="ml-auto text-base" name="checkmark" size={15} color="gray" />
+										) : null}
+									</View>
+								</Pressable>
+							)}
+						/>
+
+						<Pressable
+							onPress={() => setOpen(false)}
+							className="mt-2 py-3 items-center rounded-xl bg-gray-100"
+						>
+							<Text className="text-gray-700">Cancel</Text>
+						</Pressable>
+					</View>
+				</Pressable>
+			</Modal>
 		</SafeAreaView >
 	)
 }

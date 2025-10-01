@@ -1,0 +1,67 @@
+import { styled } from "nativewind";
+import type { StepProps } from '../model/CalibrationStepProps';
+import CalibrationSpinning from "../components/CalibrationSpinning";
+import { CircleCheckBig, Hand, RotateCcw, RotateCw, ArrowUpDown, BluetoothSearching } from "lucide-react-native";
+
+const LuBleSearch = styled(BluetoothSearching);
+const LuCircleBig = styled(CircleCheckBig);
+const LuHand = styled(Hand);
+const LuRotateCcw = styled(RotateCcw);
+const LuRotateCw = styled(RotateCw);
+const LuArrowUpDown = styled(ArrowUpDown);
+
+export const dv_cn: Omit<StepProps, "status"> =
+{
+	label: "Device Connection",
+	description: "Verifying connection to HeadX Kross Smart device",
+	IconLoading: () => <CalibrationSpinning />,
+	Icon: () => <LuBleSearch size={20} color="gray"></LuBleSearch>,
+};
+
+export const ss_init: Omit<StepProps, "status"> =
+{
+	label: "Sensor Initialization",
+	description: "Initializing motion sensors and gyroscopes",
+	IconLoading: () => <CalibrationSpinning />,
+	Icon: () => <LuCircleBig size={20} color="gray"></LuCircleBig>,
+};
+
+export const hold_dv: Omit<StepProps, "status"> =
+{
+	label: "Hold Device Steady",
+	description: "Hold device steady in neutral position for baseline",
+	IconLoading: () => <CalibrationSpinning />,
+	Icon: () => <LuHand size={20} color="gray"></LuHand>,
+};
+
+export const x_asis: Omit<StepProps, "status"> =
+{
+	label: "X-Axis Calibration",
+	description: "Rotate device left and right (yaw rotation)",
+	IconLoading: () => <CalibrationSpinning />,
+	Icon: () => <LuRotateCw size={20} color="gray"></LuRotateCw>,
+};
+
+export const y_asis: Omit<StepProps, "status"> =
+{
+	label: "Y-Axis Calibration",
+	description: "Tilt device forward and backward (pitch rotation)",
+	IconLoading: () => <CalibrationSpinning />,
+	Icon: () => <LuArrowUpDown size={20} color="gray"></LuArrowUpDown>,
+};
+
+export const z_asis: Omit<StepProps, "status"> =
+{
+	label: "Z-Axis Calibration",
+	description: "Roll device side to side (roll rotation)",
+	IconLoading: () => <CalibrationSpinning />,
+	Icon: () => <LuRotateCcw size={20} color="gray"></LuRotateCcw>,
+}
+
+export const c_cpl: Omit<StepProps, "status"> =
+{
+	label: "Calibration Complete",
+	description: "All axes calibrated - device ready for assessment",
+	IconLoading: () => <CalibrationSpinning />,
+	Icon: () => <LuCircleBig size={20} color="gray"></LuCircleBig>,
+};
