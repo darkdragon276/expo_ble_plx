@@ -1,13 +1,13 @@
-// import { styled } from "nativewind";
+import { styled } from "nativewind";
 import { useLayoutEffect } from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { useNavigation } from '@react-navigation/native';
-//import { Feather } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from '../model/RootStackParamList';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-// const FtherIcon = styled(Feather);
+const FtherIcon = styled(Feather);
 
 const SettingsDevice = () => {
 	const navigation = useNavigation<NavigationProp>();
@@ -25,7 +25,7 @@ const SettingsDevice = () => {
 					onPress={() => navigation.goBack()}
 					className="flex-row items-center"
 				>
-					{/* <FtherIcon className="ml-5" name="arrow-left" size={20} color="gray" /> */}
+					<FtherIcon className="ml-5" name="arrow-left" size={20} color="gray" />
 					<Text className="text-xl ml-2"></Text>
 				</Pressable>
 			),
@@ -45,11 +45,11 @@ const SettingsDevice = () => {
 	}, [navigation]);
 
 	return (
-		<ScrollView className="flex-row bg-gray-50 p-4">
+		<ScrollView className="flex-1 bg-gray-50 p-4">
 			{/* Device Calibration */}
 			<View className="bg-white rounded-2xl p-4 mb-4 shadow">
 				<View className="flex-row items-center mb-5">
-					{/* <FtherIcon className="mr-1" name="rotate-ccw" size={15} color="#1976D2" /> */}
+					<FtherIcon className="mr-1" name="rotate-ccw" size={15} color="#1976D2" />
 					<Text className="text-base font-semibold">
 						Device Calibration
 					</Text>
@@ -67,7 +67,7 @@ const SettingsDevice = () => {
 					// ]}
 					>
 						<View className="flex-row items-center bg-blue-500 px-4 py-2 rounded-xl">
-							{/* <FtherIcon className="mr-2" name="rotate-ccw" size={15} color="white" /> */}
+							<FtherIcon className="mr-2" name="rotate-ccw" size={15} color="white" />
 							<Text className="text-white font-medium">
 								Calibrate
 							</Text>
