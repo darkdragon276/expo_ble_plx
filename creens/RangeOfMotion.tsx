@@ -22,12 +22,13 @@ import AssessmentLRotation from "../components/RangeOfMotion/AssessmentLRotation
 import AssessmentRRotation from "../components/RangeOfMotion/AssessmentRRotation";
 import AssessmentLLateral from "../components/RangeOfMotion/AssessmentLLateral";
 import AssessmentRLateral from "../components/RangeOfMotion/AssessmentRLateral";
-// import { useDatabase } from "../db/useDatabase";
-// import { DB_INSERT_ROM, DB_SELECT_ALL_ROM } from "../db/dbQuery";
-// import useGetMotions from "..//hooks//rangeOfMotionHook/useGetMotions";
-// import { useDispatch, useSelector } from "react-redux";
-// import { IRootState } from "../model/IRootState";
-// import useColectROM from "../hooks/rangeOfMotionHook/useColectROM";
+
+import { useDatabase } from "../db/useDatabase";
+import { DB_INSERT_ROM, DB_SELECT_ALL_ROM, DB_DELETE_ALL_ROM } from "../db/dbQuery";
+import useGetMotions from "..//hooks//rangeOfMotionHook/useGetMotions";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../model/IRootState";
+import AssessmentRecord from "../components/RangeOfMotion/AssessmentRecord";
 
 const LuPlay = styled(LucidePlay);
 const LuUsers = styled(LucideUsers);
@@ -45,10 +46,11 @@ const RightLateralSrcImage = require("../assets/RightLateral.png");
 const RangeOfMotion = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [record, setRecord] = useState(false);
-	// const db = useDatabase("headx.db");
-	// const { extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration } = useGetMotions();
-	// const extension1 = useSelector((state: IRootState) => state.rangeOfMotion.extension)
+	const db = useDatabase("headx.db");
+	const { extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration } = useGetMotions();
 
+	// const extension1 = useSelector((state: IRootState) => state.rangeOfMotion.extension)
+	console.log(`RangeOfMotion render: ${extension}`)
 	// useLayoutEffect(() => {
 	// 	console.log(`RangeOfMotion - useLayoutEffect`)
 	// 	navigation.setOptions({
@@ -83,35 +85,42 @@ const RangeOfMotion = () => {
 	// 	});
 	// }, [navigation, record]);
 
-	// useEffect(() => {
+	useEffect(() => {
+		//console.log(`useEffect ${extension} , ${flexion},  ${l_rotation},  ${r_rotation},  ${l_lateral},  ${r_lateral},  ${duration}`)
+		addData(extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration).then(() => {
+			selectData();
+		})
+	}, [extension])
 
-	// }, [])
 
-	// const addData = async () => {
-	// 	console.log("DB_INSERT_ROM start!");
+	const selectData = async () => {
+		if (!db) return;
+		//console.log("selectData");
+		db.withTransactionAsync(async () => {
+			const result = await db.getAllAsync(DB_SELECT_ALL_ROM);
+			console.log("Users:", result);
+			await db.runAsync(DB_DELETE_ALL_ROM);
+		});
+	};
 
-	// 	if (!db) {
-	// 		console.log("addData db is null !");
-	// 		return;
-	// 	}
+	const addData = async (extension: number, flexion: number, l_rotation: number, r_rotation: number, l_lateral: number, r_lateral: number, duration: number) => {
+		//console.log("DB_INSERT_ROM start!");
 
-	// 	console.log("addData go");
+		if (!db) {
+			console.log("addData db is null !");
+			return;
+		}
 
-	// 	console.log(extension);
-	// 	console.log(extension1);
-	// 	console.log("begin INSERT!");
-	// 	//db.execAsync(DB_INSERT_ROM, ["", 1, 2, 3, 4, 5, 6, 7]);
-	// 	await db.runAsync(DB_INSERT_ROM, ["", extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration]);
-	// 	console.log("INSERT done!");
-	// 	console.log("DB_INSERT_ROM inserted!");
-	// };
+		//console.log("addData go");
 
-	// const selectData = async () => {
-	// 	if (!db) return;
-
-	// 	const result = await db.getAllAsync(DB_SELECT_ALL_ROM);
-	// 	console.log("Users:", result);
-	// };
+		//console.log(extension);
+		console.log(`addData: ${extension}`)
+		console.log("begin INSERT!");
+		//db.runAsync(DB_INSERT_ROM, ["", extension, 2, 3, 4, 5, 6, 7]);
+		await db.runAsync(DB_INSERT_ROM, ["", extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration]);
+		console.log("INSERT done!");
+		//console.log("DB_INSERT_ROM inserted!");
+	};
 
 	const onPressRecording = () => {
 		//selectData();
@@ -120,11 +129,10 @@ const RangeOfMotion = () => {
 
 	const onPressStopRecor = () => {
 		setRecord(false)
-		setTimeout(() => {
-			// addData().then((res) => {
+		//console.log(`onPressStopRecor: ${extension}`)
 
-			// });
-			navigation.navigate("RangeOfMotionSummary")
+		setTimeout(() => {
+			//navigation.navigate("RangeOfMotionSummary")
 		}, 500);
 	};
 
@@ -179,41 +187,42 @@ const RangeOfMotion = () => {
 						</View>
 					</View>
 				</View>
+			</View>
 
-				{/* Start Assessment Button */}
-				<View className="flex-row items-center justify-center rounded-xl bg-white p-4">
-					{
-						!record
-							?
-							<TouchableOpacity
-								onPress={onPressRecording}
-								activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
-								<LinearGradient
-									colors={["#0a66ff", "#00a3ff"]}
-									start={[0, 0]}
-									end={[1, 0]}
-									className="flex-row items-center justify-center w-full py-4 px-12"
-								>
-									<LuPlay size={20} color="white"></LuPlay>
-									<Text className="text-white font-semibold ml-2 p-3">Start Assessment</Text>
-								</LinearGradient>
-							</TouchableOpacity>
-							:
-							<TouchableOpacity
-								onPress={onPressStopRecor}
-								activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
-								<LinearGradient
-									colors={["#B91C1C", "#B91C1C"]}
-									start={[0, 0]}
-									end={[1, 0]}
-									className="flex-row bg-red-700 items-center justify-center w-full py-4 px-12"
-								>
-									<LuSquare size={20} color="white"></LuSquare>
-									<Text className="text-white font-semibold ml-2 p-3">Stop Recording</Text>
-								</LinearGradient>
-							</TouchableOpacity>
-					}
-				</View>
+			{/* Start Assessment Button */}
+			<View className="flex-row items-center justify-center rounded-xl bg-white p-4">
+				{/* <AssessmentRecord></AssessmentRecord> */}
+				{
+					!record
+						?
+						<TouchableOpacity
+							onPress={onPressRecording}
+							activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
+							<LinearGradient
+								colors={["#0a66ff", "#00a3ff"]}
+								start={[0, 0]}
+								end={[1, 0]}
+								className="flex-row items-center justify-center w-full py-4 px-12"
+							>
+								<LuPlay size={20} color="white"></LuPlay>
+								<Text className="text-white font-semibold ml-2 p-3">Start Assessment</Text>
+							</LinearGradient>
+						</TouchableOpacity>
+						:
+						<TouchableOpacity
+							onPress={onPressStopRecor}
+							activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
+							<LinearGradient
+								colors={["#B91C1C", "#B91C1C"]}
+								start={[0, 0]}
+								end={[1, 0]}
+								className="flex-row bg-red-700 items-center justify-center w-full py-4 px-12"
+							>
+								<LuSquare size={20} color="white"></LuSquare>
+								<Text className="text-white font-semibold ml-2 p-3">Stop Recording</Text>
+							</LinearGradient>
+						</TouchableOpacity>
+				}
 			</View>
 
 			<View className="flex-row flex-wrap">
