@@ -1,7 +1,7 @@
 import { styled } from "nativewind";
 import { View, Text } from "react-native";
 import { CircleCheckBig } from "lucide-react-native";
-import CalibrationSpinning from "../../CalibrationSpinning";
+import CalibrationSpinning from "../CalibrationSpinning";
 import { ss_init } from "../../../dummy/calibrationStepData";
 import useCheckStep from "../../../hooks/calibrationHook/useCheckStep";
 import useStepColor from "../../../hooks/calibrationHook/useStepColor";

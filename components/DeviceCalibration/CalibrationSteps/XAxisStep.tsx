@@ -1,7 +1,7 @@
 import { styled } from "nativewind";
 import { View, Text } from "react-native";
 import { CircleCheckBig } from "lucide-react-native";
-import CalibrationSpinning from "../../CalibrationSpinning";
+import CalibrationSpinning from "../CalibrationSpinning";
 import { x_asis } from "../../../dummy/calibrationStepData";
 
 //redux zone st
