@@ -70,7 +70,7 @@ export default function MainRecentSession() {
 			}
 			//console.log(`MainRecentSession render`)
 			const rs = await db.getAllAsync<Session>(DB_SELECT_RECENT_ROM);
-			console.log(rs.length);
+			//console.log(rs.length);
 			if (rs) {
 				sessions = rs
 				setInit(true);
