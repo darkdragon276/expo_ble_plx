@@ -55,39 +55,39 @@ const RangeOfMotion = () => {
 	const refLLateral = useRef<ChildROMRef>(null);
 	const refRLateral = useRef<ChildROMRef>(null);
 
-	// useLayoutEffect(() => {
-	// 	//console.log(`RangeOfMotion - useLayoutEffect`)
-	// 	navigation.setOptions({
-	// 		title: "",
-	// 		headerTitleAlign: "left",
-	// 		headerStyle: {
-	// 			elevation: 0,
-	// 			shadowOpacity: 0,
-	// 			borderBottomWidth: 0,
-	// 		},
-	// 		headerLeft: () => (
-	// 			<View className="flex-row items-center">
-	// 				<Pressable
-	// 					onPress={() => navigation.goBack()}
-	// 					className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
-	// 				>
-	// 					<Ionicons name="arrow-back" size={18} color="black" />
-	// 					<Text className="ml-1 text-sm font-medium">Back</Text>
-	// 				</Pressable>
-	// 			</View>
-	// 		),
-	// 		headerRight: () => {
-	// 			return record
-	// 				?
-	// 				<View className="flex-row items-center px-3 py-1 rounded-full bg-red-100 border border-red-300 mr-2">
-	// 					<View className="w-2.5 h-2.5 rounded-full bg-red-600 mr-2" />
-	// 					<Text className="text-red-600 font-medium"> Recording</Text>
-	// 				</View>
-	// 				:
-	// 				<></>;
-	// 		}
-	// 	});
-	// }, [navigation, record]);
+	useLayoutEffect(() => {
+		//console.log(`RangeOfMotion - useLayoutEffect`)
+		navigation.setOptions({
+			title: "",
+			headerTitleAlign: "left",
+			headerStyle: {
+				elevation: 0,
+				shadowOpacity: 0,
+				borderBottomWidth: 0,
+			},
+			headerLeft: () => (
+				<View className="flex-row items-center">
+					<Pressable
+						onPress={() => navigation.replace("AssessmentSelection")}
+						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
+					>
+						<Ionicons name="arrow-back" size={18} color="black" />
+						<Text className="ml-1 text-sm font-medium">Back</Text>
+					</Pressable>
+				</View>
+			),
+			headerRight: () => {
+				return record
+					?
+					<View className="flex-row items-center px-3 py-1 rounded-full bg-red-100 border border-red-300 mr-2">
+						<View className="w-2.5 h-2.5 rounded-full bg-red-600 mr-2" />
+						<Text className="text-red-600 font-medium"> Recording</Text>
+					</View>
+					:
+					<></>;
+			}
+		});
+	}, [navigation, record]);
 
 	const addData = async (key: string) => {
 		if (!db) {
@@ -127,7 +127,7 @@ const RangeOfMotion = () => {
 		setRecord(false)
 		const key: string = Date.now().toString();
 		addData(key).then(() => {
-			navigation.navigate("RangeOfMotionSummary", { key: key })
+			navigation.replace("RangeOfMotionSummary", { key: key })
 		}).catch((error) => {
 			console.log(error)
 		})

@@ -37,6 +37,8 @@ type RProp = RouteProp<RootStackParamList, "RangeOfMotionSummary">;
 type DataProp = {
 	key: string,
 	date: string,
+	title: string,
+	time: string,
 	extension: number,
 	flexion: number,
 	l_rotation: number,
@@ -116,7 +118,7 @@ const RangeOfMotionSummary = () => {
 	}, [db])
 
 	const onPressGotoMain = useCallback(() => {
-		navigation.navigate("Main")
+		navigation.replace("Main")
 	}, []);
 
 	return (
@@ -126,13 +128,13 @@ const RangeOfMotionSummary = () => {
 					<View className="flex-row items-center justify-center">
 						<TextInput
 							className="w-rounded-xl px-2 py-2 text-base"
-							value="ROM Assessment - 9/28/2025 at 03:11 PM"
+							value={data?.title}
 							placeholderTextColor="black"
 						/>
 						<LuPenLine size={17} color="gray"></LuPenLine>
 					</View>
 					<Text className="text-lg text-gray-500 text-center">
-						ROM Assessment - 9/28/2025 at 03:11 PM
+						ROM Assessment - {data?.title}
 					</Text>
 				</View>
 
@@ -150,12 +152,12 @@ const RangeOfMotionSummary = () => {
 					<View className="flex-row flex-wrap py-4">
 						<View className="w-1/2">
 							<Text className="text-xs text-muted-foreground mb-1 text-gray-400">Date & Time</Text>
-							<Text className="font-medium text-sm">9/28/2025, 3:11:03 PM</Text>
+							<Text className="font-medium text-sm">{data?.date}</Text>
 						</View>
 
 						<View className="w-1/2">
 							<Text className="text-xs text-muted-foreground mb-1 text-gray-400">Duration</Text>
-							<Text className="font-medium text-sm">~12 min</Text>
+							<Text className="font-medium text-sm">~{data?.duration} min</Text>
 						</View>
 					</View>
 				</View>
