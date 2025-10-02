@@ -10,16 +10,19 @@ import {
 	ScrollView,
 } from "react-native";
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { RootStackParamList } from "../model/RootStackParamList";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 export default function DeviceCalibration() {
-	const navigation = useNavigation();
+	const navigation = useNavigation<NavigationProp>();
 	const [pressStartProgress, setPressStartProgress] = useState(false)
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
 			title: "",
 			headerTitleAlign: "left",
-			headerBackTitleVisible: false,
 			headerStyle: {
 				elevation: 0,
 				shadowOpacity: 0,
@@ -28,7 +31,7 @@ export default function DeviceCalibration() {
 			headerLeft: () => (
 				<View className="flex-row items-center">
 					<Pressable
-						onPress={() => navigation.goBack()}
+						onPress={() => navigation.replace("SettingsDevice")}
 						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
 					>
 						<Ionicons name="arrow-back" size={18} color="black" />

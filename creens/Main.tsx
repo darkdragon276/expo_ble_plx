@@ -24,11 +24,11 @@ const Main = () => {
 	const [open, setOpen] = useState(false);
 
 	const onPressGotoSettings = () => {
-		navigation.navigate("SettingsDevice")
+		navigation.replace("SettingsDevice")
 	}
 
 	const onPressGotoROM = () => {
-		navigation.navigate("AssessmentSelection")
+		navigation.replace("AssessmentSelection")
 	}
 
 	return (

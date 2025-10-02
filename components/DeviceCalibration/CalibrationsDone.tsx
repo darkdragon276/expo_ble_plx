@@ -31,7 +31,7 @@ const CalibrationsDone = () => {
 			headerLeft: () => (
 				<View className="flex-row items-center">
 					<Pressable
-						onPress={() => navigation.navigate("Main")}
+						onPress={() => navigation.replace("Main")}
 						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
 					>
 						<Ionicons name="arrow-back" size={18} color="black" />

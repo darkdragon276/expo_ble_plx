@@ -13,7 +13,7 @@ const SettingsDevice = () => {
 	const navigation = useNavigation<NavigationProp>();
 
 	const onPressGotoDeviceCalibration = () => {
-		navigation.navigate("DeviceCalibration")
+		navigation.replace("DeviceCalibration")
 	}
 
 	useLayoutEffect(() => {
@@ -22,7 +22,7 @@ const SettingsDevice = () => {
 			headerTitleAlign: "left",
 			headerLeft: () => (
 				<Pressable
-					onPress={() => navigation.goBack()}
+					onPress={() => navigation.replace("Main")}
 					className="flex-row items-center"
 				>
 					<FtherIcon className="ml-5" name="arrow-left" size={20} color="gray" />

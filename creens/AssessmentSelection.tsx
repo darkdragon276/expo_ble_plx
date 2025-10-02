@@ -45,28 +45,28 @@ const AssessmentSelection = () => {
 	const [title, setTitle] = useState('');
 	const titleRef = useRef<ChildInputRef>(null);
 
-	// useLayoutEffect(() => {
-	// 	navigation.setOptions({
-	// 		title: "",
-	// 		headerTitleAlign: "left",
-	// 		headerStyle: {
-	// 			elevation: 0,
-	// 			shadowOpacity: 0,
-	// 			borderBottomWidth: 0,
-	// 		},
-	// 		headerLeft: () => (
-	// 			<View className="flex-row items-center">
-	// 				<Pressable
-	// 					onPress={() => navigation.goBack()}
-	// 					className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
-	// 				>
-	// 					<Ionicons name="arrow-back" size={18} color="black" />
-	// 					<Text className="ml-1 text-sm font-medium">Back</Text>
-	// 				</Pressable>
-	// 			</View>
-	// 		),
-	// 	});
-	// }, [navigation]);
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			title: "",
+			headerTitleAlign: "left",
+			headerStyle: {
+				elevation: 0,
+				shadowOpacity: 0,
+				borderBottomWidth: 0,
+			},
+			headerLeft: () => (
+				<View className="flex-row items-center">
+					<Pressable
+						onPress={() => navigation.replace("Main")}
+						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
+					>
+						<Ionicons name="arrow-back" size={18} color="black" />
+						<Text className="ml-1 text-sm font-medium">Back</Text>
+					</Pressable>
+				</View>
+			),
+		});
+	}, [navigation]);
 
 	const renderFeature = ({ item }: { item: Feature }) => (
 		<View className="flex-row items-start gap-3 my-1">
@@ -80,7 +80,7 @@ const AssessmentSelection = () => {
 	const onPressGotoAssessment = () => {
 		dispatch(resetROM());
 		const title = titleRef.current?.getValue() || "";
-		navigation.navigate("RangeOfMotion", { title: title })
+		navigation.replace("RangeOfMotion", { title: title })
 	}
 
 	return (
