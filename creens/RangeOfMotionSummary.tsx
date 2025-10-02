@@ -1,5 +1,5 @@
-import { useLayoutEffect } from "react";
-import { useNavigation } from '@react-navigation/native';
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import {
 	View,
 	Text,
@@ -15,7 +15,8 @@ import { RotateCcw, PenLine, CircleAlert, ChartColumn, FileText } from 'lucide-r
 import { styled } from 'nativewind';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../model/RootStackParamList";
-import useGetMotions from "..//hooks//rangeOfMotionHook/useGetMotions";
+import { useDatabase } from "../db/useDatabase";
+import { DB_SELECT_BY_ID_ROM } from "../db/dbQuery";
 
 const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
@@ -31,53 +32,92 @@ const LeftLateralSrcImage = require("../assets/LeftLateral.png");
 const RightLateralSrcImage = require("../assets/RightLateral.png");
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
+type RProp = RouteProp<RootStackParamList, "RangeOfMotionSummary">;
+
+type DataProp = {
+	key: string,
+	date: string,
+	extension: number,
+	flexion: number,
+	l_rotation: number,
+	r_rotation: number,
+	l_lateral: number,
+	r_lateral: number,
+	duration: number,
+}
 
 const RangeOfMotionSummary = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const { extension,
-		flexion,
-		l_rotation,
-		r_rotation,
-		l_lateral,
-		r_lateral, } = useGetMotions();
+	const db = useDatabase("headx.db");
+	const route = useRoute<RProp>();
+	const [data, setData] = useState<DataProp | null>(null)
 
-	// useLayoutEffect(() => {
-	// 	navigation.setOptions({
-	// 		title: "",
-	// 		headerTitleAlign: "left",
-	// 		headerStyle: {
-	// 			elevation: 0,
-	// 			shadowOpacity: 0,
-	// 			borderBottomWidth: 0,
-	// 		},
-	// 		headerLeft: () => (
-	// 			<View className="flex-row items-center">
-	// 				<Pressable
-	// 					onPress={() => navigation.navigate("Main")}
-	// 					className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
-	// 				>
-	// 					<Ionicons name="arrow-back" size={18} color="black" />
-	// 					<Text className="ml-1 text-sm font-medium">Back</Text>
-	// 				</Pressable>
-	// 			</View>
-	// 		),
-	// 		headerRight: () => (
-	// 			<View className="flex-row items-center justify-center mb-1 mr-4">
-	// 				<Pressable
-	// 					onPress={() => { }}
-	// 					className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
-	// 				>
-	// 					<LuFileText size={18} color="black" />
-	// 					<Text className="ml-1 text-sm font-medium">Export PDF</Text>
-	// 				</Pressable >
-	// 			</View>
-	// 		)
-	// 	});
-	// }, [navigation]);
+	useLayoutEffect(() => {
+		navigation.setOptions({
+			title: "",
+			headerTitleAlign: "left",
+			headerStyle: {
+				elevation: 0,
+				shadowOpacity: 0,
+				borderBottomWidth: 0,
+			},
+			headerLeft: () => (
+				<View className="flex-row items-center">
+					<Pressable
+						onPress={onPressGotoMain}
+						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
+					>
+						<Ionicons name="arrow-back" size={18} color="black" />
+						<Text className="ml-1 text-sm font-medium">Back</Text>
+					</Pressable>
+				</View>
+			),
+			headerRight: () => (
+				<View className="flex-row items-center justify-center mb-1 mr-4">
+					<Pressable
+						onPress={() => { }}
+						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
+					>
+						<LuFileText size={18} color="black" />
+						<Text className="ml-1 text-sm font-medium">Export PDF</Text>
+					</Pressable >
+				</View>
+			)
+		});
+	}, [navigation]);
 
-	const onPressGotoMain = () => {
+	//console.log(`RangeOfMotionSummary render!`)
+	useEffect(() => {
+
+		const selectData = async () => {
+			try {
+				//console.log(`RangeOfMotionSummary selectData running}`)
+				if (!db) {
+					//console.log(`db is null`);
+					return;
+				}
+
+				const { key } = route.params;
+				//console.log(`getFirstAsync ${key}`);
+				const rs = await db.getFirstAsync<DataProp>(DB_SELECT_BY_ID_ROM, key); //"1759379091428"
+				if (rs) {
+					setData(rs);
+					//console.log(rs);
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		};
+
+		if (db) {
+			selectData();
+		}
+
+	}, [db])
+
+	const onPressGotoMain = useCallback(() => {
 		navigation.navigate("Main")
-	}
+	}, []);
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
@@ -145,7 +185,7 @@ const RangeOfMotionSummary = () => {
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
 									<Text className="font-semibold text-blue-700 text-sm">Extension</Text>
-									<Text className="text-lg font-bold text-blue-600">{extension}°</Text>
+									<Text className="text-lg font-bold text-blue-600">{data ? data.extension : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
@@ -163,7 +203,7 @@ const RangeOfMotionSummary = () => {
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
 									<Text className="font-semibold text-green-700 text-sm">Flexion</Text>
-									<Text className="text-lg font-bold text-green-600">{flexion}°</Text>
+									<Text className="text-lg font-bold text-green-600">{data ? data.flexion : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
@@ -181,7 +221,7 @@ const RangeOfMotionSummary = () => {
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
 									<Text className="font-semibold text-purple-700 text-sm">Right Rotation</Text>
-									<Text className="text-lg font-bold text-purple-600">{r_rotation}°</Text>
+									<Text className="text-lg font-bold text-purple-600">{data ? data.r_rotation : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
@@ -199,7 +239,7 @@ const RangeOfMotionSummary = () => {
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
 									<Text className="font-semibold text-orange-700 text-sm">Left Rotation</Text>
-									<Text className="text-lg font-bold text-orange-600">{l_rotation}°</Text>
+									<Text className="text-lg font-bold text-orange-600">{data ? data.l_rotation : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
@@ -217,7 +257,7 @@ const RangeOfMotionSummary = () => {
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
 									<Text className="font-semibold text-teal-700 text-sm">Left Lateral</Text>
-									<Text className="text-lg font-bold text-teal-600">{l_lateral}°</Text>
+									<Text className="text-lg font-bold text-teal-600">{data ? data.l_lateral : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
@@ -235,11 +275,12 @@ const RangeOfMotionSummary = () => {
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
 									<Text className="font-semibold text-pink-700 text-sm">Right Lateral</Text>
-									<Text className="text-lg font-bold text-pink-600">{r_lateral}°</Text>
+									<Text className="text-lg font-bold text-pink-600">{data ? data.r_lateral : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
 					</View>
+
 				</View>
 
 				{/* Card */}

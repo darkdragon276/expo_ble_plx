@@ -3,7 +3,7 @@ export type RootStackParamList = {
 	SettingsDevice: undefined;
 	DeviceCalibration: undefined;
 	AssessmentSelection: undefined;
-	RangeOfMotion: undefined;
+	RangeOfMotion: { title: string };
 	BLEScanner: undefined;
-	RangeOfMotionSummary: undefined;
+	RangeOfMotionSummary: { key: string };
 };

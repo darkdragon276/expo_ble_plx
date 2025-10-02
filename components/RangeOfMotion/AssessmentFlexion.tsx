@@ -1,18 +1,27 @@
-import { useEffect, useState } from "react";
-import { View, Text, Image } from "react-native";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { View, Text } from "react-native";
 import useGetFlexion from "../../hooks/rangeOfMotionHook/useGetFlexion";
+import { type ChildROMRef } from "../../model/ChildRefGetValue";
 
-const AssessmentFlexion = ({ record }: { record: boolean }) => {
+let flexion = 0.0;
+type AssessmentCardProps = {
+	record: boolean;
+};
+
+const AssessmentFlexion = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
 	//console.log(`AssessmentFlexion run!`)
 
-	useGetFlexion({ record, pos, setPos, posMax, setPosMax });
+	flexion = useGetFlexion({ record, pos, setPos, posMax, setPosMax });
 
-	useEffect(() => {
-		//return () => { }
-	}, [record, pos, posMax])
+	useImperativeHandle(ref, () => ({
+		getValue: () => {
+			//console.log(`AssessmentFlexion useImperativeHandle running!`)
+			return flexion
+		},
+	}), [record]);
 
 	return (
 		<>
@@ -27,6 +36,6 @@ const AssessmentFlexion = ({ record }: { record: boolean }) => {
 			</View>
 		</>
 	);
-}
+});
 
 export default AssessmentFlexion

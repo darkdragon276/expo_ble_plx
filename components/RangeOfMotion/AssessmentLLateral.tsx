@@ -1,18 +1,27 @@
-import { useEffect, useState } from "react";
-import { View, Text, Image } from "react-native";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { View, Text } from "react-native";
 import useGetLLateral from "../../hooks/rangeOfMotionHook/useGetLLateral";
+import { ChildROMRef } from "../../model/ChildRefGetValue";
 
-const AssessmentLLateral = ({ record }: { record: boolean }) => {
+let l_lateral = 0.0;
+type AssessmentCardProps = {
+	record: boolean;
+};
+
+const AssessmentLLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
 	//console.log(`AssessmentLLateral run!`)
 
-	useGetLLateral({ record, pos, setPos, posMax, setPosMax });
+	l_lateral = useGetLLateral({ record, pos, setPos, posMax, setPosMax });
 
-	useEffect(() => {
-		//return () => { }
-	}, [record, pos, posMax])
+	useImperativeHandle(ref, () => ({
+		getValue: () => {
+			//console.log(`AssessmentLLateral useImperativeHandle running!`)
+			return l_lateral
+		},
+	}), [record]);
 
 	return (
 		<>
@@ -27,6 +36,6 @@ const AssessmentLLateral = ({ record }: { record: boolean }) => {
 			</View>
 		</>
 	);
-}
+});
 
 export default AssessmentLLateral
