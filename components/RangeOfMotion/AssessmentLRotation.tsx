@@ -1,18 +1,27 @@
-import { useEffect, useState } from "react";
-import { View, Text, Image } from "react-native";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { View, Text } from "react-native";
 import useGetLRotation from "../../hooks/rangeOfMotionHook/useGetLRotation";
+import { type ChildROMRef } from "../../model/ChildRefGetValue";
 
-const AssessmentLRotation = ({ record }: { record: boolean }) => {
+let l_rotation = 0.0;
+type AssessmentCardProps = {
+	record: boolean;
+};
+
+const AssessmentLRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
 	//console.log(`AssessmentLRotation run!`)
 
-	useGetLRotation({ record, pos, setPos, posMax, setPosMax });
+	l_rotation = useGetLRotation({ record, pos, setPos, posMax, setPosMax });
 
-	useEffect(() => {
-		//return () => { }
-	}, [record, pos, posMax])
+	useImperativeHandle(ref, () => ({
+		getValue: () => {
+			//console.log(`AssessmentLRotation useImperativeHandle running!`)
+			return l_rotation
+		},
+	}), [record]);
 
 	return (
 		<>
@@ -27,6 +36,6 @@ const AssessmentLRotation = ({ record }: { record: boolean }) => {
 			</View>
 		</>
 	);
-}
+});
 
 export default AssessmentLRotation

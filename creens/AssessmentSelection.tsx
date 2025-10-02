@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect } from "react";
+import { useState, useLayoutEffect, useRef } from "react";
 import { useNavigation } from '@react-navigation/native';
 import {
 	View,
@@ -19,6 +19,8 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../model/RootStackParamList";
 import { useDispatch } from "react-redux";
 import { resetROM } from "../store/redux/rangeOfMotionSlice"
+import AssessmentTitle from "../components/AssessmentSelection/AssessmentTitle";
+import { ChildInputRef } from "../model/ChildRefGetValue";
 
 const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
@@ -42,6 +44,8 @@ const romFeatures: Feature[] = [
 const AssessmentSelection = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const dispatch = useDispatch();
+	const [title, setTitle] = useState('');
+	const titleRef = useRef<ChildInputRef>(null);
 
 	// useLayoutEffect(() => {
 	// 	navigation.setOptions({
@@ -73,9 +77,12 @@ const AssessmentSelection = () => {
 		</View>
 	);
 
+	console.log(`AssessmentSelection render!`)
+
 	const onPressGotoAssessment = () => {
-		//dispatch(resetROM())
-		navigation.navigate("RangeOfMotion")
+		dispatch(resetROM());
+		const title = titleRef.current?.getValue() || "";
+		navigation.navigate("RangeOfMotion", { title: title })
 	}
 
 	return (
@@ -93,11 +100,16 @@ const AssessmentSelection = () => {
 				{/* Session name input */}
 				<View className="flex-row items-center bg-white rounded-xl px-3 py-2 mb-6 shadow">
 					<LuPenLine size={20} className="text-blue-500"></LuPenLine>
-					<TextInput
+					{/* <TextInput
+						value={title}
+						onChangeText={setTitle}
 						placeholder="Session Name (Optional)"
 						placeholderTextColor="black"
 						className="w-full rounded-xl px-4 py-4 text-base"
-					/>
+					/> */}
+					<AssessmentTitle
+						ref={titleRef}
+					></AssessmentTitle>
 				</View>
 
 				{/* ROM Card */}

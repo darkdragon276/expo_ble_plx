@@ -13,7 +13,11 @@ export function useDatabase(dbName: string = "headx.db") {
 				await database.execAsync(`
 					CREATE TABLE IF NOT EXISTS TableROM (
 						id INTEGER PRIMARY KEY AUTOINCREMENT,
-						dt			text,
+						key 		text,
+						title		text,
+						date		text,
+						time		text,
+						type		text,
 						extension	decimal(3,1),
 						flexion		decimal(3,1),
 						l_rotation	decimal(3,1),
@@ -22,15 +26,27 @@ export function useDatabase(dbName: string = "headx.db") {
 						r_lateral	decimal(3,1),
 						duration	decimal(3,1)
 					)
-        		`);
+				`);
 
-				console.log("CREATE TABLE TableROM Susscessfull! ");
+				// await database.execAsync(`
+				// 	DROP TABLE IF EXISTS TableROM
+				// `);
+
+				// await database.execAsync(`
+				// 	DELETE FROM TableROM
+				// `);
+
 			} catch (error) {
 				console.error("Error opening database:", error);
 			}
 		};
 
 		initDb();
+
+		return () => {
+			db ? db.closeAsync() : null;
+		};
+
 	}, [dbName]);
 
 	return db;

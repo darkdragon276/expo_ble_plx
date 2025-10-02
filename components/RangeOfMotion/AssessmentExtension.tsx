@@ -1,18 +1,27 @@
-import { useEffect, useState } from "react";
-import { View, Text, Image } from "react-native";
+import { useState, forwardRef, useImperativeHandle } from "react";
+import { View, Text } from "react-native";
 import useGetExtension from "../../hooks/rangeOfMotionHook/useGetExtension";
+import { type ChildROMRef } from "../../model/ChildRefGetValue";
 
-const AssessmentCardExtension = ({ record }: { record: boolean }) => {
+let extension = 0.0;
+type AssessmentCardProps = {
+	record: boolean;
+};
+
+const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
 	//console.log(`AssessmentCardExtension run!`)
 
-	useGetExtension({ record, pos, setPos, posMax, setPosMax });
+	extension = useGetExtension({ record, pos, setPos, posMax, setPosMax });
 
-	useEffect(() => {
-		//return () => { }
-	}, [record, pos, posMax])
+	useImperativeHandle(ref, () => ({
+		getValue: () => {
+			//console.log(`AssessmentExtension useImperativeHandle running!`)
+			return extension
+		},
+	}), [record]);
 
 	return (
 		<>
@@ -27,6 +36,6 @@ const AssessmentCardExtension = ({ record }: { record: boolean }) => {
 			</View>
 		</>
 	);
-};
+});
 
-export default AssessmentCardExtension
+export default AssessmentExtension

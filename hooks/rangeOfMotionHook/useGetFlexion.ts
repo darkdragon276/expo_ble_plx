@@ -39,6 +39,8 @@ const useGetFlexion = ({ record, pos, setPos, posMax, setPosMax }:
 
 		return () => runDummy.stop();
 	}, [record, pos]);
+
+	return randomDecimal;
 }
 
 export default useGetFlexion

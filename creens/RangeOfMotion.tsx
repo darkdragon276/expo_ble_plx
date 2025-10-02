@@ -1,5 +1,5 @@
-import { useState, useLayoutEffect, useEffect } from "react";
-import { useNavigation } from '@react-navigation/native';
+import { useState, useLayoutEffect, useEffect, useRef } from "react";
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import {
 	View,
 	Text,
@@ -25,16 +25,15 @@ import AssessmentRLateral from "../components/RangeOfMotion/AssessmentRLateral";
 
 import { useDatabase } from "../db/useDatabase";
 import { DB_INSERT_ROM, DB_SELECT_ALL_ROM, DB_DELETE_ALL_ROM } from "../db/dbQuery";
-import useGetMotions from "..//hooks//rangeOfMotionHook/useGetMotions";
-import { useDispatch, useSelector } from "react-redux";
-import { IRootState } from "../model/IRootState";
-import AssessmentRecord from "../components/RangeOfMotion/AssessmentRecord";
+import { getCurrentDateTime } from "../utils/getDateTime";
+import { ChildROMRef } from "../model/ChildRefGetValue";
 
 const LuPlay = styled(LucidePlay);
 const LuUsers = styled(LucideUsers);
 const LuSquare = styled(LucideSquare);
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
+type RProp = RouteProp<RootStackParamList, "RangeOfMotion">;
 
 const ExtensionSrcImage = require("../assets/Extension.png");
 const FlexionSrcImage = require("../assets/Flexion.png");
@@ -47,12 +46,17 @@ const RangeOfMotion = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [record, setRecord] = useState(false);
 	const db = useDatabase("headx.db");
-	const { extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration } = useGetMotions();
+	const route = useRoute<RProp>();
 
-	// const extension1 = useSelector((state: IRootState) => state.rangeOfMotion.extension)
-	console.log(`RangeOfMotion render: ${extension}`)
+	const refExtension = useRef<ChildROMRef>(null);
+	const refFlexion = useRef<ChildROMRef>(null);
+	const refLRotation = useRef<ChildROMRef>(null);
+	const refRRotation = useRef<ChildROMRef>(null);
+	const refLLateral = useRef<ChildROMRef>(null);
+	const refRLateral = useRef<ChildROMRef>(null);
+
 	// useLayoutEffect(() => {
-	// 	console.log(`RangeOfMotion - useLayoutEffect`)
+	// 	//console.log(`RangeOfMotion - useLayoutEffect`)
 	// 	navigation.setOptions({
 	// 		title: "",
 	// 		headerTitleAlign: "left",
@@ -85,55 +89,49 @@ const RangeOfMotion = () => {
 	// 	});
 	// }, [navigation, record]);
 
-	useEffect(() => {
-		//console.log(`useEffect ${extension} , ${flexion},  ${l_rotation},  ${r_rotation},  ${l_lateral},  ${r_lateral},  ${duration}`)
-		addData(extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration).then(() => {
-			selectData();
-		})
-	}, [extension])
-
-
-	const selectData = async () => {
-		if (!db) return;
-		//console.log("selectData");
-		db.withTransactionAsync(async () => {
-			const result = await db.getAllAsync(DB_SELECT_ALL_ROM);
-			console.log("Users:", result);
-			await db.runAsync(DB_DELETE_ALL_ROM);
-		});
-	};
-
-	const addData = async (extension: number, flexion: number, l_rotation: number, r_rotation: number, l_lateral: number, r_lateral: number, duration: number) => {
-		//console.log("DB_INSERT_ROM start!");
-
+	const addData = async (key: string) => {
 		if (!db) {
-			console.log("addData db is null !");
+			//console.log("addData db is null !");
 			return;
 		}
 
-		//console.log("addData go");
+		const extension = refExtension.current?.getValue() || 0.0;
+		const flexion = refFlexion.current?.getValue() || 0.0;
+		const l_rotation = refLRotation.current?.getValue() || 0.0;
+		const r_rotation = refRRotation.current?.getValue() || 0.0;
+		const l_lateral = refLLateral.current?.getValue() || 0.0;
+		const r_lateral = refRLateral.current?.getValue() || 0.0;
 
-		//console.log(extension);
-		console.log(`addData: ${extension}`)
-		console.log("begin INSERT!");
-		//db.runAsync(DB_INSERT_ROM, ["", extension, 2, 3, 4, 5, 6, 7]);
-		await db.runAsync(DB_INSERT_ROM, ["", extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration]);
-		console.log("INSERT done!");
-		//console.log("DB_INSERT_ROM inserted!");
+		//console.log(`RangeOfMotion key insert: ${key}`)
+		//console.log(`addData: ${extension}`)
+		let { title } = route.params;
+		const { year, month, date, hours, minutes, seconds, localDateTime } = getCurrentDateTime()
+		const dt: string = `${month}/${date}/${year}, ${hours}:${minutes}:${seconds}`;
+		const time: string = `${hours}:${minutes}:${seconds}`;
+		const type: string = "ROM";
+
+		if (title == "") {
+			title = `ROM Session - ${localDateTime}`;
+		}
+
+		await db.runAsync(DB_INSERT_ROM, [key, title, dt, time, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, 0]);
+		//console.log(`Rom of Motion -> INSERT done! ---> title: ${title}`);
+		//navigation.navigate("RangeOfMotionSummary", { key: key })
 	};
 
 	const onPressRecording = () => {
-		//selectData();
 		setRecord(true)
 	};
 
 	const onPressStopRecor = () => {
 		setRecord(false)
-		//console.log(`onPressStopRecor: ${extension}`)
+		const key: string = Date.now().toString();
+		addData(key).then(() => {
+			navigation.navigate("RangeOfMotionSummary", { key: key })
+		}).catch((error) => {
+			console.log(error)
+		})
 
-		setTimeout(() => {
-			//navigation.navigate("RangeOfMotionSummary")
-		}, 500);
 	};
 
 	return (
@@ -191,7 +189,6 @@ const RangeOfMotion = () => {
 
 			{/* Start Assessment Button */}
 			<View className="flex-row items-center justify-center rounded-xl bg-white p-4">
-				{/* <AssessmentRecord></AssessmentRecord> */}
 				{
 					!record
 						?
@@ -237,7 +234,7 @@ const RangeOfMotion = () => {
 								source={ExtensionSrcImage}
 							/>
 						</View>
-						<AssessmentCardExtension record={record}></AssessmentCardExtension>
+						<AssessmentCardExtension record={record} ref={refExtension}></AssessmentCardExtension>
 					</View>
 				</View>
 
@@ -253,7 +250,7 @@ const RangeOfMotion = () => {
 								source={FlexionSrcImage}
 							/>
 						</View>
-						<AssessmentFlexion record={record}></AssessmentFlexion>
+						<AssessmentFlexion record={record} ref={refFlexion}></AssessmentFlexion>
 					</View>
 				</View>
 
@@ -269,7 +266,7 @@ const RangeOfMotion = () => {
 								source={LeftRotationSrcImage}
 							/>
 						</View>
-						<AssessmentRRotation record={record}></AssessmentRRotation>
+						<AssessmentRRotation record={record} ref={refRRotation}></AssessmentRRotation>
 					</View>
 				</View>
 
@@ -285,7 +282,7 @@ const RangeOfMotion = () => {
 								source={RightRotationSrcImage}
 							/>
 						</View>
-						<AssessmentRLateral record={record}></AssessmentRLateral>
+						<AssessmentRLateral record={record} ref={refRLateral}></AssessmentRLateral>
 					</View>
 				</View>
 
@@ -301,7 +298,7 @@ const RangeOfMotion = () => {
 								source={LeftLateralSrcImage}
 							/>
 						</View>
-						<AssessmentLRotation record={record}></AssessmentLRotation>
+						<AssessmentLRotation record={record} ref={refLRotation}></AssessmentLRotation>
 					</View>
 				</View>
 
@@ -317,7 +314,7 @@ const RangeOfMotion = () => {
 								source={RightLateralSrcImage}
 							/>
 						</View>
-						<AssessmentLLateral record={record}></AssessmentLLateral>
+						<AssessmentLLateral record={record} ref={refLLateral}></AssessmentLLateral>
 					</View>
 
 				</View>
