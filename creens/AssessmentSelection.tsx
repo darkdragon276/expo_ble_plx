@@ -6,9 +6,7 @@ import {
 	Pressable,
 	TouchableOpacity,
 	ScrollView,
-	TextInput,
 	FlatList,
-	Platform,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -77,7 +75,7 @@ const AssessmentSelection = () => {
 		</View>
 	);
 
-	console.log(`AssessmentSelection render!`)
+	//console.log(`AssessmentSelection render!`)
 
 	const onPressGotoAssessment = () => {
 		dispatch(resetROM());
