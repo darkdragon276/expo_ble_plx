@@ -25,7 +25,8 @@ const MainDeviceList = () => {
 
 	useEffect(() => {
 		setDevice(dv);
-	}, [device])
+		setSelected(dv[0])
+	}, [])
 
 	return (
 		<View className="px-4">
