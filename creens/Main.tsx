@@ -14,14 +14,28 @@ import { devices } from '../dummy/devices';
 import MainRecentSession from '../components/Main/MainRecentSession';
 import MainDeviceList from '../components/Main/MainDeviceList';
 
+//Scan devices
+import useScanDevice from '../hooks/ble/useScanDevice';
+import { Device } from 'react-native-ble-plx';
+
 type NavigationProp = StackNavigationProp<RootStackParamList>;
+type ScannedDevice = {
+	id: string;
+	name: string | null;
+	rssi: number | null;
+	device: Device;
+};
 
 const Main = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const dv = devices
 
-	const [selected, setSelected] = useState(dv[0]);
-	const [open, setOpen] = useState(false);
+	const [device, setDevice] = useState<ScannedDevice[]>([]);
+	const devices = useScanDevice();
+	const dv = Array.from(devices.values())
+
+	useEffect(() => {
+		setDevice(dv);
+	}, [])
 
 	const onPressGotoSettings = () => {
 		navigation.replace("SettingsDevice")
@@ -89,7 +103,7 @@ const Main = () => {
 			</View>
 
 			{/* All device list */}
-			<MainDeviceList></MainDeviceList>
+			<MainDeviceList devices={dv}></MainDeviceList>
 
 			{/* Recent session */}
 			<MainRecentSession></MainRecentSession>
