@@ -2,12 +2,21 @@ import { styled } from "nativewind";
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { colorMap, colorMapBg, type ColorVariant } from '../../model/DotStatusColor';
+import { Device } from "react-native-ble-plx";
 
 //const Icon = styled(Ionicons);
-const MainCardDevices = ({ devices, setOpen }: any) => {
 
-	const color: ColorVariant = devices.color
-	const colorbg: ColorVariant = devices.color
+type ScannedDevice = {
+	id: string;
+	name: string | null;
+	rssi: number | null;
+	device: Device;
+};
+
+const MainCardDevices = ({ devices, setOpen }: { devices: ScannedDevice | undefined, setOpen: any }) => {
+
+	//const color: ColorVariant = devices.color
+	//const colorbg: ColorVariant = devices.color
 
 	return (
 		<View className="bg-white rounded-2xl p-4 shadow">
@@ -17,11 +26,11 @@ const MainCardDevices = ({ devices, setOpen }: any) => {
 				<View className="flex-row justify-end items-center space-x-2">
 					{/* Battery icon */}
 					<Ionicons name="battery-half-outline" size={18} />
-					<Text className={`${colorMap[color]} font-medium`}>{devices.battery}</Text>
+					{/* <Text className={`${colorMap[color]} font-medium`}>{devices.battery}</Text> */}
 
 					{/* Status dot */}
-					<View className={`w-2.5 h-2.5 rounded-full ${colorMapBg[colorbg]} ml-2`} />
-					<Text className={`text-${devices.color}-600 font-medium`}>{devices.status}</Text>
+					{/* <View className={`w-2.5 h-2.5 rounded-full ${colorMapBg[colorbg]} ml-2`} /> */}
+					{/* <Text className={`text-${devices.color}-600 font-medium`}>{devices.status}</Text> */}
 				</View>
 			</View>
 
@@ -32,8 +41,8 @@ const MainCardDevices = ({ devices, setOpen }: any) => {
 			>
 				<View className="flex-row items-center">
 					{/* green dot */}
-					<View className={`w-3 h-3 rounded-full ${colorMapBg[colorbg]} mr-3`} />
-					<Text className="text-gray-700">{devices.name}</Text>
+					{/* <View className={`w-3 h-3 rounded-full ${colorMapBg[colorbg]} mr-3`} /> */}
+					<Text className="text-gray-700">{devices?.name}</Text>
 				</View>
 
 				<Text className="text-gray-400">
