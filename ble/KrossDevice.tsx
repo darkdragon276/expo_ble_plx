@@ -62,7 +62,7 @@ export class KrossDevice {
         return Buffer.from(str, 'base64').toString('binary');
     }
 
-    get q() {
+    get q(): { x: number; y: number; z: number; w: number } {
         return this._q;
     }
     set q(value: { x: number; y: number; z: number; w: number } | { data: Uint8Array; byteOffset: number }) {
@@ -78,7 +78,7 @@ export class KrossDevice {
         }
     }
 
-    get mag() {
+    get mag(): { x: number; y: number; z: number } {
         return this._mag;
     }
     set mag(value: { x: number; y: number; z: number } | { data: Uint8Array; byteOffset: number }) {
@@ -93,7 +93,7 @@ export class KrossDevice {
         }
     }
 
-    get gyro() {
+    get gyro(): { x: number; y: number; z: number } {
         return this._gyro;
     }
     set gyro(value: { x: number; y: number; z: number } | { data: Uint8Array; byteOffset: number }) {
@@ -108,7 +108,7 @@ export class KrossDevice {
         }
     }
 
-    get accel() {
+    get accel(): { x: number; y: number; z: number } {
         return this._accel;
     }
     set accel(value: { x: number; y: number; z: number } | { data: Uint8Array; byteOffset: number }) {
@@ -123,7 +123,7 @@ export class KrossDevice {
         }
     }
 
-    get angle() {
+    get angle(): { roll: number; pitch: number; yaw: number } {
         return this._angle;
     }
     set angle(value: { roll: number; pitch: number; yaw: number } | { data: Uint8Array; byteOffset: number }) {
@@ -138,7 +138,7 @@ export class KrossDevice {
         }
     }
 
-    get soc() {
+    get soc(): number {
         return this._soc;
     }
     set soc(value: number | { data: Uint8Array; byteOffset: number }) {
@@ -149,14 +149,14 @@ export class KrossDevice {
         }
     }
 
-    get mac() {
+    get mac(): string {
         return this._mac;
     }
     set mac(value: string) {
         this._mac = value;
     }
 
-    get name() {
+    get name(): string {
         return this._name;
     }
     set name(value: string) {
@@ -177,7 +177,7 @@ export class KrossDevice {
         }
     }
 
-    get accelMapping() {
+    get accelMapping(): { x: string; y: string; z: string } {
         return this._accelMapping;
     }
 
@@ -195,7 +195,7 @@ export class KrossDevice {
         }
     }
 
-    get gyroMapping() {
+    get gyroMapping(): { x: string; y: string; z: string } {
         return this._gyroMapping;
     }
 
@@ -213,7 +213,7 @@ export class KrossDevice {
         }
     }
 
-    get magnetMapping() {
+    get magnetMapping(): { x: string; y: string; z: string } {
         return this._magnetMapping;
     }
 
