@@ -16,6 +16,7 @@ import { RootStackParamList } from "../model/RootStackParamList";
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { Provider } from 'react-redux';
+import { KrossDevice } from '../ble/KrossDevice';
 
 type ScannedDevice = {
 	id: string;
@@ -31,6 +32,10 @@ export default function BLEScanner() {
 	const [devicesMap, setDevicesMap] = useState<Map<string, ScannedDevice>>(new Map());
 	const [, setStateVersion] = useState(0); // force re-render when map changes
 	const navigation = useNavigation<NavigationProp>();
+	const SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+	const DATA_IN_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
+	const DATA_OUT_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+	const krossDevice = new KrossDevice();
 
 	useEffect(() => {
 		let manager: BleManager;
@@ -95,7 +100,7 @@ export default function BLEScanner() {
 
 			setIsScanning(true);
 
-			manager.startDeviceScan(["6E400001-B5A3-F393-E0A9-E50E24DCCA9E"], { allowDuplicates: false }, (error, scannedDevice) => {
+			manager.startDeviceScan([SERVICE_UUID], { allowDuplicates: false }, (error, scannedDevice) => {
 				if (error) {
 					//console.warn('Scan error', error);
 					Alert.alert('Scan error', `${error.message}`);
@@ -132,9 +137,31 @@ export default function BLEScanner() {
 		const { device } = item;
 		try {
 			stopScan();
-			const connected = await device.connect();
+			const connected = await managerRef.current?.connectToDevice(device.id, { autoConnect: true });
+			if (!connected) {
+				Alert.alert('Connect error', 'No connected device');
+				return;
+			}
 			await connected.discoverAllServicesAndCharacteristics();
-			Alert.alert('Connect sussess', `Connected to ${item.name ?? item.id}`);
+			Alert.alert('Connect success', `Connected to ${item.name ?? item.id}`);
+
+			const subscription = await connected.monitorCharacteristicForService(
+				SERVICE_UUID,
+				DATA_OUT_UUID,
+				(error, char) => {
+					if (error) {
+						console.error("Notification error:", error);
+						return;
+					}
+					let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
+					if (data) {
+						krossDevice.unpack(data);
+						krossDevice.log();
+					} else {
+						// console.log("Received data is null");
+					}
+				}
+			);
 			// After connecting you can read/write characteristics
 		} catch (e: any) {
 			console.warn('connect error', e);
