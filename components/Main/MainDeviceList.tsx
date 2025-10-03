@@ -3,13 +3,19 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useState } from 'react';
 
 //temp code
-import { devices } from "../../dummy/devices";
 import MainCardDevices from './MainCardDevices';
+import { Device } from 'react-native-ble-plx';
 
-const MainDeviceList = () => {
-	const dv = devices
+type ScannedDevice = {
+	id: string;
+	name: string | null;
+	rssi: number | null;
+	device: Device;
+};
 
-	const [selected, setSelected] = useState(dv[0]);
+const MainDeviceList = ({ devices }: { devices: ScannedDevice[] }) => {
+
+	const [selected, setSelected] = useState<ScannedDevice>();
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -48,10 +54,10 @@ const MainDeviceList = () => {
 									className="px-3 py-3 rounded-xl mb-2"
 								>
 									<View className="flex-row items-center">
-										<View className={`w-2 h-2 rounded-full bg-${item.color}-500 mr-2`} />
+										{/* <View className={`w-2 h-2 rounded-full bg-${item.color}-500 mr-2`} /> */}
 										<Text className="text-gray-700">{item.name}</Text>
 										<View className="w-4" />
-										{item.id === selected.id ? (
+										{item.id === selected?.id ? (
 											<Ionicons className="ml-auto text-base" name="checkmark" size={15} color="gray" />
 										) : null}
 									</View>
