@@ -1,10 +1,11 @@
 import { Text, View, Pressable, Modal, FlatList } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 //temp code
 import MainCardDevices from './MainCardDevices';
 import { Device } from 'react-native-ble-plx';
+import useScanDevice from '../../hooks/ble/useScanDevice';
 
 type ScannedDevice = {
 	id: string;
@@ -13,10 +14,18 @@ type ScannedDevice = {
 	device: Device;
 };
 
-const MainDeviceList = ({ devices }: { devices: ScannedDevice[] }) => {
+const MainDeviceList = () => {
 
 	const [selected, setSelected] = useState<ScannedDevice>();
 	const [open, setOpen] = useState(false);
+
+	const [device, setDevice] = useState<ScannedDevice[]>([]);
+	const devices = useScanDevice();
+	const dv = Array.from(devices.values())
+
+	useEffect(() => {
+		setDevice(dv);
+	}, [device])
 
 	return (
 		<View className="px-4">
@@ -43,7 +52,7 @@ const MainDeviceList = ({ devices }: { devices: ScannedDevice[] }) => {
 						<Text className="text-gray-700 font-semibold mb-3">Select device</Text>
 
 						<FlatList
-							data={devices}
+							data={device}
 							keyExtractor={(item) => item.id}
 							renderItem={({ item }) => (
 								<Pressable

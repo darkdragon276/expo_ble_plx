@@ -4,39 +4,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 //import { Ionicons, Feather } from '@expo/vector-icons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-import { useEffect, useState } from 'react';
-import MainCardDevices from '../components/Main/MainCardDevices';
+// import { useEffect, useState } from 'react';
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from '../model/RootStackParamList';
 
 //temp code
-import { devices } from '../dummy/devices';
 import MainRecentSession from '../components/Main/MainRecentSession';
 import MainDeviceList from '../components/Main/MainDeviceList';
 
-//Scan devices
-import useScanDevice from '../hooks/ble/useScanDevice';
-import { Device } from 'react-native-ble-plx';
-
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-type ScannedDevice = {
-	id: string;
-	name: string | null;
-	rssi: number | null;
-	device: Device;
-};
-
 const Main = () => {
 	const navigation = useNavigation<NavigationProp>();
-
-	const [device, setDevice] = useState<ScannedDevice[]>([]);
-	const devices = useScanDevice();
-	const dv = Array.from(devices.values())
-
-	useEffect(() => {
-		setDevice(dv);
-	}, [])
-
 	const onPressGotoSettings = () => {
 		navigation.replace("SettingsDevice")
 	}
@@ -103,7 +81,7 @@ const Main = () => {
 			</View>
 
 			{/* All device list */}
-			<MainDeviceList devices={dv}></MainDeviceList>
+			<MainDeviceList></MainDeviceList>
 
 			{/* Recent session */}
 			<MainRecentSession></MainRecentSession>
