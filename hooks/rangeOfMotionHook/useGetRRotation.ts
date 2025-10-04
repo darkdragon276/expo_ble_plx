@@ -14,7 +14,7 @@ const useGetRRotation = ({ record, pos, setPos, posMax, setPosMax }:
 	}
 ) => {
 
-	const dispatch = useDispatch();
+	//const dispatch = useDispatch();
 
 	const runDummy = interval(async () => {
 		randomDecimal = Number((Math.random() * 99).toFixed(1));
@@ -29,11 +29,11 @@ const useGetRRotation = ({ record, pos, setPos, posMax, setPosMax }:
 
 		if (!record) {
 			runDummy.stop();
-			dispatch(updateROM({ key: "r_rotation", value: randomDecimal }));
-			dispatch(updateROM({ key: "startRecording", value: record }))
+			//dispatch(updateROM({ key: "r_rotation", value: randomDecimal }));
+			//dispatch(updateROM({ key: "startRecording", value: record }))
 		} else {
 			runDummy.start();
-			dispatch(updateROM({ key: "startRecording", value: record }))
+			//dispatch(updateROM({ key: "startRecording", value: record }))
 		}
 
 		return () => runDummy.stop();
