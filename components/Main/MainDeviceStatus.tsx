@@ -28,6 +28,11 @@ const MainDeviceStatus = ({ device, setOpen, managerRef, }: { device: Device | u
 
 	useEffect(() => {
 		connectToDevice();
+
+		return () => {
+			//managerRef.current = null;
+		}
+
 	}, []);
 
 	const connectToDevice = async () => {
