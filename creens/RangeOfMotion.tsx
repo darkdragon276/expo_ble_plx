@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	Image,
+	Alert,
 } from "react-native";
 
 // import LinearGradient from "react-native-linear-gradient";
@@ -27,6 +28,10 @@ import { useDatabase } from "../db/useDatabase";
 import { DB_INSERT_ROM, DB_SELECT_ALL_ROM, DB_DELETE_ALL_ROM } from "../db/dbQuery";
 import { getCurrentDateTime } from "../utils/getDateTime";
 import { ChildROMRef } from "../model/ChildRefGetValue";
+import { KrossDevice } from "../ble/KrossDevice";
+import { BleManager, State } from "react-native-ble-plx";
+import BLEManagerInstance from "../ble/BLEManager";
+import bleEventEmitter from "../utils/BleEmitter";
 
 const LuPlay = styled(LucidePlay);
 const LuUsers = styled(LucideUsers);
@@ -42,11 +47,18 @@ const RightRotationSrcImage = require("../assets/RightRotation.png");
 const LeftLateralSrcImage = require("../assets/LeftLateral.png");
 const RightLateralSrcImage = require("../assets/RightLateral.png");
 
+const SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+const DATA_OUT_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+
 const RangeOfMotion = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [record, setRecord] = useState(false);
 	const db = useDatabase("headx.db");
 	const route = useRoute<RProp>();
+
+	const managerRef = useRef<BleManager | null>(null);
+	const krossDevice = new KrossDevice();
+	const tranSactionID = "READ_DATA_DEVICE";
 
 	const refExtension = useRef<ChildROMRef>(null);
 	const refFlexion = useRef<ChildROMRef>(null);
@@ -89,6 +101,93 @@ const RangeOfMotion = () => {
 		});
 	}, [navigation, record]);
 
+	useEffect(() => {
+		console.log(`MainDeviceList useEffect running!`)
+			let manager: BleManager;
+			let sub: any;
+	
+			try {
+				manager = new BleManager();
+				managerRef.current = manager;
+	
+				sub = manager.onStateChange((state: State) => {
+					if (state === 'PoweredOff') {
+						Alert.alert('Bluetooth off', 'Turn off device to Scan!');
+					}
+				}, true);
+			} catch (error) {
+				Alert.alert('Can not init BleManager');
+			}
+			
+			return () => {
+				try {
+					sub.remove();
+					stopScan();
+					manager.destroy();
+					managerRef.current = null;
+				} catch (cleanupError) {
+					//console.error("Error to cleanup BleManager:", cleanupError);
+				}
+			};
+	}, [])
+
+	const startReadDataDevice = async (deviceId: string) => {
+		console.log(`RangeOfMotion -- Run connectToDevice with deviceId: ${deviceId}`);
+		try {
+			
+			if (deviceId === "") {
+				return;
+			}
+
+			stopScan();
+			const connected = await managerRef.current?.connectToDevice(deviceId, { autoConnect: true });
+			if (!connected) {
+				//Alert.alert('Connect error', `No connected device: `);
+				//console.log(`MainDeviceStatus -- Connect error No connected device: ${deviceId}`);
+				return;
+			}
+
+			//console.log(`MainDeviceStatus -- Connect success: ${deviceId}`);
+
+			await connected.discoverAllServicesAndCharacteristics();
+			let subscription = connected.monitorCharacteristicForService(
+				SERVICE_UUID,
+				DATA_OUT_UUID,
+				(error, char) => {
+					if (error) {
+						//console.error("Notification error:", error);
+						return;
+					}
+
+					BLEManagerInstance.setUUID(deviceId);
+
+					//onsole.log(`MainDeviceStatus - connectToDevice - monitorCharacteristicForService`)
+					let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
+					if (data) {
+						krossDevice.unpack(data);
+						//krossDevice.log();
+						//console.log(krossDevice.angle.pitch);
+						bleEventEmitter.emit('BleData', krossDevice.angle.pitch);
+					} else {
+					// 	// console.log("Received data is null");
+					}
+				},
+				tranSactionID
+			);
+		} catch (e: any) {
+			//Alert.alert('connect error', e?.message ?? String(e));
+		}
+	};
+
+	const stopScan = () => {
+		const manager = managerRef.current;
+		try {
+			manager?.stopDeviceScan();
+		} catch (e) {
+			//console.warn('stopScan error', e);
+		}
+	};
+
 	const addROMData = async (key: string) => {
 		if (!db) {
 			//console.log("addData db is null !");
@@ -120,13 +219,15 @@ const RangeOfMotion = () => {
 
 	const onPressRecording = () => {
 		setRecord(true)
+		startReadDataDevice(BLEManagerInstance.getUUID());
 	};
 
 	const onPressStopRecor = () => {
 		setRecord(false)
+		managerRef.current?.cancelTransaction(tranSactionID);
 		const key: string = Date.now().toString();
 		addROMData(key).then(() => {
-			navigation.replace("RangeOfMotionSummary", { key: key })
+			//navigation.replace("RangeOfMotionSummary", { key: key })
 		}).catch((error) => {
 			console.log(error)
 		})
