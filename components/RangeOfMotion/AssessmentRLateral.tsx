@@ -20,7 +20,7 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 		//console.log(`AssessmentCardExtension useEffect running!`)
 		const sub = bleEventEmitter.addListener('BleDataRoll', (data) => {
 			//console.log(data);
-			setPos(data * -1);
+			setPos(data);
 			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
@@ -31,7 +31,7 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentRLateral useImperativeHandle running!`)
+			console.log(`AssessmentRLateral useImperativeHandle return: ${pos}`)
 			return pos
 		},
 	}), [record]);

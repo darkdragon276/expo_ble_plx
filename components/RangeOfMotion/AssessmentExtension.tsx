@@ -18,10 +18,8 @@ const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 		//console.log(`AssessmentCardExtension useEffect running!`)
 		const sub = bleEventEmitter.addListener('BleDataPitch', (data) => {
 			//console.log(data);
-			if (data > 0) {
-				setPos(data);
-				setPosMax((pos > posMax) ? pos : posMax);
-			}
+			setPos(data);
+			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
 		return () => {
@@ -31,7 +29,7 @@ const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentExtension useImperativeHandle running! ${pos}`)
+			console.log(`AssessmentExtension useImperativeHandle running! ${pos}`)
 			return pos //extension
 		},
 	}), [record]);

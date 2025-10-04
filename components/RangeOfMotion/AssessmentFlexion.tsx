@@ -33,7 +33,7 @@ const AssessmentFlexion = forwardRef<ChildROMRef, AssessmentCardProps>(({ record
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentFlexion useImperativeHandle running!`)
+			console.log(`AssessmentFlexion useImperativeHandle return: ${pos}`)
 			return pos
 		},
 	}), [record]);
