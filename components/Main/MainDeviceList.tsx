@@ -70,11 +70,11 @@ const MainDeviceList = () => {
 		try {
 			// On iOS you don't need to request runtime permission here (Info.plist required)
 			// On Android you must request ACCESS_FINE_LOCATION / BLUETOOTH_SCAN depending on SDK level.
-			setIsScanning(true);
+			//setIsScanning(true);
 			manager.startDeviceScan([SERVICE_UUID], { allowDuplicates: false }, (error, scannedDevice) => {
 				if (error) {
 					Alert.alert('Scan error', `${error.message}`);
-					setIsScanning(false);
+					//setIsScanning(false);
 					return;
 				}
 
@@ -91,12 +91,12 @@ const MainDeviceList = () => {
 			// Auto-stop scan after 10 seconds to save battery
 			setTimeout(() => {
 				stopScan();
-			}, 5000);
+			}, 2000);
 
 		} catch (e: any) {
 			//console.warn('Failed to start scan', e);
 			Alert.alert('Failed to start scan', e?.message ?? String(e));
-			setIsScanning(false);
+			//setIsScanning(false);
 		}
 	};
 
@@ -107,7 +107,7 @@ const MainDeviceList = () => {
 		} catch (e) {
 			console.warn('stopScan error', e);
 		}
-		setIsScanning(false);
+		//setIsScanning(false);
 	};
 
 	return (
