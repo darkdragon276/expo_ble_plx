@@ -31,7 +31,7 @@ import { ChildROMRef } from "../model/ChildRefGetValue";
 import { KrossDevice } from "../ble/KrossDevice";
 import { BleManager, State } from "react-native-ble-plx";
 import BLEManagerInstance from "../ble/BLEManager";
-import bleEventEmitter from "../utils/BleEmitter";
+import {bleEventEmitter, type BleEmitterProps} from "../utils/BleEmitter";
 
 const LuPlay = styled(LucidePlay);
 const LuUsers = styled(LucideUsers);
@@ -132,7 +132,7 @@ const RangeOfMotion = () => {
 	}, [])
 
 	const startReadDataDevice = async (deviceId: string) => {
-		console.log(`RangeOfMotion -- Run connectToDevice with deviceId: ${deviceId}`);
+		//console.log(`RangeOfMotion -- Run connectToDevice with deviceId: ${deviceId}`);
 		try {
 			
 			if (deviceId === "") {
@@ -166,8 +166,10 @@ const RangeOfMotion = () => {
 					if (data) {
 						krossDevice.unpack(data);
 						//krossDevice.log();
-						//console.log(krossDevice.angle.pitch);
-						bleEventEmitter.emit('BleData', krossDevice.angle.pitch);
+						//console.log(krossDevice.angle);
+						bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
+						bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
+						bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
 					} else {
 					// 	// console.log("Received data is null");
 					}
@@ -225,12 +227,15 @@ const RangeOfMotion = () => {
 	const onPressStopRecor = () => {
 		setRecord(false)
 		managerRef.current?.cancelTransaction(tranSactionID);
-		const key: string = Date.now().toString();
+		setTimeout(() => {
+			const key: string = Date.now().toString();
 		addROMData(key).then(() => {
-			//navigation.replace("RangeOfMotionSummary", { key: key })
+			navigation.replace("RangeOfMotionSummary", { key: key })
 		}).catch((error) => {
 			console.log(error)
 		})
+		}, 500);
+		
 
 	};
 

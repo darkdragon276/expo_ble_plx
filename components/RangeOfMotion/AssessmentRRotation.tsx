@@ -1,9 +1,9 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { View, Text, Image } from "react-native";
 import useGetRRotation from "../../hooks/rangeOfMotionHook/useGetRRotation";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
+import { bleEventEmitter } from "../../utils/BleEmitter";
 
-let r_rotation = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
 };
@@ -14,12 +14,25 @@ const AssessmentRRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	//console.log(`AssessmentRRotation run!`)
 
-	r_rotation = useGetRRotation({ record, pos, setPos, posMax, setPosMax });
+	//r_rotation = useGetRRotation({ record, pos, setPos, posMax, setPosMax });
+
+	useEffect(() => {
+		//console.log(`AssessmentCardExtension useEffect running!`)
+		const sub = bleEventEmitter.addListener('BleDataRoll', (data) => {
+			//console.log(data);
+			setPos(data * -1);
+			setPosMax((pos > posMax) ? pos : posMax);
+		});
+
+		return () => {
+			sub.remove();
+		};
+	}, [pos]);
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
 			//console.log(`AssessmentRRotation useImperativeHandle running!`)
-			return r_rotation
+			return pos
 		},
 	}), [record]);
 

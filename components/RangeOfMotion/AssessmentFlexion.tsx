@@ -1,9 +1,9 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { View, Text } from "react-native";
 import useGetFlexion from "../../hooks/rangeOfMotionHook/useGetFlexion";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
+import { bleEventEmitter } from "../../utils/BleEmitter";
 
-let flexion = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
 };
@@ -14,12 +14,27 @@ const AssessmentFlexion = forwardRef<ChildROMRef, AssessmentCardProps>(({ record
 
 	//console.log(`AssessmentFlexion run!`)
 
-	flexion = useGetFlexion({ record, pos, setPos, posMax, setPosMax });
+	//flexion = useGetFlexion({ record, pos, setPos, posMax, setPosMax });
+
+	useEffect(() => {
+		//console.log(`AssessmentCardExtension useEffect running!`)
+		const sub = bleEventEmitter.addListener('BleDataPitch', (data) => {
+			//console.log(data);
+			if (data < 0) {
+				setPos(data * -1);
+				setPosMax((pos > posMax) ? pos : posMax);
+			}
+		});
+
+		return () => {
+			sub.remove();
+		};
+	}, [pos]);
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
 			//console.log(`AssessmentFlexion useImperativeHandle running!`)
-			return flexion
+			return pos
 		},
 	}), [record]);
 

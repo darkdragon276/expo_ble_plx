@@ -5,6 +5,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { BleManager, Device } from "react-native-ble-plx";
 import { KrossDevice } from '../../ble/KrossDevice';
 import { useEffect, useState } from "react";
+//import { BLEService } from "../../ble/BLEService";
+import bleService from '../../ble/BLEService';
+import BLEManagerInstance from "../../ble/BLEManager";
 
 const Icon = styled(Ionicons);
 
@@ -26,11 +29,24 @@ const MainDeviceStatus = ({ deviceId, setOpen, managerRef, }: { deviceId: string
 	//console.log(`MainDeviceStatus render with deviceId! ${deviceId}`)
 	
 	useEffect(() => {
-		//console.log(`MainDeviceStatus useEffect render! ${deviceId}`)
+		console.log(`MainDeviceStatus useEffect render! ${deviceId}`)
 		setLocalDeviceId(deviceId)
 		connectToDevice(deviceId)
+		//startConnectReadDevice(deviceId);
+		// BLEService.initializeBLE().then(() => {
+		// 	startConnectReadDevice(deviceId);
+		// });
 
 	}, [deviceId]);
+
+	// const startConnectReadDevice = async (deviceId: string) => {
+
+	// 	if (deviceId === "") {
+	// 		return;
+	// 	}
+
+	// 	//await bleService.connectToDevice(deviceId);
+	// };
 
 	const connectToDevice = async (deviceId: string) => {
 		//console.log(`MainDeviceStatus -- Run connectToDevice with deviceId: ${deviceId}`);
@@ -62,6 +78,8 @@ const MainDeviceStatus = ({ deviceId, setOpen, managerRef, }: { deviceId: string
 						return;
 					}
 
+					BLEManagerInstance.setUUID(deviceId);
+
 					//onsole.log(`MainDeviceStatus - connectToDevice - monitorCharacteristicForService`)
 					let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 					if (data) {
@@ -86,9 +104,7 @@ const MainDeviceStatus = ({ deviceId, setOpen, managerRef, }: { deviceId: string
 								};
 						});
 
-						setTimeout(() => {
-							managerRef.current?.cancelTransaction(tranSactionID);
-						}, 1000);
+						managerRef.current?.cancelTransaction(tranSactionID);
 
 					} else {
 					// 	// console.log("Received data is null");
