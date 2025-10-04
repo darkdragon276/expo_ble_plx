@@ -6,7 +6,7 @@ import { BleManager, Device } from "react-native-ble-plx";
 import { KrossDevice } from '../../ble/KrossDevice';
 import { useEffect, useState } from "react";
 //import { BLEService } from "../../ble/BLEService";
-import bleService from '../../ble/BLEService';
+// import bleService from '../../ble/BLEService';
 import BLEManagerInstance from "../../ble/BLEManager";
 
 const Icon = styled(Ionicons);
