@@ -5,6 +5,9 @@ import { BleManager, Device, State } from 'react-native-ble-plx';
 import MainDeviceStatus from './MainDeviceStatus';
 //import { KrossDevice } from '../../ble/KrossDevice';
 // import useScanDevice from '../../hooks/ble/useScanDevice';
+//import { BLEService } from '../../ble/BLEService';
+//import bleService from '../../ble/BLEService';
+import BLEManagerInstance from "../../ble/BLEManager";
 
 // type ScannedDevice = {
 // 	id: string;
@@ -20,18 +23,33 @@ const DATA_OUT_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
 const MainDeviceList = () => {
 
 	const managerRef = useRef<BleManager | null>(null);
-	const [isScanning, setIsScanning] = useState(false);
+	//const [isScanning, setIsScanning] = useState(false);
 	const [devices, setDevices] = useState<Device[]>([]);
 	const [deviceId, setSelectedDevice] = useState<string>("");
 	const [open, setOpen] = useState(false);
 	//const [, setStateVersion] = useState(0);
 	//const krossDevice = new KrossDevice();
 
-	//console.log(`MainDeviceList render!`)
+	
 
 	useEffect(() => {
+		console.log(`MainDeviceList useEffect running!`)
 		let manager: BleManager;
 		let sub: any;
+		//console.log(`MainDeviceList useEffect run!`)
+		
+	//bleService.scanDevices(onSetDevice, [SERVICE_UUID], true)
+
+		// BLEService.initializeBLE().then(() => {
+		// 	BLEService.stopDeviceScan();
+		// 	//console.log("BLE initialized!");
+		// 	BLEService.scanDevices(onSetDevice, [SERVICE_UUID], true).then(()=>{
+		// 		//console.log("BLE scanDevices!");
+		// 		//
+		// 	})
+		// });
+
+		//BLEManagerInstance.getInstance();
 
 		try {
 			manager = new BleManager();
@@ -60,6 +78,16 @@ const MainDeviceList = () => {
 		};
 	}, []);
 
+	// const onSetDevice = (device: Device) => {
+	// 	//setDevices([]);
+	// 	setDevices((prev) => {
+	// 		if (prev.find((d) => d.id === device.id)) return prev;
+	// 		return [...prev, device];
+	// 	});
+	// 	//bleService.stopScan();
+	// 	//console.log(`setting device done!`)
+	// }
+
 	const startScan = async () => {
 		const manager = managerRef.current;
 		if (!manager) return;
@@ -74,29 +102,19 @@ const MainDeviceList = () => {
 			manager.startDeviceScan([SERVICE_UUID], { allowDuplicates: false }, (error, scannedDevice) => {
 				if (error) {
 					Alert.alert('Scan error', `${error.message}`);
-					//setIsScanning(false);
 					return;
 				}
 
 				if (scannedDevice) {
-					setDevices(prev => [...prev, scannedDevice]);
-					//console.log(`MainDeviceList -- startScan -- ${scannedDevice.name} (${scannedDevice.id})`)
-
-
-					//if (scannedDevice) {
-					//console.log(`MainDeviceList -- startScan -- ${device}`)
-					//setSelectedDevice(scannedDevice)
-				//}
+					setDevices((prev) => {
+						if (prev.find((d) => d.id === scannedDevice.id)) return prev;
+						return [...prev, scannedDevice];
+					});
 				}
 
 				stopScan();
 
 			})
-
-			// Auto-stop scan after 10 seconds to save battery
-			// setTimeout(() => {
-			// 	stopScan();
-			// }, 2000);
 
 		} catch (e: any) {
 			//console.warn('Failed to start scan', e);

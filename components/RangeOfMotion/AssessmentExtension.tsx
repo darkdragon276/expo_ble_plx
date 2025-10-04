@@ -1,9 +1,9 @@
-import { useState, forwardRef, useImperativeHandle } from "react";
+import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { View, Text } from "react-native";
 import useGetExtension from "../../hooks/rangeOfMotionHook/useGetExtension";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
+import { bleEventEmitter, type BleEmitterProps} from "../../utils/BleEmitter";
 
-let extension = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
 };
@@ -12,14 +12,27 @@ const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
-	//console.log(`AssessmentCardExtension run!`)
+	//console.log(`AssessmentCardExtension render!`)
 
-	extension = useGetExtension({ record, pos, setPos, posMax, setPosMax });
+	useEffect(() => {
+		//console.log(`AssessmentCardExtension useEffect running!`)
+		const sub = bleEventEmitter.addListener('BleDataPitch', (data) => {
+			//console.log(data);
+			if (data > 0) {
+				setPos(data);
+				setPosMax((pos > posMax) ? pos : posMax);
+			}
+		});
+
+		return () => {
+			sub.remove();
+		};
+	}, [pos]);
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentExtension useImperativeHandle running!`)
-			return extension
+			//console.log(`AssessmentExtension useImperativeHandle running! ${pos}`)
+			return pos //extension
 		},
 	}), [record]);
 
