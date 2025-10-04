@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { interval } from "../../utils/interval";
 import { updateROM } from "../../store/redux/rangeOfMotionSlice";
+import {KrossDevice} from "../../ble/KrossDevice";
 
 let randomDecimal: any;
 
@@ -15,29 +16,21 @@ const useGetExtension = ({ record, pos, setPos, posMax, setPosMax }:
 	}
 ) => {
 
-	//const dispatch = useDispatch();
-
-	const runDummy = interval(async () => {
-		randomDecimal = Number((Math.random() * 99).toFixed(1));
-
-		//console.log(`fetchData: ${randomDecimal}`)
-
-		setPosMax((pos > posMax) ? pos : posMax);
-		setPos(randomDecimal);
-	}, 100);
+	//setPosMax((pos > posMax) ? pos : posMax);
+	//setPos(randomDecimal);
 
 	useEffect(() => {
 
 		if (!record) {
-			runDummy.stop();
+			//runDummy.stop();
 			//dispatch(updateROM({ key: "extension", value: randomDecimal }));
 			//dispatch(updateROM({ key: "startRecording", value: record }))
 		} else {
-			runDummy.start();
+			//runDummy.start();
 			//dispatch(updateROM({ key: "startRecording", value: record }))
 		}
 
-		return () => runDummy.stop();
+		//return () => runDummy.stop();
 	}, [record, pos]);
 
 	return randomDecimal;
