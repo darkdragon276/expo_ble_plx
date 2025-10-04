@@ -89,7 +89,7 @@ const RangeOfMotion = () => {
 		});
 	}, [navigation, record]);
 
-	const addData = async (key: string) => {
+	const addROMData = async (key: string) => {
 		if (!db) {
 			//console.log("addData db is null !");
 			return;
@@ -104,19 +104,18 @@ const RangeOfMotion = () => {
 
 		//console.log(`RangeOfMotion key insert: ${key}`)
 		//console.log(`addData: ${extension}`)
+
 		let { title } = route.params;
-		const { year, month, date, hours, minutes, seconds, localDateTime } = getCurrentDateTime()
-		const dt: string = `${month}/${date}/${year}, ${hours}:${minutes}:${seconds}`;
-		const time: string = `${hours}:${minutes}:${seconds}`;
+		const { localShortDateTime, strNow } = getCurrentDateTime()
+		const dt: string = strNow;
 		const type: string = "ROM";
 
 		if (title == "") {
-			title = `ROM Session - ${localDateTime}`;
+			title = `ROM Session - ${localShortDateTime}`;
 		}
 
-		await db.runAsync(DB_INSERT_ROM, [key, title, dt, time, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, 0]);
+		await db.runAsync(DB_INSERT_ROM, [key, title, dt, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, 0]);
 		//console.log(`Rom of Motion -> INSERT done! ---> title: ${title}`);
-		//navigation.navigate("RangeOfMotionSummary", { key: key })
 	};
 
 	const onPressRecording = () => {
@@ -126,7 +125,7 @@ const RangeOfMotion = () => {
 	const onPressStopRecor = () => {
 		setRecord(false)
 		const key: string = Date.now().toString();
-		addData(key).then(() => {
+		addROMData(key).then(() => {
 			navigation.replace("RangeOfMotionSummary", { key: key })
 		}).catch((error) => {
 			console.log(error)

@@ -17,6 +17,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../model/RootStackParamList";
 import { useDatabase } from "../db/useDatabase";
 import { DB_SELECT_BY_ID_ROM } from "../db/dbQuery";
+import useConvertDateTime from "../utils/convertDateTime";
 
 const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
@@ -38,7 +39,6 @@ type DataProp = {
 	key: string,
 	date: string,
 	title: string,
-	time: string,
 	extension: number,
 	flexion: number,
 	l_rotation: number,
@@ -48,11 +48,18 @@ type DataProp = {
 	duration: number,
 }
 
+type DtConconvert = {
+	date_dd_MM_yyyy_hh_mm_ss_ampm: string,
+	date_dd_MM_yyyy_at_hh_mm_ampm: string,
+	date_short: string,
+}
+
 const RangeOfMotionSummary = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const db = useDatabase("headx.db");
 	const route = useRoute<RProp>();
 	const [data, setData] = useState<DataProp | null>(null)
+	const [dateConvert, setDateConvert] = useState<DtConconvert | null>()
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -101,10 +108,12 @@ const RangeOfMotionSummary = () => {
 
 				const { key } = route.params;
 				//console.log(`getFirstAsync ${key}`);
-				const rs = await db.getFirstAsync<DataProp>(DB_SELECT_BY_ID_ROM, key); //"1759379091428"
+				const rs = await db.getFirstAsync<DataProp>(DB_SELECT_BY_ID_ROM, key);
 				if (rs) {
+					const { date_dd_MM_yyyy_hh_mm_ss_ampm, date_dd_MM_yyyy_at_hh_mm_ampm, date_short } = useConvertDateTime(new Date(rs.date));
 					setData(rs);
 					//console.log(rs);
+					setDateConvert({ date_dd_MM_yyyy_hh_mm_ss_ampm, date_dd_MM_yyyy_at_hh_mm_ampm, date_short })
 				}
 			} catch (error) {
 				console.log(error);
@@ -134,7 +143,7 @@ const RangeOfMotionSummary = () => {
 						<LuPenLine size={17} color="gray"></LuPenLine>
 					</View>
 					<Text className="text-lg text-gray-500 text-center">
-						ROM Assessment - {data?.title}
+						ROM Assessment - {dateConvert?.date_dd_MM_yyyy_at_hh_mm_ampm}
 					</Text>
 				</View>
 
@@ -152,7 +161,7 @@ const RangeOfMotionSummary = () => {
 					<View className="flex-row flex-wrap py-4">
 						<View className="w-1/2">
 							<Text className="text-xs text-muted-foreground mb-1 text-gray-400">Date & Time</Text>
-							<Text className="font-medium text-sm">{data?.date}</Text>
+							<Text className="font-medium text-sm">{dateConvert?.date_dd_MM_yyyy_hh_mm_ss_ampm}</Text>
 						</View>
 
 						<View className="w-1/2">
