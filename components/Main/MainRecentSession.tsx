@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../model/RootStackParamList";
 import { styled } from 'nativewind';
+import useConvertDateTime from "../../utils/convertDateTime";
 
 const LuTrendUp = styled(LucideTrendingUp);
 const LucHistory = styled(LucideHistory);
@@ -18,27 +19,19 @@ type Session = {
 	key: string;
 	title: string;
 	date: string;
-	time: string;
 	type: "JPS" | "ROM";
 };
 
-let sessions: Session[] = [
-	// {
-	// 	id: "1",
-	// 	title: "JPS Session - Oct 2, 2:36 PM",
-	// 	date: "10/2/2025, 2:36:57 PM",
-	// 	time: "2:36 PM",
-	// 	type: "JPS",
-	// },
-];
+let sessions: Session[] = [];
 
 const SessionItem = memo(({ item, gotoHistory }: { item: Session, gotoHistory: any }) => {
-	//console.log(`SessionItem ---- ${item.key}`)
+	const { date_dd_MM_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
+
 	return (
 		<TouchableOpacity
 			onPress={(key) => gotoHistory(key)}
 		>
-			<View className="bg-blue-50/30 rounded-2xl border border-gray-200 p-2 mb-3 shadow-sm">
+			<View className="bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
 				<View className="flex-row justify-between items-center">
 					<Text className="text-md font-bold">{item.title}</Text>
 					<View
@@ -49,7 +42,7 @@ const SessionItem = memo(({ item, gotoHistory }: { item: Session, gotoHistory: a
 						</Text>
 					</View>
 				</View>
-				<Text className="text-xs text-muted-foreground">{item.date}</Text>
+				<Text className="text-xs text-muted-foreground">{date_dd_MM_yyyy_hh_mm_ss_ampm}</Text>
 
 				<Text className="text-xs text-blue-600 mt-1">
 					Tap to view full report

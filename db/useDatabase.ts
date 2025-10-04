@@ -16,7 +16,6 @@ export function useDatabase(dbName: string = "headx.db") {
 						key 		text,
 						title		text,
 						date		text,
-						time		text,
 						type		text,
 						extension	decimal(3,1),
 						flexion		decimal(3,1),
