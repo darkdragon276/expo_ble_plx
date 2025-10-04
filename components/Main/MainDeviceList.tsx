@@ -22,12 +22,12 @@ const MainDeviceList = () => {
 	const managerRef = useRef<BleManager | null>(null);
 	const [isScanning, setIsScanning] = useState(false);
 	const [devices, setDevices] = useState<Device[]>([]);
-	const [device, setSelectedDevice] = useState<Device>();
+	const [deviceId, setSelectedDevice] = useState<string>("");
 	const [open, setOpen] = useState(false);
 	//const [, setStateVersion] = useState(0);
 	//const krossDevice = new KrossDevice();
 
-	console.log(`MainDeviceList render!`)
+	//console.log(`MainDeviceList render!`)
 
 	useEffect(() => {
 		let manager: BleManager;
@@ -80,11 +80,13 @@ const MainDeviceList = () => {
 
 				if (scannedDevice) {
 					setDevices(prev => [...prev, scannedDevice]);
-				}
+					//console.log(`MainDeviceList -- startScan -- ${scannedDevice.name} (${scannedDevice.id})`)
 
-				if (!device) {
-					console.log(`MainDeviceList -- startScan -- ${device}`)
-					setSelectedDevice(devices[0])
+
+					//if (scannedDevice) {
+					//console.log(`MainDeviceList -- startScan -- ${device}`)
+					//setSelectedDevice(scannedDevice)
+				//}
 				}
 
 				stopScan();
@@ -117,7 +119,7 @@ const MainDeviceList = () => {
 		<View className="px-4">
 			{/* Card for device status (contains combobox) */}
 			<MainDeviceStatus
-				device={device}
+				deviceId={deviceId}
 				setOpen={() => setOpen(true)}
 				managerRef={managerRef}
 			>
@@ -144,7 +146,7 @@ const MainDeviceList = () => {
 							renderItem={({ item }) => (
 								<Pressable
 									onPress={() => {
-										setSelectedDevice(item);
+										setSelectedDevice(item.id);
 										setOpen(false);
 									}}
 									className="px-3 py-3 rounded-xl mb-2"
@@ -153,7 +155,7 @@ const MainDeviceList = () => {
 										{/* <View className={`w-2 h-2 rounded-full bg-${item.color}-500 mr-2`} /> */}
 										<Text className="text-gray-700">{item.name}</Text>
 										<View className="w-4" />
-										{item.id === device?.id ? (
+										{item.id === deviceId ? (
 											<Ionicons className="ml-auto text-base" name="checkmark" size={15} color="gray" />
 										) : null}
 									</View>
