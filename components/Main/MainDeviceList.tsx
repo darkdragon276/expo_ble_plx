@@ -83,15 +83,18 @@ const MainDeviceList = () => {
 				}
 
 				if (!device) {
+					console.log(`MainDeviceList -- startScan -- ${device}`)
 					setSelectedDevice(devices[0])
 				}
+
+				stopScan();
 
 			})
 
 			// Auto-stop scan after 10 seconds to save battery
-			setTimeout(() => {
-				stopScan();
-			}, 2000);
+			// setTimeout(() => {
+			// 	stopScan();
+			// }, 2000);
 
 		} catch (e: any) {
 			//console.warn('Failed to start scan', e);
