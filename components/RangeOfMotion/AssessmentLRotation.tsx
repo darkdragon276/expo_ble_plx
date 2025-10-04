@@ -8,6 +8,8 @@ type AssessmentCardProps = {
 	record: boolean;
 };
 
+let fistOffset: number = 0.0
+
 const AssessmentLRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
@@ -20,7 +22,11 @@ const AssessmentLRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 		//console.log(`AssessmentCardExtension useEffect running!`)
 		const sub = bleEventEmitter.addListener('BleDataYaw', (data) => {
 			//console.log(data);
-			setPos(data * -1);
+			if (!fistOffset) {
+				fistOffset = data
+			}
+			data = data - fistOffset;
+			setPos(data);
 			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
@@ -31,7 +37,7 @@ const AssessmentLRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentLRotation useImperativeHandle running!`)
+			console.log(`AssessmentLRotation useImperativeHandle return: ${pos}`)
 			return pos
 		},
 	}), [record]);

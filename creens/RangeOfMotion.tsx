@@ -230,7 +230,7 @@ const RangeOfMotion = () => {
 		setTimeout(() => {
 			const key: string = Date.now().toString();
 		addROMData(key).then(() => {
-			navigation.replace("RangeOfMotionSummary", { key: key })
+			//navigation.replace("RangeOfMotionSummary", { key: key })
 		}).catch((error) => {
 			console.log(error)
 		})
