@@ -34,7 +34,8 @@ const MainDeviceStatus = ({ device, setOpen, managerRef, }: { device: Device | u
 		try {
 			const connected = await managerRef.current?.connectToDevice(device ? device.id : "", { autoConnect: true });
 			if (!connected) {
-				Alert.alert('Connect error', 'No connected device');
+				//Alert.alert('Connect error', `No connected device: `);
+				console.log(`MainDeviceStatus -- Connect error No connected device: ${device ? device.id : ""}`);
 				return;
 			}
 
@@ -47,6 +48,8 @@ const MainDeviceStatus = ({ device, setOpen, managerRef, }: { device: Device | u
 						//console.error("Notification error:", error);
 						return;
 					}
+
+					console.log(`MainDeviceStatus - connectToDevice - monitorCharacteristicForService`)
 
 					let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 					if (data) {
