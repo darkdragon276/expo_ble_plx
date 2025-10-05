@@ -11,39 +11,45 @@ import useStepColor from '../../../hooks/calibrationHook/useStepColor';
 import { useDispatch } from "react-redux";
 import { updateStep } from "../../../store/redux/calibrationStepSlice";
 import { bleEventEmitter } from "../../../utils/BleEmitter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 //redux zone ed
 
 const LuCircleBig = styled(CircleCheckBig);
 let data = dv_cn
 let IconDefault: React.FC<any> = data.Icon
 
+//const DeviceConnectionStep = ({ connectDeviceStep }: { connectDeviceStep: string }) => {
 const DeviceConnectionStep = () => {
-	const { stt_cn_dv_stt, stt_ss_init } = useCheckStep();
+
+	const { stt_cn_dv_stt } = useCheckStep();
 	const status = stt_cn_dv_stt
 	const { statusColor, textColor } = useStepColor({ status });
+	//const [connectStep, setConnectStep] = useState(false);
 
-	//useRunCnDvStep();
+	//console.log(`DeviceConnectionStep ${stt_cn_dv_stt}`);
 
-	const dispatch = useDispatch();
+	useRunCnDvStep();
 
-	useEffect(() => {
-		dispatch(updateStep({ key: "cn_dv_stt", value: "active" }))
+	// const dispatch = useDispatch();
 
-		const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
-			if (data) {
-				dispatch(updateStep({ key: "cn_dv_stt", value: "done" }))
-				dispatch(updateStep({ key: "ss_init", value: "active" }))
-			}
-		});
+	// useEffect(() => {
+	// 	dispatch(updateStep({ key: "cn_dv_stt", value: "active" }))
 
-		console.log(`DeviceConnectionStep ${stt_cn_dv_stt} - ${stt_ss_init}`)
+	// 	const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
+	// 		if (data) {
+	// 			//dispatch(updateStep({ key: "cn_dv_stt", value: "done" }))
+	// 			//dispatch(updateStep({ key: "ss_init", value: "active" }))
+	// 			//setConnectStep(true)
+	// 		}
+	// 	});
 
-		return () => {
-			//console.log(`DeviceConnectionStep sub removed`);
-			//sub.remove();
-		};
-	}, []);
+	// 	//console.log(`DeviceConnectionStep ${stt_cn_dv_stt} - ${stt_ss_init}`)
+
+	// 	return () => {
+	// 		//console.log(`DeviceConnectionStep sub removed`);
+	// 		//sub.remove();
+	// 	};
+	// }, []);
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>

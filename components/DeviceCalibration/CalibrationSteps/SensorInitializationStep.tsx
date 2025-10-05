@@ -15,42 +15,48 @@ const LuCircleBig = styled(CircleCheckBig);
 let data = ss_init
 let IconDefault: React.FC<any> = data.Icon
 
-const SensorInitializationStep = () => {
-	const { stt_ss_init, stt_cn_dv_stt, stt_hold_dv } = useCheckStep();
+//const SensorInitializationStep =  ({ initSensorStep }: { initSensorStep: string}) => {
+const SensorInitializationStep =  () => {
+
+	const { stt_ss_init} = useCheckStep();
 	const status = stt_ss_init
 	const { statusColor, textColor } = useStepColor({ status });
-	const [sensorStep, SetSensorStep] = useState(false)
+	//const [sensorStep, SetSensorStep] = useState(false)
 
-	//useRunSsInitStep();
+	useRunSsInitStep();
 
-	const dispatch = useDispatch();
+	//const dispatch = useDispatch();
 	//const { stt_ss_init } = useCheckStep();
 
-	console.log(`SensorInitializationStep render`);
+	//console.log(`SensorInitializationStep render`);
 
-	useEffect(() => {
-		//let sub: EmitterSubscription;
 
-		const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
-			const { stt_cn_dv_stt } = useCheckStep();
-			if (stt_cn_dv_stt === "done") {
-				//console.log(`SensorInitializationStep: bleEventEmitter - ${stt_cn_dv_stt}`);
-				if (data) {
-					dispatch(updateStep({ key: "ss_init", value: "done" }))
-					dispatch(updateStep({ key: "hold_dv", value: "active" }))
-					console.log(`SensorInitializationStep: dispatch-ss_init done`);
-					SetSensorStep(true)
-				}
-			}
-		});
 
-		//console.log(`SensorInitializationStep ${stt_cn_dv_stt} - ${stt_ss_init}`)
+	// useEffect(() => {
+	// 	//let sub: EmitterSubscription;
+	// 	const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
+	// 		const { stt_cn_dv_stt } = useCheckStep();
+	// 		console.log(`SensorInitializationStep: bleEventEmitter - ${stt_cn_dv_stt}`);
+	// 		//if (stt_cn_dv_stt === "done") {
 
-		return () => {
-			//console.log(`SensorInitializationStep sub removed`);
-			sub.remove();
-		};
-	}, [sensorStep]);
+	// 			if (data) {
+	// 				console.log(`SensorInitializationStep: bleEventEmitter - ${data}`);
+	// 				dispatch(updateStep({ key: "ss_init", value: "done" }))
+	// 				dispatch(updateStep({ key: "hold_dv", value: "active" }))
+	// 				console.log(`SensorInitializationStep: dispatch-ss_init done`);
+	// 				SetSensorStep(true)
+	// 			}
+	// 		//}
+	// 	});
+
+
+	// 	//console.log(`SensorInitializationStep ${stt_cn_dv_stt} - ${stt_ss_init}`)
+
+	// 	return () => {
+	// 		//console.log(`SensorInitializationStep sub removed`);
+	// 		sub.remove();
+	// 	};
+	// }, [sensorStep]);
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>
