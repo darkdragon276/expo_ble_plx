@@ -8,7 +8,7 @@ import ZAxisStep from './CalibrationSteps/ZAxisStep'
 import DeviceConnectionStep from "./CalibrationSteps/DeviceConnectionStep";
 import CalibrationCompleteStep from "./CalibrationSteps/CalibrationCompleteStep";
 import useCheckStep from "../../hooks/calibrationHook/useCheckStep";
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BLEService } from '../../ble/BLEService'
 import { Characteristic } from 'react-native-ble-plx'
 import { KrossDevice } from '../../ble/KrossDevice'
@@ -19,42 +19,54 @@ const CalibrationsProgress = () => {
 	const { stt_c_cpl, stt_hold_dv } = useCheckStep();
 	const krossDevice = new KrossDevice();
 
+	const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
+	const [initSensorStep, setInitSensorStep] = useState("pending");
+	const [holdDeviceStep, setHoldDeviceStep] = useState("pending");
+	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
+	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
+	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
+	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
+	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
+
 	useEffect(() => {
-
 		const initiateCalibration = async () => {
-			if (BLEService.getDevice() == null) {
-				BLEService.scanDevices((device) => {
-					BLEService.connectToDevice(device.id).then(() => {
-						bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true);
-
-					}).catch((e) => {
-						bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', false);
-
-					})
-				}, [BLEService.SERVICE_UUID]);
-			} else {
-				BLEService.connectToDevice(BLEService.getDevice()!.id).then(() => {
-					bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
-
-				}).catch((e) => {
-					bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', false);
-
-				})
-			}
 
 			// if (BLEService.getDevice() == null) {
 			// 	BLEService.scanDevices((device) => {
-			// 		BLEService.connectToDevice(device.id);
+			// 		BLEService.connectToDevice(device.id).then(() => {
+			// 			bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true);
+
+			// 		}).catch((e) => {
+			// 			bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', false);
+
+			// 		})
 			// 	}, [BLEService.SERVICE_UUID]);
 			// } else {
-			// 	BLEService.connectToDevice(BLEService.getDevice()!.id);
+			// 	BLEService.connectToDevice(BLEService.getDevice()!.id).then(() => {
+			// 		bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
+
+			// 	}).catch((e) => {
+			// 		bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', false);
+
+			// 	})
 			// }
+			setConnectDeviceStep("active");
+
+			if (BLEService.getDevice() == null) {
+				BLEService.scanDevices((device) => {
+					BLEService.connectToDevice(device.id);
+				}, [BLEService.SERVICE_UUID]);
+			} else {
+				BLEService.connectToDevice(BLEService.getDevice()!.id);
+			}
+
 		};
 
-		initiateCalibration().finally(() => {
-			console.log('initiateCalibration finally');
-			runStepCalibation();
-		});
+		// initiateCalibration().then(() => {
+		// 	//bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
+		// 	//console.log('initiateCalibration finally');
+		// 	runStepCalibation();
+		// });
 
 		return () => {
 			try {
@@ -86,10 +98,10 @@ const CalibrationsProgress = () => {
 			};
 
 			const onMonitor = (char: Characteristic) => {
-				console.log('onMonitor running');
+				//console.log('onMonitor running');
 				let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 				if (data) {
-					bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
+					//bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
 					krossDevice.unpack(data);
 					//krossDevice.log();
 					console.log(krossDevice.angle);
@@ -108,7 +120,7 @@ const CalibrationsProgress = () => {
 				// }, 3000)
 			}
 
-			console.log('runStepCalibation is unpacking');
+			//console.log('runStepCalibation is unpacking');
 
 			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
 			BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
@@ -122,21 +134,30 @@ const CalibrationsProgress = () => {
 		}
 	};
 
+	const intervalRunCali = setInterval(() => {
+
+	}, 1000);
+
 	return (
 		<>
-			{stt_hold_dv === "done"
+			{stt_c_cpl === "done"
 				?
 				(<CalibrationsDone></CalibrationsDone>)
 				:
 				(
 					<>
-						<DeviceConnectionStep></DeviceConnectionStep>
-						<SensorInitializationStep></SensorInitializationStep>
+						<DeviceConnectionStep
+							// connectDeviceStep={connectDeviceStep}
+						>
+						</DeviceConnectionStep>
+						<SensorInitializationStep
+							// initSensorStep={initSensorStep}
+						></SensorInitializationStep>
 						<HoldDeviceStep ></HoldDeviceStep>
-						{/* <XAxisStep></XAxisStep>
+						<XAxisStep></XAxisStep>
 						<YAxisStep></YAxisStep>
 						<ZAxisStep></ZAxisStep>
-						<CalibrationCompleteStep></CalibrationCompleteStep> */}
+						<CalibrationCompleteStep></CalibrationCompleteStep>
 					</>
 				)
 			}

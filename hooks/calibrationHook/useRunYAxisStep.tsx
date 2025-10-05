@@ -10,23 +10,35 @@ const useRunYAxisStep = () => {
 	const { stt_x_axis } = useCheckStep();
 
 	useEffect(() => {
-		//let sub: EmitterSubscription;
+		////let sub: EmitterSubscription;
 
-		if (stt_x_axis !== "done") {
-			return
-		}
+		// if (stt_x_axis !== "done") {
+		// 	return
+		// }
 
-		const sub = bleEventEmitter.addListener('CALIBRATION_Y', (data: number) => {
-			if (data !== 0) {
+		// const sub = bleEventEmitter.addListener('CALIBRATION_Y', (data: number) => {
+		// 	if (data !== 0) {
+		// 		dispatch(updateStep({ key: "y_axis", value: "done" }))
+		// 		dispatch(updateStep({ key: "z_axis", value: "active" }))
+		// 	}
+		// });
+
+		// return () => {
+		// 	console.log(`useRunYAxisStep sub removed`);
+		// 	sub.remove();
+		// };
+
+		const fetchData = async () => {
+			await new Promise(res => setTimeout(() => {
 				dispatch(updateStep({ key: "y_axis", value: "done" }))
 				dispatch(updateStep({ key: "z_axis", value: "active" }))
-			}
-		});
-
-		return () => {
-			console.log(`useRunYAxisStep sub removed`);
-			sub.remove();
+			}, 2000));
 		};
+
+		if (stt_x_axis === "done") {
+			fetchData();
+		}
+
 	}, [stt_x_axis]);
 }
 

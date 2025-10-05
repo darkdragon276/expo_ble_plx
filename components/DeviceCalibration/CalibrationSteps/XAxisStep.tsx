@@ -23,34 +23,34 @@ const XAxisStep = () => {
 	const status = stt_x_axis
 	const { statusColor, textColor } = useStepColor({ status });
 
-	//useRunXAxisStep();
+	useRunXAxisStep();
 
-	const dispatch = useDispatch();
-	const { stt_hold_dv } = useCheckStep();
+	// const dispatch = useDispatch();
+	// const { stt_hold_dv } = useCheckStep();
 
-	useEffect(() => {
-		//let sub: EmitterSubscription;
+	// useEffect(() => {
+	// 	//let sub: EmitterSubscription;
 
-		// if (stt_hold_dv !== "done") {
-		// 	return;
-		// }
+	// 	// if (stt_hold_dv !== "done") {
+	// 	// 	return;
+	// 	// }
 
-		const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data: number) => {
-			const { stt_hold_dv } = useCheckStep();
-			if (stt_hold_dv === "done") {
-				if (data) {
-					dispatch(updateStep({ key: "x_axis", value: "done" }))
-					dispatch(updateStep({ key: "y_axis", value: "active" }))
-				}
-			}
+	// 	const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data: number) => {
+	// 		const { stt_hold_dv } = useCheckStep();
+	// 		if (stt_hold_dv === "done") {
+	// 			if (data) {
+	// 				dispatch(updateStep({ key: "x_axis", value: "done" }))
+	// 				dispatch(updateStep({ key: "y_axis", value: "active" }))
+	// 			}
+	// 		}
 
-		});
+	// 	});
 
-		return () => {
-			//console.log(`useRunXAxisStep sub removed`);
-			sub.remove();
-		};
-	}, [stt_hold_dv]);
+	// 	return () => {
+	// 		//console.log(`useRunXAxisStep sub removed`);
+	// 		sub.remove();
+	// 	};
+	// }, [stt_hold_dv]);
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>

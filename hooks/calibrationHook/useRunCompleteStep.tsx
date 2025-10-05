@@ -11,7 +11,7 @@ const useRunCompleteStep = () => {
 		const fetchData = async () => {
 			await new Promise(res => setTimeout(() => {
 				dispatch(updateStep({ key: "c_cpl", value: "done" }))
-			}, 1000));
+			}, 2000));
 		};
 
 		if (stt_z_axis === "done") {

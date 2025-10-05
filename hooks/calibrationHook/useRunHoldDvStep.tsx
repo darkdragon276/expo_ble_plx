@@ -10,24 +10,36 @@ const useRunHoldDvStep = () => {
 	const { stt_ss_init } = useCheckStep();
 
 	useEffect(() => {
-		//let sub: EmitterSubscription;
+		// //let sub: EmitterSubscription;
 
-		const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
-			//console.log(`useRunHoldDvStep: ${data}`);
-			if (stt_ss_init === "done") {
-				if (data) {
-					dispatch(updateStep({ key: "hold_dv", value: "done" }))
-					dispatch(updateStep({ key: "x_axis", value: "active" }))
-				}
-			}
-		});
+		// //const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
+		// 	//console.log(`useRunHoldDvStep: ${data}`);
+		// 	if (stt_ss_init === "done") {
+		// 		//if (data) {
+		// 			dispatch(updateStep({ key: "hold_dv", value: "done" }))
+		// 			dispatch(updateStep({ key: "x_axis", value: "active" }))
+		// 		}
+		// 	//}
+		// //});
 
-		console.log(`useRunHoldDvStep ${stt_ss_init}`)
+		// //console.log(`useRunHoldDvStep ${stt_ss_init}`)
 
-		return () => {
-			//console.log(`useRunHoldDvStep sub removed`);
-			sub.remove();
+		// return () => {
+		// 	//console.log(`useRunHoldDvStep sub removed`);
+		// 	//sub.remove();
+		// };
+
+		const fetchData = async () => {
+			await new Promise(res => setTimeout(() => {
+				dispatch(updateStep({ key: "hold_dv", value: "done" }))
+				dispatch(updateStep({ key: "x_axis", value: "active" }))
+			}, 2000));
 		};
+
+		if (stt_ss_init === "done") {
+			fetchData();
+		}
+
 	}, [stt_ss_init]);
 }
 
