@@ -1,5 +1,5 @@
 import { styled } from "nativewind";
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 import { CircleCheckBig } from "lucide-react-native";
 import CalibrationSpinning from "../CalibrationSpinning";
 import { dv_cn } from "../../../dummy/calibrationStepData";
@@ -12,6 +12,8 @@ import { useDispatch } from "react-redux";
 import { updateStep } from "../../../store/redux/calibrationStepSlice";
 import { bleEventEmitter } from "../../../utils/BleEmitter";
 import { useEffect, useState } from "react";
+import { BLEService } from "../../../ble/BLEService";
+import { KrossDevice } from "../../../ble/KrossDevice";
 //redux zone ed
 
 const LuCircleBig = styled(CircleCheckBig);
@@ -24,11 +26,45 @@ const DeviceConnectionStep = () => {
 	const { stt_cn_dv_stt } = useCheckStep();
 	const status = stt_cn_dv_stt
 	const { statusColor, textColor } = useStepColor({ status });
+	const krossDevice = new KrossDevice();
 	//const [connectStep, setConnectStep] = useState(false);
 
 	//console.log(`DeviceConnectionStep ${stt_cn_dv_stt}`);
 
 	useRunCnDvStep();
+
+	useEffect(() => {
+
+		if (BLEService.getDevice() == null) {
+			BLEService.scanDevices((device) => {
+				BLEService.connectToDevice(device.id);
+			}, [BLEService.SERVICE_UUID]);
+		} else {
+			BLEService.connectToDevice(BLEService.getDevice()!.id);
+		}
+
+		runStartCalibation();
+	}, [])
+
+	const runStartCalibation = async () => {
+		if (BLEService.getDevice() == null) {
+			Alert.alert('Connect error', `No connected device: `);
+			return;
+		}
+
+		try {
+			console.log('DeviceConnectionStep is pack --- MAGNET_CALIB_START');
+			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+			BLEService.writeCharacteristicWithoutResponseForDevice(
+				BLEService.SERVICE_UUID,
+				BLEService.DATA_IN_UUID,
+				KrossDevice.encodeBase64(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_START))
+			);
+			
+		} catch (e: any) {
+			//Alert.alert('connect error', e?.message ?? String(e));
+		}
+	};
 
 	// const dispatch = useDispatch();
 
