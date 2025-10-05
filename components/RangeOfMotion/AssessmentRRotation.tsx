@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { View, Text, Image } from "react-native";
-import useGetRRotation from "../../hooks/rangeOfMotionHook/useGetRRotation";
+import { View, Text} from "react-native";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
 import { bleEventEmitter } from "../../utils/BleEmitter";
 
@@ -8,7 +7,7 @@ type AssessmentCardProps = {
 	record: boolean;
 };
 
-let fistOffset: number = 0.0
+let firstRRotationOffset: number = 0.0
 
 const AssessmentRRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
@@ -16,18 +15,23 @@ const AssessmentRRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	//console.log(`AssessmentRRotation run!`)
 
-	//r_rotation = useGetRRotation({ record, pos, setPos, posMax, setPosMax });
-
 	useEffect(() => {
 		//console.log(`AssessmentCardExtension useEffect running!`)
 		const sub = bleEventEmitter.addListener('BleDataYaw', (data) => {
 			//console.log(data);
-			if (!fistOffset) {
-				fistOffset = data
+
+			if (data > 0) {
+				data = data - firstRRotationOffset;
+				setPos(data);
+				setPosMax((pos > posMax) ? pos : posMax);
+
+				if (firstRRotationOffset == 0.0) {
+					firstRRotationOffset = data
+				}
+				
+			} else {
+				setPos(0.0);
 			}
-			data = data - fistOffset;
-			setPos(data);
-			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
 		return () => {
@@ -37,8 +41,8 @@ const AssessmentRRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			console.log(`AssessmentRRotation useImperativeHandle return: ${pos}`)
-			return pos
+			//console.log(`AssessmentRRotation useImperativeHandle return: ${parseFloat(pos.toFixed(1))}`)
+			return parseFloat(pos.toFixed(1))
 		},
 	}), [record]);
 

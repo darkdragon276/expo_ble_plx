@@ -102,7 +102,7 @@ const RangeOfMotion = () => {
 	}, [navigation, record]);
 
 	useEffect(() => {
-		console.log(`MainDeviceList useEffect running!`)
+		//console.log(`RangeOfMotion useEffect running!`)
 			let manager: BleManager;
 			let sub: any;
 	
@@ -124,6 +124,7 @@ const RangeOfMotion = () => {
 					sub.remove();
 					stopScan();
 					manager.destroy();
+					managerRef.current?.cancelTransaction(tranSactionID);
 					managerRef.current = null;
 				} catch (cleanupError) {
 					//console.error("Error to cleanup BleManager:", cleanupError);
@@ -132,24 +133,28 @@ const RangeOfMotion = () => {
 	}, [])
 
 	const startReadDataDevice = async (deviceId: string) => {
-		//console.log(`RangeOfMotion -- Run connectToDevice with deviceId: ${deviceId}`);
+		console.log(`RangeOfMotion -- Run connectToDevice with deviceId: ${deviceId}`);
 		try {
 			
 			if (deviceId === "") {
+				Alert.alert('Connect error', `No connected device: `);
 				return;
 			}
 
 			stopScan();
+
 			const connected = await managerRef.current?.connectToDevice(deviceId, { autoConnect: true });
 			if (!connected) {
-				//Alert.alert('Connect error', `No connected device: `);
+				Alert.alert('Connect error', `No connected device: `);
 				//console.log(`MainDeviceStatus -- Connect error No connected device: ${deviceId}`);
 				return;
 			}
 
-			//console.log(`MainDeviceStatus -- Connect success: ${deviceId}`);
-
+			console.log(`RangeOfMotion -- Connect success: ${deviceId}`);
+			
 			await connected.discoverAllServicesAndCharacteristics();
+			setRecord(true);
+
 			let subscription = connected.monitorCharacteristicForService(
 				SERVICE_UUID,
 				DATA_OUT_UUID,
@@ -161,7 +166,7 @@ const RangeOfMotion = () => {
 
 					BLEManagerInstance.setUUID(deviceId);
 
-					//onsole.log(`MainDeviceStatus - connectToDevice - monitorCharacteristicForService`)
+					//console.log(`MainDeviceStatus - connectToDevice - monitorCharacteristicForService`)
 					let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 					if (data) {
 						krossDevice.unpack(data);
@@ -220,23 +225,21 @@ const RangeOfMotion = () => {
 	};
 
 	const onPressRecording = () => {
-		setRecord(true)
 		startReadDataDevice(BLEManagerInstance.getUUID());
 	};
 
-	const onPressStopRecor = () => {
+	const onPressStopRecor = async () => {
 		setRecord(false)
-		managerRef.current?.cancelTransaction(tranSactionID);
-		setTimeout(() => {
-			const key: string = Date.now().toString();
+
+		await managerRef.current?.cancelTransaction(tranSactionID)
+		await managerRef.current?.cancelDeviceConnection(BLEManagerInstance.getUUID());
+
+		const key: string = Date.now().toString();
 		addROMData(key).then(() => {
-			//navigation.replace("RangeOfMotionSummary", { key: key })
+			navigation.replace("RangeOfMotionSummary", { key: key })
 		}).catch((error) => {
 			console.log(error)
-		})
-		}, 500);
-		
-
+		});
 	};
 
 	return (

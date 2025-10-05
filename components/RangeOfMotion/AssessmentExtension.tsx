@@ -1,6 +1,5 @@
 import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { View, Text } from "react-native";
-import useGetExtension from "../../hooks/rangeOfMotionHook/useGetExtension";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
 import { bleEventEmitter, type BleEmitterProps} from "../../utils/BleEmitter";
 
@@ -18,8 +17,12 @@ const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 		//console.log(`AssessmentCardExtension useEffect running!`)
 		const sub = bleEventEmitter.addListener('BleDataPitch', (data) => {
 			//console.log(data);
-			setPos(data);
-			setPosMax((pos > posMax) ? pos : posMax);
+			if (data > 0) {
+				setPos(data);
+			} else {
+				setPos(0.0);
+			}
+			setPosMax((data > posMax) ? data : posMax);
 		});
 
 		return () => {
@@ -29,8 +32,8 @@ const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			console.log(`AssessmentExtension useImperativeHandle running! ${pos}`)
-			return pos //extension
+			//console.log(`AssessmentExtension useImperativeHandle running! ${parseFloat(pos.toFixed(1))}`)
+			return parseFloat(pos.toFixed(1))
 		},
 	}), [record]);
 
