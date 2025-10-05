@@ -1,5 +1,11 @@
 import { NativeEventEmitter, NativeModules } from 'react-native';
-const bleEventEmitter = new NativeEventEmitter(NativeModules.BLEModule || {}); 
+
+const { BleManager } = NativeModules;
+
+const bleEventEmitter =
+	BleManager
+		? new NativeEventEmitter(NativeModules.BLEModule || {})
+		: new NativeEventEmitter();
 
 type BleEmitterProps = {
 	roll: number;
@@ -7,4 +13,4 @@ type BleEmitterProps = {
 	yaw: number;
 };
 
-export {type BleEmitterProps, bleEventEmitter} ;
+export { type BleEmitterProps, bleEventEmitter };
