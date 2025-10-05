@@ -17,13 +17,18 @@ type StatusDevice = {
     color: string;
 };
 
-const MainDeviceStatus = ({ deviceId, setOpen}: { deviceId: string, setOpen: any}) => {
+const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: any }) => {
     const krossDevice = new KrossDevice();
     const [dvInfo, setDvInfo] = useState<StatusDevice>();
     const [localDeviceId, setLocalDeviceId] = useState<string>(deviceId);
 
     useEffect(() => {
-        setLocalDeviceId(deviceId)
+        let IdDeviceSeleted = setDeviceSelected();
+        if (IdDeviceSeleted) {
+            deviceId = IdDeviceSeleted;
+        }
+
+        //setLocalDeviceId(deviceId)
         connectToDevice(deviceId)
     }, [deviceId]);
 
@@ -78,10 +83,29 @@ const MainDeviceStatus = ({ deviceId, setOpen}: { deviceId: string, setOpen: any
 
             await BLEService.discoverAllServicesAndCharacteristicsForDevice();
             BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
-            
+
         } catch (e: any) {
             //Alert.alert('connect error', e?.message ?? String(e));
         }
+    };
+
+    const setDeviceSelected = () => {
+        const deviceSeleted = BLEService.getDevice();
+        if (!deviceSeleted)
+            return undefined;
+
+        const objDevice: StatusDevice = {
+            id: deviceSeleted.id,
+            battery: null,
+            name: deviceSeleted.name,
+            status: "",
+            color: "",
+        };
+
+        setDvInfo(objDevice);
+
+        return objDevice.id
+
     };
 
     // const color: ColorVariant = "green";
