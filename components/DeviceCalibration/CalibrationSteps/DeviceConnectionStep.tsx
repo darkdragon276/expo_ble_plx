@@ -20,31 +20,31 @@ const LuCircleBig = styled(CircleCheckBig);
 let data = dv_cn
 let IconDefault: React.FC<any> = data.Icon
 
-//const DeviceConnectionStep = ({ connectDeviceStep }: { connectDeviceStep: string }) => {
-const DeviceConnectionStep = () => {
+const DeviceConnectionStep = ({ connectDeviceStep }: { connectDeviceStep: string }) => {
+	//const DeviceConnectionStep = () => {
 
-	const { stt_cn_dv_stt } = useCheckStep();
-	const status = stt_cn_dv_stt
+	//const { stt_cn_dv_stt } = useCheckStep();
+	const status = connectDeviceStep
 	const { statusColor, textColor } = useStepColor({ status });
 	const krossDevice = new KrossDevice();
 	//const [connectStep, setConnectStep] = useState(false);
 
 	//console.log(`DeviceConnectionStep ${stt_cn_dv_stt}`);
 
-	useRunCnDvStep();
+	// useRunCnDvStep();
 
-	useEffect(() => {
+	// useEffect(() => {
 
-		if (BLEService.getDevice() == null) {
-			BLEService.scanDevices((device) => {
-				BLEService.connectToDevice(device.id);
-			}, [BLEService.SERVICE_UUID]);
-		} else {
-			BLEService.connectToDevice(BLEService.getDevice()!.id);
-		}
+	// 	if (BLEService.getDevice() == null) {
+	// 		BLEService.scanDevices((device) => {
+	// 			BLEService.connectToDevice(device.id);
+	// 		}, [BLEService.SERVICE_UUID]);
+	// 	} else {
+	// 		BLEService.connectToDevice(BLEService.getDevice()!.id);
+	// 	}
 
-		runStartCalibation();
-	}, [])
+	// 	runStartCalibation();
+	// }, [])
 
 	const runStartCalibation = async () => {
 		if (BLEService.getDevice() == null) {
@@ -60,7 +60,7 @@ const DeviceConnectionStep = () => {
 				BLEService.DATA_IN_UUID,
 				KrossDevice.encodeBase64(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_START))
 			);
-			
+
 		} catch (e: any) {
 			//Alert.alert('connect error', e?.message ?? String(e));
 		}

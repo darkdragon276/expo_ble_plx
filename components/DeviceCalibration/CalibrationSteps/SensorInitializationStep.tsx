@@ -15,15 +15,15 @@ const LuCircleBig = styled(CircleCheckBig);
 let data = ss_init
 let IconDefault: React.FC<any> = data.Icon
 
-//const SensorInitializationStep =  ({ initSensorStep }: { initSensorStep: string}) => {
-const SensorInitializationStep =  () => {
+const SensorInitializationStep = ({ initSensorStep }: { initSensorStep: string }) => {
+	//const SensorInitializationStep =  () => {
 
-	const { stt_ss_init} = useCheckStep();
-	const status = stt_ss_init
+	//const { stt_ss_init } = useCheckStep();
+	const status = initSensorStep
 	const { statusColor, textColor } = useStepColor({ status });
 	//const [sensorStep, SetSensorStep] = useState(false)
 
-	useRunSsInitStep();
+	//useRunSsInitStep();
 
 	//const dispatch = useDispatch();
 	//const { stt_ss_init } = useCheckStep();
