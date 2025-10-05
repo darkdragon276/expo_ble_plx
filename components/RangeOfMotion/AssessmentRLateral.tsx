@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { View, Text } from "react-native";
-import useGetRLateral from "../../hooks/rangeOfMotionHook/useGetRLateral";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
 import { bleEventEmitter } from "../../utils/BleEmitter";
 
@@ -14,14 +13,16 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 
 	//console.log(`AssessmentRLateral run!`)
 
-	//r_lateral = useGetRLateral({ record, pos, setPos, posMax, setPosMax });
-
 	useEffect(() => {
 		//console.log(`AssessmentCardExtension useEffect running!`)
 		const sub = bleEventEmitter.addListener('BleDataRoll', (data) => {
 			//console.log(data);
-			setPos(data);
-			setPosMax((pos > posMax) ? pos : posMax);
+			if (data > 0) {
+				setPos(data);
+			} else {
+				setPos(0.0);
+			}
+			setPosMax((data > posMax) ? data : posMax);
 		});
 
 		return () => {
@@ -31,8 +32,8 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			console.log(`AssessmentRLateral useImperativeHandle return: ${pos}`)
-			return pos
+			//console.log(`AssessmentRLateral useImperativeHandle return: ${parseFloat(pos.toFixed(1))}`)
+			return parseFloat(pos.toFixed(1))
 		},
 	}), [record]);
 

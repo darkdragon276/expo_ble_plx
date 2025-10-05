@@ -33,7 +33,7 @@ const MainDeviceList = () => {
 	
 
 	useEffect(() => {
-		console.log(`MainDeviceList useEffect running!`)
+		//console.log(`MainDeviceList useEffect running!`)
 		let manager: BleManager;
 		let sub: any;
 		//console.log(`MainDeviceList useEffect run!`)
@@ -89,12 +89,15 @@ const MainDeviceList = () => {
 	// }
 
 	const startScan = async () => {
+		//console.log(`MainDeviceList startScan running!`)
 		const manager = managerRef.current;
 		if (!manager) return;
 
+		stopScan();
+
 		// Clear previous results
 		setDevices([]);
-
+		//console.log(`MainDeviceList begin startScan !`)
 		try {
 			// On iOS you don't need to request runtime permission here (Info.plist required)
 			// On Android you must request ACCESS_FINE_LOCATION / BLUETOOTH_SCAN depending on SDK level.
@@ -104,7 +107,7 @@ const MainDeviceList = () => {
 					Alert.alert('Scan error', `${error.message}`);
 					return;
 				}
-
+				//console.log(`MainDeviceList startScan done! ${scannedDevice}`)
 				if (scannedDevice) {
 					setDevices((prev) => {
 						if (prev.find((d) => d.id === scannedDevice.id)) return prev;

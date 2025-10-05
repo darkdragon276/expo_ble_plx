@@ -29,7 +29,7 @@ const MainDeviceStatus = ({ deviceId, setOpen, managerRef, }: { deviceId: string
 	//console.log(`MainDeviceStatus render with deviceId! ${deviceId}`)
 	
 	useEffect(() => {
-		console.log(`MainDeviceStatus useEffect render! ${deviceId}`)
+		//console.log(`MainDeviceStatus useEffect render! ${deviceId}`)
 		setLocalDeviceId(deviceId)
 		connectToDevice(deviceId)
 		//startConnectReadDevice(deviceId);
@@ -104,7 +104,9 @@ const MainDeviceStatus = ({ deviceId, setOpen, managerRef, }: { deviceId: string
 								};
 						});
 
-						managerRef.current?.cancelTransaction(tranSactionID);
+						managerRef.current?.cancelTransaction(tranSactionID).finally(() => {
+							managerRef.current?.cancelDeviceConnection(deviceId);
+						});
 
 					} else {
 					// 	// console.log("Received data is null");
