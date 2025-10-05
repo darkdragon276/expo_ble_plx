@@ -12,8 +12,15 @@ const MainDeviceList = () => {
 	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
-		BLEService.initializeBLE();
-		startScan();
+		
+		const initBLE = async () => {
+			// await BLEService.initializeBLE();
+			await BLEService.requestBluetoothPermission();
+			await startScan();
+		};
+
+		initBLE();
+
 		return () => {
 			try {
 				BLEService.stopDeviceScan();
@@ -27,7 +34,7 @@ const MainDeviceList = () => {
 		try {
 			// On iOS you don't need to request runtime permission here (Info.plist required)
 			// On Android you must request ACCESS_FINE_LOCATION / BLUETOOTH_SCAN depending on SDK level.
-			BLEService.scanDevices((device) => {
+			await BLEService.scanDevices((device) => {
 				setDevices((prev) => {
 					if (prev.find((d) => d.id === device.id)) return prev;
 					return [...prev, device];
