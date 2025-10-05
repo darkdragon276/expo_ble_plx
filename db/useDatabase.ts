@@ -7,7 +7,10 @@ export function useDatabase(dbName: string = "headx.db") {
 	useEffect(() => {
 		const initDb = async () => {
 			try {
-				const database = await SQLite.openDatabaseAsync(dbName);
+				const database = await SQLite.openDatabaseAsync(dbName, {
+					useNewConnection: true
+				});
+				
 				setDb(database);
 
 				await database.execAsync(`
