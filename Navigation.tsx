@@ -16,13 +16,13 @@ const Navigatior = () => {
 			screenOptions={{
 				cardStyle: { backgroundColor: '#f3f4f6' }
 			}}>
-			<Stack.Screen
+			{/* <Stack.Screen
 				name='BLEScanner'
 				component={BLEScanner}
 				options={{
 					headerShown: false
 				}} >
-			</Stack.Screen>
+			</Stack.Screen> */}
 			<Stack.Screen
 				name="Main"
 				component={Main}

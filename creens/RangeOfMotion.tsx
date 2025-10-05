@@ -1,13 +1,13 @@
 import { useState, useLayoutEffect, useEffect, useRef } from "react";
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import {
-	View,
-	Text,
-	Pressable,
-	TouchableOpacity,
-	ScrollView,
-	Image,
-	Alert,
+    View,
+    Text,
+    Pressable,
+    TouchableOpacity,
+    ScrollView,
+    Image,
+    Alert,
 } from "react-native";
 
 // import LinearGradient from "react-native-linear-gradient";
@@ -29,9 +29,9 @@ import { DB_INSERT_ROM, DB_SELECT_ALL_ROM, DB_DELETE_ALL_ROM } from "../db/dbQue
 import { getCurrentDateTime } from "../utils/getDateTime";
 import { ChildROMRef } from "../model/ChildRefGetValue";
 import { KrossDevice } from "../ble/KrossDevice";
-import { BleManager, State } from "react-native-ble-plx";
-import BLEManagerInstance from "../ble/BLEManager";
-import {bleEventEmitter, type BleEmitterProps} from "../utils/BleEmitter";
+import { BleManager, State, Characteristic } from "react-native-ble-plx";
+import { bleEventEmitter, type BleEmitterProps } from "../utils/BleEmitter";
+import { BLEService } from "../ble/BLEService";
 
 const LuPlay = styled(LucidePlay);
 const LuUsers = styled(LucideUsers);
@@ -47,388 +47,345 @@ const RightRotationSrcImage = require("../assets/RightRotation.png");
 const LeftLateralSrcImage = require("../assets/LeftLateral.png");
 const RightLateralSrcImage = require("../assets/RightLateral.png");
 
-const SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
-const DATA_OUT_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
-
 const RangeOfMotion = () => {
-	const navigation = useNavigation<NavigationProp>();
-	const [record, setRecord] = useState(false);
-	const db = useDatabase("headx.db");
-	const route = useRoute<RProp>();
+    const navigation = useNavigation<NavigationProp>();
+    const [record, setRecord] = useState(false);
+    const db = useDatabase("headx.db");
+    const route = useRoute<RProp>();
 
-	const managerRef = useRef<BleManager | null>(null);
-	const krossDevice = new KrossDevice();
-	const tranSactionID = "READ_DATA_DEVICE";
+    const krossDevice = new KrossDevice();
 
-	const refExtension = useRef<ChildROMRef>(null);
-	const refFlexion = useRef<ChildROMRef>(null);
-	const refLRotation = useRef<ChildROMRef>(null);
-	const refRRotation = useRef<ChildROMRef>(null);
-	const refLLateral = useRef<ChildROMRef>(null);
-	const refRLateral = useRef<ChildROMRef>(null);
+    const refExtension = useRef<ChildROMRef>(null);
+    const refFlexion = useRef<ChildROMRef>(null);
+    const refLRotation = useRef<ChildROMRef>(null);
+    const refRRotation = useRef<ChildROMRef>(null);
+    const refLLateral = useRef<ChildROMRef>(null);
+    const refRLateral = useRef<ChildROMRef>(null);
 
-	useLayoutEffect(() => {
-		//console.log(`RangeOfMotion - useLayoutEffect`)
-		navigation.setOptions({
-			title: "",
-			headerTitleAlign: "left",
-			headerStyle: {
-				elevation: 0,
-				shadowOpacity: 0,
-				borderBottomWidth: 0,
-			},
-			headerLeft: () => (
-				<View className="flex-row items-center">
-					<Pressable
-						onPress={() => navigation.replace("AssessmentSelection")}
-						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
-					>
-						<Ionicons name="arrow-back" size={18} color="black" />
-						<Text className="ml-1 text-sm font-medium">Back</Text>
-					</Pressable>
-				</View>
-			),
-			headerRight: () => {
-				return record
-					?
-					<View className="flex-row items-center px-3 py-1 rounded-full bg-red-100 border border-red-300 mr-2">
-						<View className="w-2.5 h-2.5 rounded-full bg-red-600 mr-2" />
-						<Text className="text-red-600 font-medium"> Recording</Text>
-					</View>
-					:
-					<></>;
-			}
-		});
-	}, [navigation, record]);
+    useLayoutEffect(() => {
+        //console.log(`RangeOfMotion - useLayoutEffect`)
+        navigation.setOptions({
+            title: "",
+            headerTitleAlign: "left",
+            headerStyle: {
+                elevation: 0,
+                shadowOpacity: 0,
+                borderBottomWidth: 0,
+            },
+            headerLeft: () => (
+                <View className="flex-row items-center">
+                    <Pressable
+                        onPress={() => navigation.replace("AssessmentSelection")}
+                        className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
+                    >
+                        <Ionicons name="arrow-back" size={18} color="black" />
+                        <Text className="ml-1 text-sm font-medium">Back</Text>
+                    </Pressable>
+                </View>
+            ),
+            headerRight: () => {
+                return record
+                    ?
+                    <View className="flex-row items-center px-3 py-1 rounded-full bg-red-100 border border-red-300 mr-2">
+                        <View className="w-2.5 h-2.5 rounded-full bg-red-600 mr-2" />
+                        <Text className="text-red-600 font-medium"> Recording</Text>
+                    </View>
+                    :
+                    <></>;
+            }
+        });
+    }, [navigation, record]);
 
-	useEffect(() => {
-		//console.log(`RangeOfMotion useEffect running!`)
-			let manager: BleManager;
-			let sub: any;
-	
-			try {
-				manager = new BleManager();
-				managerRef.current = manager;
-	
-				sub = manager.onStateChange((state: State) => {
-					if (state === 'PoweredOff') {
-						Alert.alert('Bluetooth off', 'Turn off device to Scan!');
-					}
-				}, true);
-			} catch (error) {
-				Alert.alert('Can not init BleManager');
-			}
-			
-			return () => {
-				try {
-					sub.remove();
-					stopScan();
-					manager.destroy();
-					managerRef.current?.cancelTransaction(tranSactionID);
-					managerRef.current = null;
-				} catch (cleanupError) {
-					//console.error("Error to cleanup BleManager:", cleanupError);
-				}
-			};
-	}, [])
+    useEffect(() => {
+        if (BLEService.getDevice() == null) {
+            BLEService.scanDevices((device) => {
+                BLEService.connectToDevice(device.id);
+            }, [BLEService.SERVICE_UUID]);
+        } else {
+            BLEService.connectToDevice(BLEService.getDevice()!.id);
+        }
 
-	const startReadDataDevice = async (deviceId: string) => {
-		console.log(`RangeOfMotion -- Run connectToDevice with deviceId: ${deviceId}`);
-		try {
-			
-			if (deviceId === "") {
-				Alert.alert('Connect error', `No connected device: `);
-				return;
-			}
+        return () => {
+            try {
+                if (BLEService.getDevice() != null) {
+                    BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
+                    BLEService.disconnectDevice();
+                }
+            } catch (cleanupError) {
+                //console.error("Error to cleanup BleManager:", cleanupError);
+            }
+        };
+    }, [])
 
-			stopScan();
+    const addROMData = async (key: string) => {
+        if (!db) {
+            //console.log("addData db is null !");
+            return;
+        }
 
-			const connected = await managerRef.current?.connectToDevice(deviceId, { autoConnect: true });
-			if (!connected) {
-				Alert.alert('Connect error', `No connected device: `);
-				//console.log(`MainDeviceStatus -- Connect error No connected device: ${deviceId}`);
-				return;
-			}
+        const extension = refExtension.current?.getValue() || 0.0;
+        const flexion = refFlexion.current?.getValue() || 0.0;
+        const l_rotation = refLRotation.current?.getValue() || 0.0;
+        const r_rotation = refRRotation.current?.getValue() || 0.0;
+        const l_lateral = refLLateral.current?.getValue() || 0.0;
+        const r_lateral = refRLateral.current?.getValue() || 0.0;
 
-			console.log(`RangeOfMotion -- Connect success: ${deviceId}`);
-			
-			await connected.discoverAllServicesAndCharacteristics();
-			setRecord(true);
+        //console.log(`RangeOfMotion key insert: ${key}`)
+        //console.log(`addData: ${extension}`)
 
-			let subscription = connected.monitorCharacteristicForService(
-				SERVICE_UUID,
-				DATA_OUT_UUID,
-				(error, char) => {
-					if (error) {
-						//console.error("Notification error:", error);
-						return;
-					}
+        let { title } = route.params;
+        const { localShortDateTime, strNow } = getCurrentDateTime()
+        const dt: string = strNow;
+        const type: string = "ROM";
 
-					BLEManagerInstance.setUUID(deviceId);
+        if (title == "") {
+            title = `ROM Session - ${localShortDateTime}`;
+        }
 
-					//console.log(`MainDeviceStatus - connectToDevice - monitorCharacteristicForService`)
-					let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
-					if (data) {
-						krossDevice.unpack(data);
-						//krossDevice.log();
-						//console.log(krossDevice.angle);
-						bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
-						bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
-						bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
-					} else {
-					// 	// console.log("Received data is null");
-					}
-				},
-				tranSactionID
-			);
-		} catch (e: any) {
-			//Alert.alert('connect error', e?.message ?? String(e));
-		}
-	};
+        await db.runAsync(DB_INSERT_ROM, [key, title, dt, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, 0]);
+        //console.log(`Rom of Motion -> INSERT done! ---> title: ${title}`);
+    };
 
-	const stopScan = () => {
-		const manager = managerRef.current;
-		try {
-			manager?.stopDeviceScan();
-		} catch (e) {
-			//console.warn('stopScan error', e);
-		}
-	};
+    const onPressRecording = async () => {
+        if (BLEService.getDevice() == null) {
+            Alert.alert('Connect error', `No connected device: `);
+            return;
+        }
 
-	const addROMData = async (key: string) => {
-		if (!db) {
-			//console.log("addData db is null !");
-			return;
-		}
+        try {
+            const onError = (error: Error): void => {
+                if (error) {
+                    //Alert.alert('BLE Error', error?.message ?? String(error));
+                    //console.error("BLE Error", error);
+                    return;
+                }
+                return;
+            };
 
-		const extension = refExtension.current?.getValue() || 0.0;
-		const flexion = refFlexion.current?.getValue() || 0.0;
-		const l_rotation = refLRotation.current?.getValue() || 0.0;
-		const r_rotation = refRRotation.current?.getValue() || 0.0;
-		const l_lateral = refLLateral.current?.getValue() || 0.0;
-		const r_lateral = refRLateral.current?.getValue() || 0.0;
+            const onMonitor = (char: Characteristic) => {
+                let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
+                if (data) {
+                    krossDevice.unpack(data);
+                    //krossDevice.log();
+                    //console.log(krossDevice.angle);
+                    bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
+                    bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
+                    bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
+                } else {
+                    // 	// console.log("Received data is null");
+                }
+            }
 
-		//console.log(`RangeOfMotion key insert: ${key}`)
-		//console.log(`addData: ${extension}`)
+            await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+            setRecord(true);
+            BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
+        } catch (e: any) {
+            //Alert.alert('connect error', e?.message ?? String(e));
+        }
+    };
 
-		let { title } = route.params;
-		const { localShortDateTime, strNow } = getCurrentDateTime()
-		const dt: string = strNow;
-		const type: string = "ROM";
+    const onPressStopRecording = async () => {
 
-		if (title == "") {
-			title = `ROM Session - ${localShortDateTime}`;
-		}
+        await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
+        await BLEService.disconnectDevice();
+        setRecord(false);
 
-		await db.runAsync(DB_INSERT_ROM, [key, title, dt, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, 0]);
-		//console.log(`Rom of Motion -> INSERT done! ---> title: ${title}`);
-	};
+        setTimeout(async () => {
+            const key: string = Date.now().toString();
+            addROMData(key).then(() => {
+                navigation.replace("RangeOfMotionSummary", { key: key })
+            }).catch((error) => {
+                console.log(error)
+            });
+        }, 50)
+    };
 
-	const onPressRecording = () => {
-		startReadDataDevice(BLEManagerInstance.getUUID());
-	};
+    return (
+        <ScrollView className="flex-1 p-4 space-y-6">
+            <View className="items-center">
+                <Text className="text-lg font-semibold mb-1">
+                    Range of Motion Assessment
+                </Text>
+                <Text className="text-sm text-gray-500 text-center">
+                    Live data capture from all cervical movements
+                </Text>
+            </View>
 
-	const onPressStopRecor = async () => {
-		setRecord(false)
+            <View className="flex-1 space-y-6">
+                {/* Card Instructions */}
+                <View className="bg-blue-50 rounded-xl px-4 py-3 shadow-sm">
+                    {/* Header */}
+                    <View className="flex-row items-center justify-center">
+                        {/* Small icon */}
+                        <LuUsers size={20}></LuUsers>
+                        <Text className="ml-2 font-semibold text-blue-700">Instructions</Text>
+                    </View>
 
-		await managerRef.current?.cancelTransaction(tranSactionID)
-		await managerRef.current?.cancelDeviceConnection(BLEManagerInstance.getUUID());
+                    {/* List Steps */}
+                    <View className="space-y-2">
+                        <View className="flex-row items-start">
+                            <Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
+                                1
+                            </Text>
+                            <Text className="flex-1 text-sm text-blue-700">
+                                Position patient seated, looking straight ahead
+                            </Text>
+                        </View>
 
-		const key: string = Date.now().toString();
-		addROMData(key).then(() => {
-			navigation.replace("RangeOfMotionSummary", { key: key })
-		}).catch((error) => {
-			console.log(error)
-		});
-	};
+                        <View className="flex-row items-start">
+                            <Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
+                                2
+                            </Text>
+                            <Text className="flex-1 text-sm text-blue-700">
+                                Start recording and guide through all 6 movements
+                            </Text>
+                        </View>
 
-	return (
-		<ScrollView className="flex-1 p-4 space-y-6">
-			<View className="items-center">
-				<Text className="text-lg font-semibold mb-1">
-					Range of Motion Assessment
-				</Text>
-				<Text className="text-sm text-gray-500 text-center">
-					Live data capture from all cervical movements
-				</Text>
-			</View>
+                        <View className="flex-row items-start">
+                            <Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
+                                3
+                            </Text>
+                            <Text className="flex-1 text-sm text-blue-700">
+                                Stop recording when complete to view results
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </View>
 
-			<View className="flex-1 space-y-6">
-				{/* Card Instructions */}
-				<View className="bg-blue-50 rounded-xl px-4 py-3 shadow-sm">
-					{/* Header */}
-					<View className="flex-row items-center justify-center">
-						{/* Small icon */}
-						<LuUsers size={20}></LuUsers>
-						<Text className="ml-2 font-semibold text-blue-700">Instructions</Text>
-					</View>
+            {/* Start Assessment Button */}
+            <View className="flex-row items-center justify-center rounded-xl bg-white p-4">
+                {
+                    !record
+                        ?
+                        <TouchableOpacity
+                            onPress={onPressRecording}
+                            activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
+                            <LinearGradient
+                                colors={["#0a66ff", "#00a3ff"]}
+                                start={[0, 0]}
+                                end={[1, 0]}
+                                className="flex-row items-center justify-center w-full py-4 px-12"
+                            >
+                                <LuPlay size={20} color="white"></LuPlay>
+                                <Text className="text-white font-semibold ml-2 p-3">Start Assessment</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                        :
+                        <TouchableOpacity
+                            onPress={onPressStopRecording}
+                            activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
+                            <LinearGradient
+                                colors={["#B91C1C", "#B91C1C"]}
+                                start={[0, 0]}
+                                end={[1, 0]}
+                                className="flex-row bg-red-700 items-center justify-center w-full py-4 px-12"
+                            >
+                                <LuSquare size={20} color="white"></LuSquare>
+                                <Text className="text-white font-semibold ml-2 p-3">Stop Recording</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                }
+            </View>
 
-					{/* List Steps */}
-					<View className="space-y-2">
-						<View className="flex-row items-start">
-							<Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
-								1
-							</Text>
-							<Text className="flex-1 text-sm text-blue-700">
-								Position patient seated, looking straight ahead
-							</Text>
-						</View>
+            <View className="flex-row flex-wrap">
+                <View className="w-1/2 p-2">
+                    <View className="bg-blue-50/80 border border-blue-300 rounded-xl p-3">
+                        {/* Title */}
+                        <Text className="font-semibold text-gray-800 mb-1">Extension</Text>
+                        {/* Icon + description */}
+                        <View className="items-center">
+                            <Image
+                                className="w-14 h-14"
+                                source={ExtensionSrcImage}
+                            />
+                        </View>
+                        <AssessmentCardExtension record={record} ref={refExtension}></AssessmentCardExtension>
+                    </View>
+                </View>
 
-						<View className="flex-row items-start">
-							<Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
-								2
-							</Text>
-							<Text className="flex-1 text-sm text-blue-700">
-								Start recording and guide through all 6 movements
-							</Text>
-						</View>
+                <View className="w-1/2 p-2">
+                    <View className="bg-green-50/80 border border-green-300 rounded-xl p-3">
+                        {/* Title */}
+                        <Text className="font-semibold text-gray-800 mb-1">Flexion</Text>
 
-						<View className="flex-row items-start">
-							<Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
-								3
-							</Text>
-							<Text className="flex-1 text-sm text-blue-700">
-								Stop recording when complete to view results
-							</Text>
-						</View>
-					</View>
-				</View>
-			</View>
+                        {/* Icon + description */}
+                        <View className="items-center">
+                            <Image
+                                className="w-14 h-14"
+                                source={FlexionSrcImage}
+                            />
+                        </View>
+                        <AssessmentFlexion record={record} ref={refFlexion}></AssessmentFlexion>
+                    </View>
+                </View>
 
-			{/* Start Assessment Button */}
-			<View className="flex-row items-center justify-center rounded-xl bg-white p-4">
-				{
-					!record
-						?
-						<TouchableOpacity
-							onPress={onPressRecording}
-							activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
-							<LinearGradient
-								colors={["#0a66ff", "#00a3ff"]}
-								start={[0, 0]}
-								end={[1, 0]}
-								className="flex-row items-center justify-center w-full py-4 px-12"
-							>
-								<LuPlay size={20} color="white"></LuPlay>
-								<Text className="text-white font-semibold ml-2 p-3">Start Assessment</Text>
-							</LinearGradient>
-						</TouchableOpacity>
-						:
-						<TouchableOpacity
-							onPress={onPressStopRecor}
-							activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
-							<LinearGradient
-								colors={["#B91C1C", "#B91C1C"]}
-								start={[0, 0]}
-								end={[1, 0]}
-								className="flex-row bg-red-700 items-center justify-center w-full py-4 px-12"
-							>
-								<LuSquare size={20} color="white"></LuSquare>
-								<Text className="text-white font-semibold ml-2 p-3">Stop Recording</Text>
-							</LinearGradient>
-						</TouchableOpacity>
-				}
-			</View>
+                <View className="w-1/2 p-2">
+                    <View className="bg-purple-50/80 border border-purple-300 rounded-xl p-3">
+                        {/* Title */}
+                        <Text className="font-semibold text-gray-800 mb-1">Left Rotation</Text>
 
-			<View className="flex-row flex-wrap">
-				<View className="w-1/2 p-2">
-					<View className="bg-blue-50/80 border border-blue-300 rounded-xl p-3">
-						{/* Title */}
-						<Text className="font-semibold text-gray-800 mb-1">Extension</Text>
-						{/* Icon + description */}
-						<View className="items-center">
-							<Image
-								className="w-14 h-14"
-								source={ExtensionSrcImage}
-							/>
-						</View>
-						<AssessmentCardExtension record={record} ref={refExtension}></AssessmentCardExtension>
-					</View>
-				</View>
+                        {/* Icon + description */}
+                        <View className="items-center">
+                            <Image
+                                className="w-14 h-14"
+                                source={LeftRotationSrcImage}
+                            />
+                        </View>
+                        <AssessmentRRotation record={record} ref={refRRotation}></AssessmentRRotation>
+                    </View>
+                </View>
 
-				<View className="w-1/2 p-2">
-					<View className="bg-green-50/80 border border-green-300 rounded-xl p-3">
-						{/* Title */}
-						<Text className="font-semibold text-gray-800 mb-1">Flexion</Text>
+                <View className="w-1/2 p-2">
+                    <View className="bg-orange-50/80 border border-orange-300 rounded-xl p-3">
+                        {/* Title */}
+                        <Text className="font-semibold text-gray-800 mb-1">Right Rotation</Text>
 
-						{/* Icon + description */}
-						<View className="items-center">
-							<Image
-								className="w-14 h-14"
-								source={FlexionSrcImage}
-							/>
-						</View>
-						<AssessmentFlexion record={record} ref={refFlexion}></AssessmentFlexion>
-					</View>
-				</View>
+                        {/* Icon + description */}
+                        <View className="items-center">
+                            <Image
+                                className="w-14 h-14"
+                                source={RightRotationSrcImage}
+                            />
+                        </View>
+                        <AssessmentRLateral record={record} ref={refRLateral}></AssessmentRLateral>
+                    </View>
+                </View>
 
-				<View className="w-1/2 p-2">
-					<View className="bg-purple-50/80 border border-purple-300 rounded-xl p-3">
-						{/* Title */}
-						<Text className="font-semibold text-gray-800 mb-1">Left Rotation</Text>
+                <View className="w-1/2 p-2">
+                    <View className="bg-teal-50/80 border border-teal-300 rounded-xl p-3">
+                        {/* Title */}
+                        <Text className="font-semibold text-gray-800 mb-1">Left Lateral</Text>
 
-						{/* Icon + description */}
-						<View className="items-center">
-							<Image
-								className="w-14 h-14"
-								source={LeftRotationSrcImage}
-							/>
-						</View>
-						<AssessmentRRotation record={record} ref={refRRotation}></AssessmentRRotation>
-					</View>
-				</View>
+                        {/* Icon + description */}
+                        <View className="items-center">
+                            <Image
+                                className="w-14 h-14"
+                                source={LeftLateralSrcImage}
+                            />
+                        </View>
+                        <AssessmentLRotation record={record} ref={refLRotation}></AssessmentLRotation>
+                    </View>
+                </View>
 
-				<View className="w-1/2 p-2">
-					<View className="bg-orange-50/80 border border-orange-300 rounded-xl p-3">
-						{/* Title */}
-						<Text className="font-semibold text-gray-800 mb-1">Right Rotation</Text>
+                <View className="w-1/2 p-2">
+                    <View className="bg-pink-50/80 border border-pink-300 rounded-xl p-3">
+                        {/* Title */}
+                        <Text className="font-semibold text-gray-800 mb-1">Right Lateral</Text>
 
-						{/* Icon + description */}
-						<View className="items-center">
-							<Image
-								className="w-14 h-14"
-								source={RightRotationSrcImage}
-							/>
-						</View>
-						<AssessmentRLateral record={record} ref={refRLateral}></AssessmentRLateral>
-					</View>
-				</View>
-
-				<View className="w-1/2 p-2">
-					<View className="bg-teal-50/80 border border-teal-300 rounded-xl p-3">
-						{/* Title */}
-						<Text className="font-semibold text-gray-800 mb-1">Left Lateral</Text>
-
-						{/* Icon + description */}
-						<View className="items-center">
-							<Image
-								className="w-14 h-14"
-								source={LeftLateralSrcImage}
-							/>
-						</View>
-						<AssessmentLRotation record={record} ref={refLRotation}></AssessmentLRotation>
-					</View>
-				</View>
-
-				<View className="w-1/2 p-2">
-					<View className="bg-pink-50/80 border border-pink-300 rounded-xl p-3">
-						{/* Title */}
-						<Text className="font-semibold text-gray-800 mb-1">Right Lateral</Text>
-
-						{/* Icon + description */}
-						<View className="items-center">
-							<Image
-								className="w-14 h-14"
-								source={RightLateralSrcImage}
-							/>
-						</View>
-						<AssessmentLLateral record={record} ref={refLLateral}></AssessmentLLateral>
-					</View>
-
-				</View>
-			</View>
-		</ScrollView>
-	)
+                        {/* Icon + description */}
+                        <View className="items-center">
+                            <Image
+                                className="w-14 h-14"
+                                source={RightLateralSrcImage}
+                            />
+                        </View>
+                        <AssessmentLLateral record={record} ref={refLLateral}></AssessmentLLateral>
+                    </View>
+                </View>
+            </View>
+        </ScrollView>
+    )
 }
 
 export default RangeOfMotion
