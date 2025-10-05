@@ -1,11 +1,12 @@
 import { styled } from "nativewind";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable, Alert, TouchableOpacity } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from "@expo/vector-icons";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from '../model/RootStackParamList';
 import { BLEService } from "../ble/BLEService";
+import { KrossDevice } from "../ble/KrossDevice";
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const FtherIcon = styled(Feather);
@@ -18,6 +19,7 @@ type SettingsDeviceProps = {
 const SettingsDevice = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [deviceInfo, setDeviceInfo] = useState<SettingsDeviceProps>()
+	const krossDevice = new KrossDevice();
 
 	const onPressGotoDeviceCalibration = () => {
 		navigation.replace("DeviceCalibration")
@@ -38,14 +40,14 @@ const SettingsDevice = () => {
 			),
 			headerRight: () => (
 				<View className="flex-row items-center justify-center mb-1 mr-8">
-					<Pressable
-						onPress={() => { }}
+					<TouchableOpacity
+						onPress={reSet}
 						className="bg-white px-4 py-2 rounded-xl border border-gray-300"
 					>
 						<Text className="text-gray-800 text-center">
 							Reset
 						</Text>
-					</Pressable >
+					</TouchableOpacity >
 				</View>
 			),
 		});
@@ -55,7 +57,7 @@ const SettingsDevice = () => {
 
 		const fetchDeviceName = async () => {
 			const device = await BLEService.getDevice();
-			
+
 			if (!device) {
 				return;
 			}
@@ -65,13 +67,40 @@ const SettingsDevice = () => {
 					deviceName: device.name ?? "Unknown Device",
 					deviceState: "Device Connected" //isConnected ? "Device Connected" : "No Device Connected",
 				};
-				
+
 				setDeviceInfo(deviceInfo);
 			});
 		};
 
+		if (BLEService.getDevice() == null) {
+			BLEService.scanDevices((device) => {
+				BLEService.connectToDevice(device.id);
+			}, [BLEService.SERVICE_UUID]);
+		} else {
+			BLEService.connectToDevice(BLEService.getDevice()!.id);
+		}
+
 		fetchDeviceName();
 	}, []);
+
+	const reSet = async () => {
+		if (BLEService.getDevice() == null) {
+			Alert.alert('Connect error', `No connected device: `);
+			return;
+		}
+
+		try {
+			console.log('Setting Device is pack --- RESET_QUATERNION');
+			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+			BLEService.writeCharacteristicWithoutResponseForDevice(
+				BLEService.SERVICE_UUID,
+				BLEService.DATA_IN_UUID,
+				KrossDevice.encodeBase64(krossDevice.pack(KrossDevice.Cmd.RESET_QUATERNION))
+			);
+		} catch (e: any) {
+			//Alert.alert('connect error', e?.message ?? String(e));
+		}
+	};
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
