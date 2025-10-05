@@ -3,137 +3,39 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useEffect, useRef, useState } from 'react';
 import { BleManager, Device, State } from 'react-native-ble-plx';
 import MainDeviceStatus from './MainDeviceStatus';
-//import { KrossDevice } from '../../ble/KrossDevice';
-// import useScanDevice from '../../hooks/ble/useScanDevice';
-//import { BLEService } from '../../ble/BLEService';
-//import bleService from '../../ble/BLEService';
-import BLEManagerInstance from "../../ble/BLEManager";
-
-// type ScannedDevice = {
-// 	id: string;
-// 	name: string | null;
-// 	rssi: number | null;
-// 	device: Device;
-// };
-
-const SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
-const DATA_IN_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
-const DATA_OUT_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+import { BLEService } from '../../ble/BLEService';
 
 const MainDeviceList = () => {
 
-	const managerRef = useRef<BleManager | null>(null);
-	//const [isScanning, setIsScanning] = useState(false);
 	const [devices, setDevices] = useState<Device[]>([]);
 	const [deviceId, setSelectedDevice] = useState<string>("");
 	const [open, setOpen] = useState(false);
-	//const [, setStateVersion] = useState(0);
-	//const krossDevice = new KrossDevice();
-
-	
 
 	useEffect(() => {
-		//console.log(`MainDeviceList useEffect running!`)
-		let manager: BleManager;
-		let sub: any;
-		//console.log(`MainDeviceList useEffect run!`)
-		
-	//bleService.scanDevices(onSetDevice, [SERVICE_UUID], true)
-
-		// BLEService.initializeBLE().then(() => {
-		// 	BLEService.stopDeviceScan();
-		// 	//console.log("BLE initialized!");
-		// 	BLEService.scanDevices(onSetDevice, [SERVICE_UUID], true).then(()=>{
-		// 		//console.log("BLE scanDevices!");
-		// 		//
-		// 	})
-		// });
-
-		//BLEManagerInstance.getInstance();
-
-		try {
-			manager = new BleManager();
-			managerRef.current = manager;
-
-			sub = manager.onStateChange((state: State) => {
-				if (state === 'PoweredOff') {
-					Alert.alert('Bluetooth off', 'Turn off device to Scan!');
-				}
-			}, true);
-		} catch (error) {
-			Alert.alert('Can not init BleManager');
-		}
-
+		BLEService.initializeBLE();
 		startScan();
-
 		return () => {
 			try {
-				sub.remove();
-				stopScan();
-				manager.destroy();
-				managerRef.current = null;
+				BLEService.stopDeviceScan();
 			} catch (cleanupError) {
-				//console.error("Error to cleanup BleManager:", cleanupError);
 			}
 		};
 	}, []);
 
-	// const onSetDevice = (device: Device) => {
-	// 	//setDevices([]);
-	// 	setDevices((prev) => {
-	// 		if (prev.find((d) => d.id === device.id)) return prev;
-	// 		return [...prev, device];
-	// 	});
-	// 	//bleService.stopScan();
-	// 	//console.log(`setting device done!`)
-	// }
-
 	const startScan = async () => {
-		//console.log(`MainDeviceList startScan running!`)
-		const manager = managerRef.current;
-		if (!manager) return;
-
-		stopScan();
-
-		// Clear previous results
 		setDevices([]);
-		//console.log(`MainDeviceList begin startScan !`)
 		try {
 			// On iOS you don't need to request runtime permission here (Info.plist required)
 			// On Android you must request ACCESS_FINE_LOCATION / BLUETOOTH_SCAN depending on SDK level.
-			//setIsScanning(true);
-			manager.startDeviceScan([SERVICE_UUID], { allowDuplicates: false }, (error, scannedDevice) => {
-				if (error) {
-					Alert.alert('Scan error', `${error.message}`);
-					return;
-				}
-				//console.log(`MainDeviceList startScan done! ${scannedDevice}`)
-				if (scannedDevice) {
-					setDevices((prev) => {
-						if (prev.find((d) => d.id === scannedDevice.id)) return prev;
-						return [...prev, scannedDevice];
-					});
-				}
-
-				stopScan();
-
-			})
-
+			BLEService.scanDevices((device) => {
+				setDevices((prev) => {
+					if (prev.find((d) => d.id === device.id)) return prev;
+					return [...prev, device];
+				});
+			}, [BLEService.SERVICE_UUID]);
 		} catch (e: any) {
-			//console.warn('Failed to start scan', e);
 			Alert.alert('Failed to start scan', e?.message ?? String(e));
-			//setIsScanning(false);
 		}
-	};
-
-	const stopScan = () => {
-		const manager = managerRef.current;
-		try {
-			manager?.stopDeviceScan();
-		} catch (e) {
-			console.warn('stopScan error', e);
-		}
-		//setIsScanning(false);
 	};
 
 	return (
@@ -142,7 +44,6 @@ const MainDeviceList = () => {
 			<MainDeviceStatus
 				deviceId={deviceId}
 				setOpen={() => setOpen(true)}
-				managerRef={managerRef}
 			>
 			</MainDeviceStatus>
 

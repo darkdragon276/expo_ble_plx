@@ -138,6 +138,7 @@ export default function BLEScanner() {
 		try {
 			stopScan();
 			const connected = await managerRef.current?.connectToDevice(device.id, { autoConnect: true });
+			console.log(`Connected to device: ${device.id}`);
 			if (!connected) {
 				Alert.alert('Connect error', 'No connected device');
 				return;
@@ -156,7 +157,7 @@ export default function BLEScanner() {
 					let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 					if (data) {
 						krossDevice.unpack(data);
-						krossDevice.log();
+						//krossDevice.log();
 					} else {
 						// console.log("Received data is null");
 					}

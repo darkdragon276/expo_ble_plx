@@ -26,6 +26,11 @@ class BLEServiceInstance {
 
 	isCharacteristicMonitorDisconnectExpected = false
 
+	readonly SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+	readonly DATA_IN_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
+	readonly DATA_OUT_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E";
+	readonly READ_DATA_TRANSACTION_ID = "READ-DATA-ABC-123";
+
 	constructor() {
 		this.device = null
 		this.characteristicMonitor = null
@@ -70,7 +75,7 @@ class BLEServiceInstance {
 			}, true)
 		})
 
-	disconnectDevice = () => {
+	disconnectDevice = async() => {
 		if (!this.device) {
 			this.showErrorToast(deviceNotConnectedErrorText)
 			throw new Error(deviceNotConnectedErrorText)
@@ -418,20 +423,20 @@ class BLEServiceInstance {
 	}
 
 	showErrorToast = (error: string) => {
-		Toast.show({
-			type: 'error',
-			text1: 'Error',
-			text2: error
-		})
-		console.error(error)
+		// Toast.show({
+		// 	type: 'error',
+		// 	text1: 'Error',
+		// 	text2: error
+		// })
+		// console.error(error)
 	}
 
 	showSuccessToast = (info: string) => {
-		Toast.show({
-			type: 'success',
-			text1: 'Success',
-			text2: info
-		})
+		// Toast.show({
+		// 	type: 'success',
+		// 	text1: 'Success',
+		// 	text2: info
+		// })
 	}
 }
 
