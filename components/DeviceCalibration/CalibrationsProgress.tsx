@@ -15,6 +15,20 @@ import { KrossDevice } from '../../ble/KrossDevice'
 import { Alert } from 'react-native'
 import { bleEventEmitter } from '../../utils/BleEmitter'
 
+let _connectDeviceStep: boolean = false;
+let _initSensorStep: boolean = false;
+let _holdDeviceStep: boolean = false;
+// let _xAxis: boolean = false;
+// let _yAxis: boolean = false;
+// let _zAxis: boolean = false;
+
+let roll_Z_Left: number = 0;
+let roll_Z_Right: number = 0;
+let pitch_Y_Up: number = 0;
+let pitch_Y_Down: number = 0;
+let yaw_X_Left: number = 0;
+let yaw_X_Right: number = 0;
+
 const CalibrationsProgress = () => {
 	const { stt_c_cpl, stt_hold_dv } = useCheckStep();
 	const krossDevice = new KrossDevice();
@@ -22,51 +36,35 @@ const CalibrationsProgress = () => {
 	const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
 	const [initSensorStep, setInitSensorStep] = useState("pending");
 	const [holdDeviceStep, setHoldDeviceStep] = useState("pending");
-	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
-	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
-	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
-	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
-	// const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
+	const [xAxis, setXAxis] = useState("pending");
+	const [yAxis, setYAxis] = useState("pending");
+	const [zAxis, setZAxis] = useState("pending");
+	const [complete, setComplete] = useState("pending");
 
 	useEffect(() => {
 		const initiateCalibration = async () => {
-
-			// if (BLEService.getDevice() == null) {
-			// 	BLEService.scanDevices((device) => {
-			// 		BLEService.connectToDevice(device.id).then(() => {
-			// 			bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true);
-
-			// 		}).catch((e) => {
-			// 			bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', false);
-
-			// 		})
-			// 	}, [BLEService.SERVICE_UUID]);
-			// } else {
-			// 	BLEService.connectToDevice(BLEService.getDevice()!.id).then(() => {
-			// 		bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
-
-			// 	}).catch((e) => {
-			// 		bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', false);
-
-			// 	})
-			// }
-			setConnectDeviceStep("active");
-
 			if (BLEService.getDevice() == null) {
 				BLEService.scanDevices((device) => {
-					BLEService.connectToDevice(device.id);
+					BLEService.connectToDevice(device.id).then(() => {
+						_connectDeviceStep = true;
+						_initSensorStep = true;
+						_holdDeviceStep = true;
+					})
 				}, [BLEService.SERVICE_UUID]);
 			} else {
-				BLEService.connectToDevice(BLEService.getDevice()!.id);
+				BLEService.connectToDevice(BLEService.getDevice()!.id).then(() => {
+					_connectDeviceStep = true;
+					_initSensorStep = true;
+					_holdDeviceStep = true;
+				})
 			}
-
 		};
 
-		// initiateCalibration().then(() => {
-		// 	//bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
-		// 	//console.log('initiateCalibration finally');
-		// 	runStepCalibation();
-		// });
+		runSequentialCalibarion();
+
+		initiateCalibration().then(() => {
+			onDataDevice();
+		});
 
 		return () => {
 			try {
@@ -81,7 +79,7 @@ const CalibrationsProgress = () => {
 
 	}, []);
 
-	const runStepCalibation = async () => {
+	const onDataDevice = async () => {
 
 		if (BLEService.getDevice() == null) {
 			Alert.alert('Connect error', `No connected device: `);
@@ -97,27 +95,39 @@ const CalibrationsProgress = () => {
 				return;
 			};
 
+
+
 			const onMonitor = (char: Characteristic) => {
 				//console.log('onMonitor running');
 				let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 				if (data) {
-					//bleEventEmitter.emit('CALIBRATION_CONNECT_DEVICE', true)
 					krossDevice.unpack(data);
-					//krossDevice.log();
-					console.log(krossDevice.angle);
-					bleEventEmitter.emit('CALIBRATION_X', krossDevice.angle.roll);
-					bleEventEmitter.emit('CALIBRATION_Y', krossDevice.angle.pitch);
-					bleEventEmitter.emit('CALIBRATION_Z', krossDevice.angle.yaw);
+					//console.log(krossDevice.angle);
+
+					if (roll_Z_Left === 0 && roll_Z_Right === 0) {
+						roll_Z_Left = krossDevice.angle.roll
+						roll_Z_Right = krossDevice.angle.roll
+					}
+
+					if (krossDevice.angle.pitch > 0 && pitch_Y_Up === 0) {
+						pitch_Y_Up = krossDevice.angle.pitch
+					}
+
+					if (krossDevice.angle.pitch < 0 && pitch_Y_Down === 0) {
+						pitch_Y_Down = krossDevice.angle.pitch
+					}
+
+					if (krossDevice.angle.yaw > 0 && yaw_X_Left === 0) {
+						yaw_X_Left = krossDevice.angle.yaw
+					}
+
+					if (krossDevice.angle.yaw < 0 && yaw_X_Right === 0) {
+						yaw_X_Right = krossDevice.angle.yaw
+					}
 
 				} else {
 					//console.log("Received data is null");
 				}
-
-				// setTimeout(() => {
-				// 	BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID).then(() => {
-				// 		BLEService.disconnectDevice();
-				// 	})
-				// }, 3000)
 			}
 
 			//console.log('runStepCalibation is unpacking');
@@ -134,30 +144,95 @@ const CalibrationsProgress = () => {
 		}
 	};
 
-	const intervalRunCali = setInterval(() => {
+	const tryConnectingDevice = async () => {
+		setConnectDeviceStep("active");
+		await waitUntil(() => _connectDeviceStep === true)
+		return "done"
+	};
 
-	}, 1000);
+	const tryInitSensor = async () => {
+		setInitSensorStep("active");
+		await waitUntil(() => _initSensorStep === true)
+		return "done"
+	};
+
+	const trytHoldDevice = async () => {
+		setHoldDeviceStep("active");
+		await waitUntil(() => _holdDeviceStep === true)
+		return "done"
+	};
+
+	const tryGetXAxis = async () => {
+		setXAxis("active");
+		await waitUntil(() => yaw_X_Left !== 0 && yaw_X_Right !== 0)
+		return "done"
+	};
+
+	const tryGetYAxis = async () => {
+		setYAxis("active");
+		await waitUntil(() => pitch_Y_Up !== 0 && pitch_Y_Down !== 0)
+		return "done"
+	};
+
+	const tryGetZAxis = async () => {
+		setZAxis("active");
+		await waitUntil(() => roll_Z_Left !== 0 && roll_Z_Right !== 0)
+		return "done"
+	};
+
+	const runSequentialCalibarion = async () => {
+		try {
+			const r1 = await tryConnectingDevice();
+			setConnectDeviceStep(r1);
+
+			const r2 = await tryInitSensor();
+			setInitSensorStep(r2);
+
+			const r3 = await trytHoldDevice();
+			setHoldDeviceStep(r3);
+
+			const r4 = await tryGetXAxis();
+			setXAxis(r4);
+
+			const r5 = await tryGetYAxis();
+			setYAxis(r5);
+
+			const r6 = await tryGetZAxis();
+			setZAxis(r6);
+
+		} catch (err) {
+			console.error('Error:', err);
+		} finally {
+			setComplete("done")
+		}
+	};
+
+	const waitUntil = (condition: () => boolean, intervalMs = 1000): Promise<void> => {
+		return new Promise((resolve) => {
+			const interval = setInterval(() => {
+				if (condition()) {
+					clearInterval(interval);
+					resolve();
+				}
+			}, intervalMs);
+		});
+	};
 
 	return (
 		<>
-			{stt_c_cpl === "done"
+			{complete === "done"
 				?
 				(<CalibrationsDone></CalibrationsDone>)
 				:
 				(
 					<>
-						<DeviceConnectionStep
-							// connectDeviceStep={connectDeviceStep}
-						>
-						</DeviceConnectionStep>
-						<SensorInitializationStep
-							// initSensorStep={initSensorStep}
-						></SensorInitializationStep>
-						<HoldDeviceStep ></HoldDeviceStep>
-						<XAxisStep></XAxisStep>
-						<YAxisStep></YAxisStep>
-						<ZAxisStep></ZAxisStep>
-						<CalibrationCompleteStep></CalibrationCompleteStep>
+						<DeviceConnectionStep connectDeviceStep={connectDeviceStep}></DeviceConnectionStep>
+						<SensorInitializationStep initSensorStep={initSensorStep}></SensorInitializationStep>
+						<HoldDeviceStep holdDeviceStep={holdDeviceStep}></HoldDeviceStep>
+						<XAxisStep xAxis={xAxis}></XAxisStep>
+						<YAxisStep yAxis={yAxis}></YAxisStep>
+						<ZAxisStep zAxis={zAxis} ></ZAxisStep>
+						<CalibrationCompleteStep complete={complete}></CalibrationCompleteStep>
 					</>
 				)
 			}

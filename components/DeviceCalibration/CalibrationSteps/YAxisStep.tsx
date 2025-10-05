@@ -14,12 +14,12 @@ const LuCircleBig = styled(CircleCheckBig);
 let data = y_asis
 let IconDefault: React.FC<any> = data.Icon
 
-const YAxisStep = () => {
-	const { stt_y_axis } = useCheckStep();
-	const status = stt_y_axis
+const YAxisStep = ({ yAxis }: { yAxis: string }) => {
+	//const { stt_y_axis } = useCheckStep();
+	const status = yAxis
 	const { statusColor, textColor } = useStepColor({ status });
 
-	useRunYAxisStep();
+	//useRunYAxisStep();
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>

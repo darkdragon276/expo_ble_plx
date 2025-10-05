@@ -18,12 +18,12 @@ const LuCircleBig = styled(CircleCheckBig);
 let data = x_asis
 let IconDefault: React.FC<any> = data.Icon
 
-const XAxisStep = () => {
-	const { stt_x_axis } = useCheckStep();
-	const status = stt_x_axis
+const XAxisStep = ({ xAxis }: { xAxis: string }) => {
+	//const { stt_x_axis } = useCheckStep();
+	const status = xAxis
 	const { statusColor, textColor } = useStepColor({ status });
 
-	useRunXAxisStep();
+	//useRunXAxisStep();
 
 	// const dispatch = useDispatch();
 	// const { stt_hold_dv } = useCheckStep();

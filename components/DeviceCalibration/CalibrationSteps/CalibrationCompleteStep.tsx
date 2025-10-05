@@ -18,13 +18,13 @@ const LuCircleBig = styled(CircleCheckBig);
 let data = c_cpl
 let IconDefault: React.FC<any> = data.Icon
 
-const CalibrationCompleteStep = () => {
-	const { stt_c_cpl } = useCheckStep();
-	const status = stt_c_cpl
+const CalibrationCompleteStep = ({ complete }: { complete: string }) => {
+	//const { stt_c_cpl } = useCheckStep();
+	const status = complete
 	const { statusColor, textColor } = useStepColor({ status });
 	const krossDevice = new KrossDevice();
 
-	useRunCompleteStep();
+	//useRunCompleteStep();
 
 	useEffect(() => {
 

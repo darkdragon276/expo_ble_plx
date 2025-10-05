@@ -18,13 +18,13 @@ const LuCircleBig = styled(CircleCheckBig);
 let data = hold_dv
 let IconDefault: React.FC<any> = data.Icon
 
-const HoldDeviceStep = () => {
-	const { stt_hold_dv } = useCheckStep();
-	const status = stt_hold_dv
+const HoldDeviceStep = ({ holdDeviceStep }: { holdDeviceStep: string }) => {
+	//const { stt_hold_dv } = useCheckStep();
+	const status = holdDeviceStep
 	const { statusColor, textColor } = useStepColor({ status });
 	//const [holdDeviceStep, SetHoldDeviceStep] = useState(false)
 
-	useRunHoldDvStep();
+	//useRunHoldDvStep();
 
 	// const dispatch = useDispatch();
 	// //const { stt_ss_init } = useCheckStep();
