@@ -8,6 +8,10 @@ import { hold_dv } from "../../../dummy/calibrationStepData";
 import useRunHoldDvStep from '../../../hooks/calibrationHook/useRunHoldDvStep';
 import useCheckStep from '../../../hooks/calibrationHook/useCheckStep';
 import useStepColor from '../../../hooks/calibrationHook/useStepColor';
+import { useDispatch } from "react-redux";
+import { updateStep } from "../../../store/redux/calibrationStepSlice";
+import { bleEventEmitter } from "../../../utils/BleEmitter";
+import { useEffect, useState } from "react";
 //redux zone ed
 
 const LuCircleBig = styled(CircleCheckBig);
@@ -18,8 +22,35 @@ const HoldDeviceStep = () => {
 	const { stt_hold_dv } = useCheckStep();
 	const status = stt_hold_dv
 	const { statusColor, textColor } = useStepColor({ status });
+	const [holdDeviceStep, SetHoldDeviceStep] = useState(false)
 
-	useRunHoldDvStep();
+	//useRunHoldDvStep();
+
+	const dispatch = useDispatch();
+	const { stt_ss_init } = useCheckStep();
+
+	useEffect(() => {
+		//let sub: EmitterSubscription;
+
+		const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
+			//console.log(`useRunHoldDvStep: ${data}`);
+			const { stt_ss_init } = useCheckStep();
+			if (stt_ss_init === "done") {
+				if (data) {
+					dispatch(updateStep({ key: "hold_dv", value: "done" }))
+					dispatch(updateStep({ key: "x_axis", value: "active" }))
+					SetHoldDeviceStep(true)
+				}
+			}
+		});
+
+		//console.log(`HoldDeviceStep - ${stt_ss_init} - ${stt_hold_dv}`)
+
+		return () => {
+			//console.log(`useRunHoldDvStep sub removed`);
+			sub.remove();
+		};
+	}, [holdDeviceStep]);
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>
