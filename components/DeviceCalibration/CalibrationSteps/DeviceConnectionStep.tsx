@@ -8,6 +8,10 @@ import { dv_cn } from "../../../dummy/calibrationStepData";
 import useRunCnDvStep from '../../../hooks/calibrationHook/useRunCnDvStep';
 import useCheckStep from '../../../hooks/calibrationHook/useCheckStep';
 import useStepColor from '../../../hooks/calibrationHook/useStepColor';
+import { useDispatch } from "react-redux";
+import { updateStep } from "../../../store/redux/calibrationStepSlice";
+import { bleEventEmitter } from "../../../utils/BleEmitter";
+import { useEffect } from "react";
 //redux zone ed
 
 const LuCircleBig = styled(CircleCheckBig);
@@ -15,11 +19,31 @@ let data = dv_cn
 let IconDefault: React.FC<any> = data.Icon
 
 const DeviceConnectionStep = () => {
-	const { stt_cn_dv_stt } = useCheckStep();
+	const { stt_cn_dv_stt, stt_ss_init } = useCheckStep();
 	const status = stt_cn_dv_stt
 	const { statusColor, textColor } = useStepColor({ status });
 
-	useRunCnDvStep();
+	//useRunCnDvStep();
+
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		dispatch(updateStep({ key: "cn_dv_stt", value: "active" }))
+
+		const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
+			if (data) {
+				dispatch(updateStep({ key: "cn_dv_stt", value: "done" }))
+				dispatch(updateStep({ key: "ss_init", value: "active" }))
+			}
+		});
+
+		console.log(`DeviceConnectionStep ${stt_cn_dv_stt} - ${stt_ss_init}`)
+
+		return () => {
+			//console.log(`DeviceConnectionStep sub removed`);
+			//sub.remove();
+		};
+	}, []);
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>

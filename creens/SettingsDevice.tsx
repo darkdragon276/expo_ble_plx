@@ -1,16 +1,23 @@
 import { styled } from "nativewind";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from "@expo/vector-icons";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from '../model/RootStackParamList';
+import { BLEService } from "../ble/BLEService";
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const FtherIcon = styled(Feather);
 
+type SettingsDeviceProps = {
+	deviceName: string;
+	deviceState: string;
+};
+
 const SettingsDevice = () => {
 	const navigation = useNavigation<NavigationProp>();
+	const [deviceInfo, setDeviceInfo] = useState<SettingsDeviceProps>()
 
 	const onPressGotoDeviceCalibration = () => {
 		navigation.replace("DeviceCalibration")
@@ -44,6 +51,28 @@ const SettingsDevice = () => {
 		});
 	}, [navigation]);
 
+	useEffect(() => {
+
+		const fetchDeviceName = async () => {
+			const device = await BLEService.getDevice();
+			
+			if (!device) {
+				return;
+			}
+
+			device.isConnected().then((isConnected) => {
+				const deviceInfo: SettingsDeviceProps = {
+					deviceName: device.name ?? "Unknown Device",
+					deviceState: "Device Connected" //isConnected ? "Device Connected" : "No Device Connected",
+				};
+				
+				setDeviceInfo(deviceInfo);
+			});
+		};
+
+		fetchDeviceName();
+	}, []);
+
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
 			{/* Device Calibration */}
@@ -57,8 +86,8 @@ const SettingsDevice = () => {
 
 				<View className="flex-row items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
 					<View>
-						<Text className="text-green-700 font-bold">Device Connected</Text>
-						<Text className="text-sm text-green-500">HeadX Kross Smart</Text>
+						<Text className="text-green-700 font-bold">{deviceInfo?.deviceState}</Text>
+						<Text className="text-sm text-green-500">{deviceInfo?.deviceName}</Text>
 					</View>
 					<Pressable
 						onPress={onPressGotoDeviceCalibration}

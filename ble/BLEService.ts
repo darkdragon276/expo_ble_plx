@@ -75,7 +75,7 @@ class BLEServiceInstance {
 			}, true)
 		})
 
-	disconnectDevice = async() => {
+	disconnectDevice = async () => {
 		if (!this.device) {
 			this.showErrorToast(deviceNotConnectedErrorText)
 			throw new Error(deviceNotConnectedErrorText)
@@ -181,6 +181,30 @@ class BLEServiceInstance {
 					this.onError(error)
 				})
 		})
+
+	writeCharacteristicWithResponseForDevice = async (serviceUUID: UUID, characteristicUUID: UUID, time: Base64) => {
+		if (!this.device) {
+			this.showErrorToast(deviceNotConnectedErrorText)
+			throw new Error(deviceNotConnectedErrorText)
+		}
+		return this.manager
+			.writeCharacteristicWithResponseForDevice(this.device.id, serviceUUID, characteristicUUID, time)
+			.catch(error => {
+				this.onError(error)
+			})
+	}
+
+	writeCharacteristicWithoutResponseForDevice = async (serviceUUID: UUID, characteristicUUID: UUID, time: Base64) => {
+		if (!this.device) {
+			this.showErrorToast(deviceNotConnectedErrorText)
+			throw new Error(deviceNotConnectedErrorText)
+		}
+		return this.manager
+			.writeCharacteristicWithoutResponseForDevice(this.device.id, serviceUUID, characteristicUUID, time)
+			.catch(error => {
+				this.onError(error)
+			})
+	}
 
 	setupMonitor = (
 		serviceUUID: UUID,

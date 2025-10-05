@@ -62,6 +62,10 @@ export class KrossDevice {
         return Buffer.from(str, 'base64').toString('binary');
     }
 
+    static encodeBase64(data: Uint8Array): string {
+        return Buffer.from(data).toString('base64');
+    }
+
     get q(): { x: number; y: number; z: number; w: number } {
         return this._q;
     }

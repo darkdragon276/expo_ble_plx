@@ -1,7 +1,7 @@
 import { Text, View, Pressable, Modal, FlatList, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useEffect, useRef, useState } from 'react';
-import { BleManager, Device, State } from 'react-native-ble-plx';
+import { useEffect, useState } from 'react';
+import { Device} from 'react-native-ble-plx';
 import MainDeviceStatus from './MainDeviceStatus';
 import { BLEService } from '../../ble/BLEService';
 
