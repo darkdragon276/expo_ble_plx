@@ -39,50 +39,33 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
                 return;
             }
 
-            BLEService.stopDeviceScan();
-
             const connected = await BLEService.connectToDevice(deviceId);
             if (!connected) {
                 //Alert.alert('connect error', 'Device not connected');
                 return;
             }
 
-            const onError = (error: Error): void => {
-                if (error) {
-                    //Alert.alert('BLE Error', error?.message ?? String(error));
-                    //console.error("BLE Error", error);
-                    return;
-                }
-                return;
-            };
+            await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+            let char = await BLEService.readCharacteristicForDevice(BLEService.BATTERY_SERVICE_UUID, BLEService.BATTERY_LEVEL_UUID);
 
-            const onMonitor = (char: Characteristic) => {
-                let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
-                if (data) {
-                    krossDevice.unpack(data);
-
-                    setDvInfo((prev) => {
-                        if (prev?.battery === krossDevice.soc) return prev;
-                        return {
-                            id: "",
-                            battery: krossDevice.soc,
-                            name: connected.name,
-                            status: "Connected",
-                            color: (krossDevice.soc >= 60) ? "green"
-                                : (krossDevice.soc > 25 && krossDevice.soc < 60) ? "yellow"
-                                    : "red",
-                        };
-                    });
-
-                    BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
-                    BLEService.disconnectDevice();
-                } else {
-                    // 	// console.log("Received data is null");
-                }
+            if (char?.value) {
+                let soc = KrossDevice.decodeBattery(char?.value);
+                // console.log("Battery level: " + soc);
+                setDvInfo((prev) => {
+                    if (prev?.battery === soc) return prev;
+                    return {
+                        id: "",
+                        battery: soc,
+                        name: connected.name,
+                        status: "Connected",
+                        color: (soc >= 60) ? "green"
+                            : (soc > 25 && soc < 60) ? "yellow"
+                                : "red",
+                    };
+                });
             }
 
-            await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-            BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
+            await BLEService.disconnectDevice();
 
         } catch (e: any) {
             //Alert.alert('connect error', e?.message ?? String(e));

@@ -14,7 +14,7 @@ const MainDeviceList = () => {
 	useEffect(() => {
 		
 		const initBLE = async () => {
-			// await BLEService.initializeBLE();
+			await BLEService.initializeBLE();
 			await BLEService.requestBluetoothPermission();
 			await startScan();
 		};
