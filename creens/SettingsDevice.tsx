@@ -1,6 +1,6 @@
 import { styled } from "nativewind";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { View, Text, ScrollView, Pressable, Alert, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Pressable } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from "@expo/vector-icons";
 import type { StackNavigationProp } from "@react-navigation/stack";
@@ -38,18 +38,18 @@ const SettingsDevice = () => {
 					<Text className="text-xl ml-2"></Text>
 				</Pressable>
 			),
-			headerRight: () => (
-				<View className="flex-row items-center justify-center mb-1 mr-8">
-					<TouchableOpacity
-						onPress={reSet}
-						className="bg-white px-4 py-2 rounded-xl border border-gray-300"
-					>
-						<Text className="text-gray-800 text-center">
-							Reset
-						</Text>
-					</TouchableOpacity >
-				</View>
-			),
+			// headerRight: () => (
+			// 	<View className="flex-row items-center justify-center mb-1 mr-8">
+			// 		<TouchableOpacity
+			// 			onPress={reSet}
+			// 			className="bg-white px-4 py-2 rounded-xl border border-gray-300"
+			// 		>
+			// 			<Text className="text-gray-800 text-center">
+			// 				Reset
+			// 			</Text>
+			// 		</TouchableOpacity >
+			// 	</View>
+			// ),
 		});
 	}, [navigation]);
 
@@ -83,24 +83,24 @@ const SettingsDevice = () => {
 		fetchDeviceName();
 	}, []);
 
-	const reSet = async () => {
-		if (BLEService.getDevice() == null) {
-			Alert.alert('Connect error', `No connected device: `);
-			return;
-		}
+	// const reSet = async () => {
+	// 	if (BLEService.getDevice() == null) {
+	// 		Alert.alert('Connect error', `No connected device: `);
+	// 		return;
+	// 	}
 
-		try {
-			console.log('Setting Device is pack --- RESET_QUATERNION');
-			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-			BLEService.writeCharacteristicWithoutResponseForDevice(
-				BLEService.SERVICE_UUID,
-				BLEService.DATA_IN_UUID,
-				KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.RESET_QUATERNION))
-			);
-		} catch (e: any) {
-			//Alert.alert('connect error', e?.message ?? String(e));
-		}
-	};
+	// 	try {
+	// 		console.log('Setting Device is pack --- RESET_QUATERNION');
+	// 		await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+	// 		BLEService.writeCharacteristicWithoutResponseForDevice(
+	// 			BLEService.SERVICE_UUID,
+	// 			BLEService.DATA_IN_UUID,
+	// 			KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.RESET_QUATERNION))
+	// 		);
+	// 	} catch (e: any) {
+	// 		//Alert.alert('connect error', e?.message ?? String(e));
+	// 	}
+	// };
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
