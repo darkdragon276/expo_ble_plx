@@ -62,7 +62,15 @@ export class KrossDevice {
         return Buffer.from(str, 'base64').toString('binary');
     }
 
-    static encodeBase64(data: Uint8Array): string {
+    static decodeBattery(str: string): number {
+        return Buffer.from(str, 'base64')[0];
+    }
+
+    static decodeFirmwareVersion(str: string): string {
+        return Buffer.from(str, 'base64').toString('utf8');
+    }
+
+    static encodeCmd(data: Uint8Array): string {
         return Buffer.from(data).toString('base64');
     }
 

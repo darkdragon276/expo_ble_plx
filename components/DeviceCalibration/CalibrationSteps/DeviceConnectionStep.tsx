@@ -54,11 +54,11 @@ const DeviceConnectionStep = ({ connectDeviceStep }: { connectDeviceStep: string
 
 		try {
 			console.log('DeviceConnectionStep is pack --- MAGNET_CALIB_START');
-			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-			BLEService.writeCharacteristicWithoutResponseForDevice(
+			await BLEService.discoverAllServicesAndCharacteristicsForDevice(); 
+			await BLEService.writeCharacteristicWithoutResponseForDevice(
 				BLEService.SERVICE_UUID,
 				BLEService.DATA_IN_UUID,
-				KrossDevice.encodeBase64(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_START))
+				KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_START))
 			);
 
 		} catch (e: any) {

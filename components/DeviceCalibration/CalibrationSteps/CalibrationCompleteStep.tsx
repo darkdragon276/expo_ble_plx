@@ -57,7 +57,7 @@ const CalibrationCompleteStep = ({ complete }: { complete: string }) => {
 			BLEService.writeCharacteristicWithoutResponseForDevice(
 				BLEService.SERVICE_UUID,
 				BLEService.DATA_IN_UUID,
-				KrossDevice.encodeBase64(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_STOP))
+				KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_STOP))
 			);
 		} catch (e: any) {
 			//Alert.alert('connect error', e?.message ?? String(e));

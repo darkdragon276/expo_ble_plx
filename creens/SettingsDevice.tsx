@@ -95,7 +95,7 @@ const SettingsDevice = () => {
 			BLEService.writeCharacteristicWithoutResponseForDevice(
 				BLEService.SERVICE_UUID,
 				BLEService.DATA_IN_UUID,
-				KrossDevice.encodeBase64(krossDevice.pack(KrossDevice.Cmd.RESET_QUATERNION))
+				KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.RESET_QUATERNION))
 			);
 		} catch (e: any) {
 			//Alert.alert('connect error', e?.message ?? String(e));
