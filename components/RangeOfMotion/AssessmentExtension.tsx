@@ -1,8 +1,9 @@
 import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { View, Text } from "react-native";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
-import { bleEventEmitter, type BleEmitterProps} from "../../utils/BleEmitter";
+import { bleEventEmitter } from "../../utils/BleEmitter";
 
+let extension: number = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
 };
@@ -11,37 +12,34 @@ const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
-	//console.log(`AssessmentCardExtension render!`)
-
 	useEffect(() => {
-		//console.log(`AssessmentCardExtension useEffect running!`)
-		const sub = bleEventEmitter.addListener('BleDataPitch', (data) => {
-			//console.log(data);
-			if (data > 0) {
-				setPos(data);
+		const sub = bleEventEmitter.addListener('BleDataPitch', (data: number) => {
+			extension = parseFloat(data.toFixed(1));
+			if (extension > 0) {
+				setPos(extension);
 			} else {
 				setPos(0.0);
 			}
-			setPosMax((data > posMax) ? data : posMax);
+			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
 		return () => {
+			extension = 0.0;
 			sub.remove();
 		};
 	}, [pos]);
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentExtension useImperativeHandle running! ${parseFloat(pos.toFixed(1))}`)
-			return parseFloat(pos.toFixed(1))
+			return posMax
 		},
 	}), [record]);
 
 	return (
 		<>
 			<View className="flex-row items-center justify-between mb-2">
-				<Text className="text-3xl font-bold text-blue-600 leading-none">{pos.toFixed(1)}°</Text>
-				<Text className="text-md text-gray-400">Max: {posMax.toFixed(1)}°</Text>
+				<Text className="text-3xl font-bold text-blue-600 leading-none">{pos}°</Text>
+				<Text className="text-md text-gray-400">Max: {posMax}°</Text>
 			</View>
 
 			{/* Progress bar */}
