@@ -1,56 +1,56 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
-import { View, Text} from "react-native";
+import { View, Text } from "react-native";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
 import { bleEventEmitter } from "../../utils/BleEmitter";
 
+let r_rotation: number = 0.0;
+let rotationOffset: number = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
 };
-
-let firstRRotationOffset: number = 0.0
 
 const AssessmentRRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
-	//console.log(`AssessmentRRotation run!`)
-
 	useEffect(() => {
-		//console.log(`AssessmentCardExtension useEffect running!`)
-		const sub = bleEventEmitter.addListener('BleDataYaw', (data) => {
-			//console.log(data);
+		const sub = bleEventEmitter.addListener('BleDataYaw', (data: number) => {
+			r_rotation = parseFloat(data.toFixed(1));
 
-			if (data > 0) {
-				data = data - firstRRotationOffset;
-				setPos(data);
-				setPosMax((pos > posMax) ? pos : posMax);
-
-				if (firstRRotationOffset == 0.0) {
-					firstRRotationOffset = data
-				}
-				
-			} else {
-				setPos(0.0);
+			if (rotationOffset == 0.0) {
+				rotationOffset = r_rotation
 			}
+
+			let alpha = r_rotation - rotationOffset
+			alpha = normalizeAngle(alpha);
+
+			setPos(alpha < 0 ? alpha * -1 : alpha);
+			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
 		return () => {
+			r_rotation = 0.0;
+			rotationOffset = 0.0;
 			sub.remove();
 		};
 	}, [pos]);
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentRRotation useImperativeHandle return: ${parseFloat(pos.toFixed(1))}`)
-			return parseFloat(pos.toFixed(1))
+			return posMax
 		},
 	}), [record]);
+
+	const normalizeAngle = (alpha: number): number => {
+		alpha = ((alpha + 180) % 360 + 360) % 360;
+		return alpha - 180;
+	};
 
 	return (
 		<>
 			<View className="flex-row items-center justify-between mb-2">
-				<Text className="text-3xl font-bold text-orange-600 leading-none">{pos.toFixed(1)}°</Text>
-				<Text className="text-md text-gray-400">Max: {posMax.toFixed(1)}°</Text>
+				<Text className="text-3xl font-bold text-orange-600 leading-none">{pos}°</Text>
+				<Text className="text-md text-gray-400">Max: {posMax}°</Text>
 			</View>
 
 			{/* Progress bar */}

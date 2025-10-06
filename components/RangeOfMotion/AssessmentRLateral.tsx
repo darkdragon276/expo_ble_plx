@@ -3,6 +3,7 @@ import { View, Text } from "react-native";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
 import { bleEventEmitter } from "../../utils/BleEmitter";
 
+let r_lateral: number = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
 };
@@ -11,18 +12,16 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
 
-	//console.log(`AssessmentRLateral run!`)
-
 	useEffect(() => {
-		//console.log(`AssessmentCardExtension useEffect running!`)
-		const sub = bleEventEmitter.addListener('BleDataRoll', (data) => {
-			//console.log(data);
-			if (data > 0) {
-				setPos(data);
+		const sub = bleEventEmitter.addListener('BleDataRoll', (data: number) => {
+			r_lateral = parseFloat(data.toFixed(1));
+
+			if (r_lateral > 0) {
+				setPos(r_lateral);
 			} else {
 				setPos(0.0);
 			}
-			setPosMax((data > posMax) ? data : posMax);
+			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
 		return () => {
@@ -32,8 +31,7 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			//console.log(`AssessmentRLateral useImperativeHandle return: ${parseFloat(pos.toFixed(1))}`)
-			return parseFloat(pos.toFixed(1))
+			return posMax
 		},
 	}), [record]);
 
@@ -41,8 +39,8 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 		<>
 			{/* Value + Max */}
 			<View className="flex-row items-center justify-between mb-2">
-				<Text className="text-3xl font-bold text-pink-600 leading-none">{pos.toFixed(1)}°</Text>
-				<Text className="text-md text-gray-400">Max: {posMax.toFixed(1)}°</Text>
+				<Text className="text-3xl font-bold text-pink-600 leading-none">{pos}°</Text>
+				<Text className="text-md text-gray-400">Max: {posMax}°</Text>
 			</View>
 
 			{/* Progress bar */}
