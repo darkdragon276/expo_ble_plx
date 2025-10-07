@@ -14,7 +14,7 @@ const AssessmentRLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 
 	useEffect(() => {
 		const sub = bleEventEmitter.addListener('BleDataRoll', (data: number) => {
-			r_lateral = parseFloat(data.toFixed(1));
+			r_lateral = Math.round(data * 10) / 10;
 
 			if (r_lateral > 0) {
 				setPos(r_lateral);
