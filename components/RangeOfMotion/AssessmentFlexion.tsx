@@ -14,7 +14,7 @@ const AssessmentFlexion = forwardRef<ChildROMRef, AssessmentCardProps>(({ record
 
 	useEffect(() => {
 		const sub = bleEventEmitter.addListener('BleDataPitch', (data: number) => {
-			flexion = parseFloat(data.toFixed(1));
+			flexion = Math.round(data * 10) / 10;
 			if (flexion < 0) {
 				setPos(flexion * -1);
 			} else {
