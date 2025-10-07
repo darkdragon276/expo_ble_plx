@@ -1,10 +1,8 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { View, Text } from "react-native";
 import { type ChildROMRef } from "../../model/ChildRefGetValue";
 import { bleEventEmitter } from "../../utils/BleEmitter";
 
-let r_rotation: number = 0.0;
-let rotationOffset: number = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
 };
@@ -12,25 +10,24 @@ type AssessmentCardProps = {
 const AssessmentRRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
 	const [pos, setPos] = useState<number>(0.0)
 	const [posMax, setPosMax] = useState<number>(0.0)
+	const rotationOffset = useRef<number | null>(null);
 
 	useEffect(() => {
 		const sub = bleEventEmitter.addListener('BleDataYaw', (data: number) => {
-			r_rotation = Math.round(data * 10) / 10;
-
-			if (rotationOffset == 0.0) {
-				rotationOffset = r_rotation
+			if (rotationOffset.current === null) {
+				// assign ONCE the first time listener is called
+				rotationOffset.current = Math.round(data);
 			}
+			let alpha: number = 0.0;
+			let l_rotation = Math.round(data);
 
-			let alpha = r_rotation - rotationOffset
+			alpha = l_rotation - rotationOffset.current;
 			alpha = normalizeAngle(alpha);
-
-			setPos(alpha < 0 ? alpha * -1 : alpha);
+			setPos(Math.round((alpha >= 0 ? alpha : 0) * 10) / 10);
 			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
 		return () => {
-			r_rotation = 0.0;
-			rotationOffset = 0.0;
 			sub.remove();
 		};
 	}, [pos]);
