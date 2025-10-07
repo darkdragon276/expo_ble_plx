@@ -22,7 +22,7 @@ const CalibrationCompleteStep = ({ complete }: { complete: string }) => {
 	//const { stt_c_cpl } = useCheckStep();
 	const status = complete
 	const { statusColor, textColor } = useStepColor({ status });
-	const krossDevice = new KrossDevice();
+	//const krossDevice = new KrossDevice();
 
 	//useRunCompleteStep();
 
@@ -36,33 +36,33 @@ const CalibrationCompleteStep = ({ complete }: { complete: string }) => {
 		// 	BLEService.connectToDevice(BLEService.getDevice()!.id);
 		// }
 
-		if (status === 'active') {
-			runEndCalibation();
-		}
+		//if (status === 'active') {
+			//runEndCalibation();
+		//}
 
-		return () => {
-			BLEService.disconnectDevice();
-		}
+		//return () => {
+			//BLEService.disconnectDevice();
+		//}
 	}, [status])
 
-	const runEndCalibation = async () => {
-		if (BLEService.getDevice() == null) {
-			Alert.alert('Connect error', `No connected device: `);
-			return;
-		}
+	// const runEndCalibation = async () => {
+	// 	if (BLEService.getDevice() == null) {
+	// 		Alert.alert('Connect error', `No connected device: `);
+	// 		return;
+	// 	}
 
-		try {
-			console.log('CalibrationCompleteStep is pack --- MAGNET_CALIB_STOP');
-			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-			BLEService.writeCharacteristicWithoutResponseForDevice(
-				BLEService.SERVICE_UUID,
-				BLEService.DATA_IN_UUID,
-				KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_STOP))
-			);
-		} catch (e: any) {
-			//Alert.alert('connect error', e?.message ?? String(e));
-		}
-	};
+	// 	try {
+	// 		console.log('CalibrationCompleteStep is pack --- MAGNET_CALIB_STOP');
+	// 		await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+	// 		await BLEService.writeCharacteristicWithResponseForDevice(
+	// 			BLEService.SERVICE_UUID,
+	// 			BLEService.DATA_IN_UUID,
+	// 			KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_STOP))
+	// 		);
+	// 	} catch (e: any) {
+	// 		//Alert.alert('connect error', e?.message ?? String(e));
+	// 	}
+	// };
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>

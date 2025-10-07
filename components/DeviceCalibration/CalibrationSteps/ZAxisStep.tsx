@@ -3,23 +3,15 @@ import { View, Text } from "react-native";
 import { CircleCheckBig } from "lucide-react-native";
 import CalibrationSpinning from "../CalibrationSpinning";
 import { z_asis } from "../../../dummy/calibrationStepData";
-
-//redux zone st
-import useRunZAxisStep from '../../../hooks/calibrationHook/useRunZAxisStep';
-import useCheckStep from '../../../hooks/calibrationHook/useCheckStep';
 import useStepColor from '../../../hooks/calibrationHook/useStepColor';
-//redux zone ed
 
 const LuCircleBig = styled(CircleCheckBig);
 let data = z_asis
 let IconDefault: React.FC<any> = data.Icon
 
 const ZAxisStep = ({ zAxis }: { zAxis: string }) => {
-	//const { stt_z_axis } = useCheckStep();
 	const status = zAxis
 	const { statusColor, textColor } = useStepColor({ status });
-
-	//useRunZAxisStep();
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>

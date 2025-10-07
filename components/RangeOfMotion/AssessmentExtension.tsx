@@ -14,7 +14,7 @@ const AssessmentExtension = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	useEffect(() => {
 		const sub = bleEventEmitter.addListener('BleDataPitch', (data: number) => {
-			extension = parseFloat(data.toFixed(1));
+			extension = Math.round(data * 10) / 10;
 			if (extension > 0) {
 				setPos(extension);
 			} else {

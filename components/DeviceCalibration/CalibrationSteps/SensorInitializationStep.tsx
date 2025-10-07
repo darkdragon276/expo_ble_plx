@@ -3,60 +3,16 @@ import { View, Text } from "react-native";
 import { CircleCheckBig } from "lucide-react-native";
 import CalibrationSpinning from "../CalibrationSpinning";
 import { ss_init } from "../../../dummy/calibrationStepData";
-import useCheckStep from "../../../hooks/calibrationHook/useCheckStep";
 import useStepColor from "../../../hooks/calibrationHook/useStepColor";
-import useRunSsInitStep from "../../../hooks/calibrationHook/useRunSsInitStep";
-import { useDispatch } from "react-redux";
-import { updateStep } from "../../../store/redux/calibrationStepSlice";
-import { useEffect, useState } from "react";
-import { bleEventEmitter } from "../../../utils/BleEmitter";
 
 const LuCircleBig = styled(CircleCheckBig);
 let data = ss_init
 let IconDefault: React.FC<any> = data.Icon
 
 const SensorInitializationStep = ({ initSensorStep }: { initSensorStep: string }) => {
-	//const SensorInitializationStep =  () => {
 
-	//const { stt_ss_init } = useCheckStep();
 	const status = initSensorStep
 	const { statusColor, textColor } = useStepColor({ status });
-	//const [sensorStep, SetSensorStep] = useState(false)
-
-	//useRunSsInitStep();
-
-	//const dispatch = useDispatch();
-	//const { stt_ss_init } = useCheckStep();
-
-	//console.log(`SensorInitializationStep render`);
-
-
-
-	// useEffect(() => {
-	// 	//let sub: EmitterSubscription;
-	// 	const sub = bleEventEmitter.addListener('CALIBRATION_CONNECT_DEVICE', (data) => {
-	// 		const { stt_cn_dv_stt } = useCheckStep();
-	// 		console.log(`SensorInitializationStep: bleEventEmitter - ${stt_cn_dv_stt}`);
-	// 		//if (stt_cn_dv_stt === "done") {
-
-	// 			if (data) {
-	// 				console.log(`SensorInitializationStep: bleEventEmitter - ${data}`);
-	// 				dispatch(updateStep({ key: "ss_init", value: "done" }))
-	// 				dispatch(updateStep({ key: "hold_dv", value: "active" }))
-	// 				console.log(`SensorInitializationStep: dispatch-ss_init done`);
-	// 				SetSensorStep(true)
-	// 			}
-	// 		//}
-	// 	});
-
-
-	// 	//console.log(`SensorInitializationStep ${stt_cn_dv_stt} - ${stt_ss_init}`)
-
-	// 	return () => {
-	// 		//console.log(`SensorInitializationStep sub removed`);
-	// 		sub.remove();
-	// 	};
-	// }, [sensorStep]);
 
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>

@@ -15,7 +15,7 @@ const AssessmentRRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	useEffect(() => {
 		const sub = bleEventEmitter.addListener('BleDataYaw', (data: number) => {
-			r_rotation = parseFloat(data.toFixed(1));
+			r_rotation = Math.round(data * 10) / 10;
 
 			if (rotationOffset == 0.0) {
 				rotationOffset = r_rotation
