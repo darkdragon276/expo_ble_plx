@@ -26,7 +26,7 @@ const DeviceConnectionStep = ({ connectDeviceStep }: { connectDeviceStep: string
 	//const { stt_cn_dv_stt } = useCheckStep();
 	const status = connectDeviceStep
 	const { statusColor, textColor } = useStepColor({ status });
-	const krossDevice = new KrossDevice();
+	//const krossDevice = new KrossDevice();
 	//const [connectStep, setConnectStep] = useState(false);
 
 	//console.log(`DeviceConnectionStep ${stt_cn_dv_stt}`);
@@ -46,25 +46,25 @@ const DeviceConnectionStep = ({ connectDeviceStep }: { connectDeviceStep: string
 	// 	runStartCalibation();
 	// }, [])
 
-	const runStartCalibation = async () => {
-		if (BLEService.getDevice() == null) {
-			Alert.alert('Connect error', `No connected device: `);
-			return;
-		}
+	// const runStartCalibation = async () => {
+	// 	if (BLEService.getDevice() == null) {
+	// 		Alert.alert('Connect error', `No connected device: `);
+	// 		return;
+	// 	}
 
-		try {
-			console.log('DeviceConnectionStep is pack --- MAGNET_CALIB_START');
-			await BLEService.discoverAllServicesAndCharacteristicsForDevice(); 
-			await BLEService.writeCharacteristicWithoutResponseForDevice(
-				BLEService.SERVICE_UUID,
-				BLEService.DATA_IN_UUID,
-				KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_START))
-			);
+	// 	try {
+	// 		console.log('DeviceConnectionStep is pack --- MAGNET_CALIB_START');
+	// 		await BLEService.discoverAllServicesAndCharacteristicsForDevice(); 
+	// 		await BLEService.writeCharacteristicWithResponseForDevice(
+	// 			BLEService.SERVICE_UUID,
+	// 			BLEService.DATA_IN_UUID,
+	// 			KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_START))
+	// 		);
 
-		} catch (e: any) {
-			//Alert.alert('connect error', e?.message ?? String(e));
-		}
-	};
+	// 	} catch (e: any) {
+	// 		//Alert.alert('connect error', e?.message ?? String(e));
+	// 	}
+	// };
 
 	// const dispatch = useDispatch();
 

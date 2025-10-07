@@ -5,6 +5,7 @@ import { bleEventEmitter } from "../../utils/BleEmitter";
 
 let l_rotation: number = 0.0;
 let rotationOffset: number = 0.0
+let iSFirst: boolean = false;
 let alpha: number = 0.0;
 type AssessmentCardProps = {
 	record: boolean;
@@ -17,15 +18,16 @@ const AssessmentLRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 	useEffect(() => {
 		const sub = bleEventEmitter.addListener('BleDataYaw', (data: number) => {
 
-			l_rotation = parseFloat(data.toFixed(1));
+			l_rotation = Math.round(data * 10) / 10;
 
-			if (rotationOffset == 0.0) {
+			if (!iSFirst) {
+				iSFirst = true;
 				rotationOffset = l_rotation
 			}
 
 			alpha = l_rotation - rotationOffset
 			alpha = normalizeAngle(alpha);
-
+			console.log(`alpha: ${alpha} ------- rotationOffset: ${rotationOffset}`);
 			setPos(alpha < 0 ? alpha * -1 : alpha);
 			setPosMax((pos > posMax) ? pos : posMax);
 		});
@@ -33,6 +35,7 @@ const AssessmentLRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 		return () => {
 			l_rotation = 0.0;
 			rotationOffset = 0.0;
+			iSFirst = false;
 			alpha = 0.0;
 			sub.remove();
 		};
@@ -40,7 +43,7 @@ const AssessmentLRotation = forwardRef<ChildROMRef, AssessmentCardProps>(({ reco
 
 	useImperativeHandle(ref, () => ({
 		getValue: () => {
-			return posMax
+			return posMax;
 		},
 	}), [record]);
 
