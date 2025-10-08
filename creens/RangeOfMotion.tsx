@@ -332,7 +332,7 @@ const RangeOfMotion = () => {
                                 source={LeftRotationSrcImage}
                             />
                         </View>
-                        <AssessmentRRotation record={record} ref={refRRotation}></AssessmentRRotation>
+                        <AssessmentLRotation record={record} ref={refLRotation}></AssessmentLRotation>
                     </View>
                 </View>
 
@@ -348,7 +348,7 @@ const RangeOfMotion = () => {
                                 source={RightRotationSrcImage}
                             />
                         </View>
-                        <AssessmentRLateral record={record} ref={refRLateral}></AssessmentRLateral>
+                        <AssessmentRRotation record={record} ref={refRRotation}></AssessmentRRotation>
                     </View>
                 </View>
 
@@ -364,7 +364,7 @@ const RangeOfMotion = () => {
                                 source={LeftLateralSrcImage}
                             />
                         </View>
-                        <AssessmentLRotation record={record} ref={refLRotation}></AssessmentLRotation>
+                        <AssessmentLLateral record={record} ref={refLLateral}></AssessmentLLateral>
                     </View>
                 </View>
 
@@ -380,7 +380,7 @@ const RangeOfMotion = () => {
                                 source={RightLateralSrcImage}
                             />
                         </View>
-                        <AssessmentLLateral record={record} ref={refLLateral}></AssessmentLLateral>
+                        <AssessmentRLateral record={record} ref={refRLateral}></AssessmentRLateral>
                     </View>
                 </View>
             </View>

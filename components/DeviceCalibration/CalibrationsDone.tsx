@@ -52,15 +52,14 @@ const CalibrationsDone = () => {
 
 				{/* Title */}
 				<View className="flex-row justify-center items-center mb-2">
-					<Text className="text-2xl mb-3">
+					<Text className="text-xl mb-3">
 						🎉 Calibration Successful!
 					</Text>
 				</View>
 
 				{/* Description */}
 				<Text className="text-center text-muted-foreground text-lg text-gray-500">
-					Your device is now perfectly calibrated{"\n"}
-					and ready for assessment
+					Your device is now perfectly calibrated and ready for assessment
 				</Text>
 			</View>
 		</SafeAreaView>

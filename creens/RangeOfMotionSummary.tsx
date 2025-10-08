@@ -183,6 +183,7 @@ const RangeOfMotionSummary = () => {
 					</View>
 
 					<View className="flex-row flex-wrap">
+						{/* Extension */}
 						<View className="w-1/3 p-2">
 							<View className="text-center space-y-3">
 								{/* Icon + description */}
@@ -201,6 +202,7 @@ const RangeOfMotionSummary = () => {
 							</View>
 						</View>
 
+						{/* Flexion */}
 						<View className="w-1/3 p-2">
 							<View className="text-center space-y-3">
 								{/* Icon + description */}
@@ -219,6 +221,7 @@ const RangeOfMotionSummary = () => {
 							</View>
 						</View>
 
+						{/* Left Rotation */}
 						<View className="w-1/3 p-2">
 							<View className="text-center space-y-3">
 								{/* Icon + description */}
@@ -231,12 +234,13 @@ const RangeOfMotionSummary = () => {
 
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-purple-700 text-sm">Right Rotation</Text>
-									<Text className="text-lg font-bold text-purple-600">{data ? data.r_rotation : 0.0}°</Text>
+									<Text className="font-semibold text-purple-700 text-sm">Left Rotation</Text>
+									<Text className="text-lg font-bold text-purple-600">{data ? data.l_rotation : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
 
+						{/* Right Rotation */}
 						<View className="w-1/3 p-2">
 							<View className="text-center space-y-3">
 								{/* Icon + description */}
@@ -249,12 +253,13 @@ const RangeOfMotionSummary = () => {
 
 								{/* Value + Max */}
 								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-orange-700 text-sm">Left Rotation</Text>
-									<Text className="text-lg font-bold text-orange-600">{data ? data.l_rotation : 0.0}°</Text>
+									<Text className="font-semibold text-orange-700 text-sm">Right Rotation</Text>
+									<Text className="text-lg font-bold text-orange-600">{data ? data.r_rotation : 0.0}°</Text>
 								</View>
 							</View>
 						</View>
 
+						{/* Left Lateral */}
 						<View className="w-1/3 p-2">
 							<View className="text-center space-y-3">
 								{/* Icon + description */}
@@ -273,6 +278,7 @@ const RangeOfMotionSummary = () => {
 							</View>
 						</View>
 
+						{/* Right Lateral */}
 						<View className="w-1/3 p-2">
 							<View className="text-center space-y-3">
 								{/* Icon + description */}
