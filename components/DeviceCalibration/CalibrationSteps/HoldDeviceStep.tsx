@@ -10,7 +10,6 @@ const LuCircleBig = styled(CircleCheckBig);
 let IconDefault: React.FC<any> = data.Icon
 
 const HoldDeviceStep = ({ holdDeviceStep }: { holdDeviceStep: string }) => {
-
 	const status = holdDeviceStep
 	const { statusColor, textColor } = useStepColor({ status });
 
