@@ -17,9 +17,9 @@ let _initSensorStep: boolean = false;
 let _holdDeviceStep: boolean = false;
 let _completeStep: boolean = false;
 
-let _X: boolean = false;
-let _Y: boolean = false;
-let _Z: boolean = false;
+let _yaw_X: boolean = false;
+let _pitch_Y: boolean = false;
+let _roll_Z: boolean = false;
 
 let roll_Z_Left: number = 0;
 let roll_Z_Right: number = 0;
@@ -41,22 +41,9 @@ const CalibrationsProgress = () => {
 	let interval: ReturnType<typeof setInterval>;
 
 	useEffect(() => {
-		_connectDeviceStep = false;
-		_initSensorStep = false;
-		_holdDeviceStep = false;
-		_completeStep = false;
-		_X = false;
-		_Y = false;
-		_Z = false;
-		roll_Z_Left = 0;
-		roll_Z_Right = 0;
-		pitch_Y_Up = 0;
-		pitch_Y_Down = 0;
-		yaw_X_Left = 0;
-		yaw_X_Right = 0;
+		reSet()
 
 		const connectDevice = async () => {
-
 			if (BLEService.getDevice() == null) {
 				await BLEService.scanDevices((device) => {
 					BLEService.connectToDevice(device.id).then(() => {
@@ -84,17 +71,6 @@ const CalibrationsProgress = () => {
 
 		return () => {
 			clearInterval(interval);
-			_connectDeviceStep = false;
-			_initSensorStep = false;
-			_holdDeviceStep = false;
-			_completeStep = false;
-			roll_Z_Left = 0;
-			roll_Z_Right = 0;
-			pitch_Y_Up = 0;
-			pitch_Y_Down = 0;
-			yaw_X_Left = 0;
-			yaw_X_Right = 0;
-
 			try {
 				if (BLEService.getDevice() != null) {
 					BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
@@ -107,36 +83,39 @@ const CalibrationsProgress = () => {
 
 	}, []);
 
-	// const deplayStep = async (callback: () => void): Promise<void> => {
-	// 	return new Promise((resolve) => {
-	// 		setTimeout(() => {
-	// 			callback();
-	// 			resolve();
-	// 		}, 2000);
-	// 	});
-	// };
+	const reSet = () => {
+		_connectDeviceStep = false;
+		_initSensorStep = false;
+		_holdDeviceStep = false;
+		_completeStep = false;
+		roll_Z_Left = 0;
+		roll_Z_Right = 0;
+		pitch_Y_Up = 0;
+		pitch_Y_Down = 0;
+		yaw_X_Left = 0;
+		yaw_X_Right = 0;
+	};
 
 	const onDataDevice = async () => {
 		if (BLEService.getDevice() == null) {
-			Alert.alert('Connect error', `No connected device: `);
+			Alert.alert('', `No connected device: `);
 			return;
 		}
 
 		try {
 			const onError = (error: Error): void => {
 				if (error) {
-					Alert.alert('BLE Error', error?.message ?? String(error));
+					Alert.alert('', error?.message ?? String(error));
 					return;
 				}
 				return;
 			};
 
 			const onMonitor = (char: Characteristic) => {
-				//console.log('onMonitor running');
 				let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 				if (data) {
 					krossDevice.unpack(data);
-					console.log(krossDevice.angle);
+					//console.log(krossDevice.angle);
 
 					if (krossDevice.angle.yaw > 30 && yaw_X_Left === 0) {
 						yaw_X_Left = krossDevice.angle.yaw
@@ -146,7 +125,7 @@ const CalibrationsProgress = () => {
 						yaw_X_Right = krossDevice.angle.yaw
 					}
 
-					if (_X) {
+					if (_yaw_X) {
 						if (krossDevice.angle.pitch > 30 && pitch_Y_Up === 0) {
 							pitch_Y_Up = krossDevice.angle.pitch
 						}
@@ -156,7 +135,7 @@ const CalibrationsProgress = () => {
 						}
 					}
 
-					if (_Y) {
+					if (_pitch_Y) {
 						if (roll_Z_Left === 0 && roll_Z_Right === 0) {
 							roll_Z_Left = krossDevice.angle.roll
 							roll_Z_Right = krossDevice.angle.roll
@@ -168,7 +147,7 @@ const CalibrationsProgress = () => {
 			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
 			BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
 		} catch (e: any) {
-			//Alert.alert('connect error', e?.message ?? String(e));
+			Alert.alert('', e?.message ?? String(e));
 		}
 	};
 
@@ -208,7 +187,6 @@ const CalibrationsProgress = () => {
 	};
 
 	const trytHoldDevice = async (): Promise<void> => {
-
 		if (holdDeviceStep === "done") {
 			return new Promise<void>((resolve) => { resolve() });
 		}
@@ -224,7 +202,6 @@ const CalibrationsProgress = () => {
 	};
 
 	const tryGetXAxis = async (): Promise<void> => {
-
 		if (xAxis === "done") {
 			return new Promise<void>((resolve) => { resolve() });
 		}
@@ -232,9 +209,7 @@ const CalibrationsProgress = () => {
 		setXAxis("active");
 		await waitUntil(() => yaw_X_Left !== 0 && yaw_X_Right !== 0).then(() => {
 			return new Promise<void>((resolve) => {
-				_X = true;
-				yaw_X_Left = 0;
-				yaw_X_Right = 0;
+				_yaw_X = true;
 				setXAxis("done");
 				resolve();
 			})
@@ -250,9 +225,7 @@ const CalibrationsProgress = () => {
 		setYAxis("active");
 		await waitUntil(() => pitch_Y_Up !== 0 && pitch_Y_Down !== 0).then(() => {
 			return new Promise<void>((resolve) => {
-				_Y = true;
-				pitch_Y_Up = 0;
-				pitch_Y_Down = 0;
+				_pitch_Y = true;
 				setYAxis("done");
 				resolve();
 			})
@@ -260,7 +233,6 @@ const CalibrationsProgress = () => {
 	};
 
 	const tryGetZAxis = async (): Promise<void> => {
-
 		if (zAxis === "done") {
 			return new Promise((resolve) => { resolve() });
 		}
@@ -268,9 +240,7 @@ const CalibrationsProgress = () => {
 		setZAxis("active");
 		await waitUntil(() => roll_Z_Left !== 0 && roll_Z_Right !== 0).then(() => {
 			return new Promise<void>((resolve) => {
-				_Z = true;
-				roll_Z_Left = 0;
-				roll_Z_Right = 0;
+				_roll_Z = true;
 				setZAxis("done");
 				resolve();
 			})
@@ -278,7 +248,6 @@ const CalibrationsProgress = () => {
 	};
 
 	const tryGetComplete = async (): Promise<void> => {
-
 		if (complete === "done") {
 			return new Promise<void>((resolve) => { resolve() });
 		}

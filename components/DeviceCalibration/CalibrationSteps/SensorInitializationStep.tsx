@@ -10,7 +10,6 @@ let data = ss_init
 let IconDefault: React.FC<any> = data.Icon
 
 const SensorInitializationStep = ({ initSensorStep }: { initSensorStep: string }) => {
-
 	const status = initSensorStep
 	const { statusColor, textColor } = useStepColor({ status });
 
