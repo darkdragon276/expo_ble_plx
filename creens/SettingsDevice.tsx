@@ -12,8 +12,9 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 const FtherIcon = styled(Feather);
 
 type SettingsDeviceProps = {
-	deviceName: string;
-	deviceState: string;
+	deviceName?: string;
+	deviceState?: string;
+	firmwareVersion?: string;
 };
 
 const SettingsDevice = () => {
@@ -57,30 +58,45 @@ const SettingsDevice = () => {
 
 		const fetchDeviceName = async () => {
 			const device = await BLEService.getDevice();
-
 			if (!device) {
 				return;
 			}
 
-			device.isConnected().then((isConnected) => {
-				const deviceInfo: SettingsDeviceProps = {
-					deviceName: device.name ?? "Unknown Device",
-					deviceState: "Device Connected" //isConnected ? "Device Connected" : "No Device Connected",
-				};
+			let deviceInfo: SettingsDeviceProps = {
+				deviceName: device.name ?? "Unknown Device",
+				firmwareVersion: "",
+			};
 
-				setDeviceInfo(deviceInfo);
+			await device.isConnected().then((isConnected) => {
+				deviceInfo.deviceState = isConnected ? "Device Connected" : "No Device Connected";
 			});
+
+			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+			let char = await BLEService.readCharacteristicForDevice(BLEService.DEVICE_INFORMATION_SERVICE_UUID, BLEService.FIRMWARE_REVISION_UUID);
+			if (char?.value) {
+				deviceInfo.firmwareVersion = KrossDevice.decodeFirmwareVersion(char?.value);
+			}
+
+			setDeviceInfo(deviceInfo);
 		};
 
-		if (BLEService.getDevice() == null) {
-			BLEService.scanDevices((device) => {
-				BLEService.connectToDevice(device.id);
-			}, [BLEService.SERVICE_UUID]);
-		} else {
-			BLEService.connectToDevice(BLEService.getDevice()!.id);
+		const connectDevice = async () => {
+			if (BLEService.getDevice() == null) {
+				await BLEService.scanDevices((device) => {
+					BLEService.connectToDevice(device.id);
+				}, [BLEService.SERVICE_UUID]);
+			} else {
+				await BLEService.connectToDevice(BLEService.getDevice()!.id);
+			}
 		}
 
-		fetchDeviceName();
+		const settingInitial = async () => {
+			await connectDevice();
+			await fetchDeviceName();
+		}
+
+		settingInitial();
+
 	}, []);
 
 	// const reSet = async () => {
@@ -152,7 +168,7 @@ const SettingsDevice = () => {
 					<View className="w-1/2 p-2">
 						<View className="h-10">
 							<Text className="text-xs text-muted-foreground">Device Firmware</Text>
-							<Text className="font-mono text-sm">HX-KS-2024.1.2</Text>
+							<Text className="font-mono text-sm">{deviceInfo?.firmwareVersion}</Text>
 						</View>
 					</View>
 					<View className="w-1/2 p-2">
