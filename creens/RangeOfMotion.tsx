@@ -10,7 +10,6 @@ import {
     Alert,
 } from "react-native";
 
-// import LinearGradient from "react-native-linear-gradient";
 import { LinearGradient } from "expo-linear-gradient";
 import { LucidePlay, LucideSquare, LucideUsers } from 'lucide-react-native'
 import { Ionicons } from "@expo/vector-icons";
@@ -23,14 +22,15 @@ import AssessmentLRotation from "../components/RangeOfMotion/AssessmentLRotation
 import AssessmentRRotation from "../components/RangeOfMotion/AssessmentRRotation";
 import AssessmentLLateral from "../components/RangeOfMotion/AssessmentLLateral";
 import AssessmentRLateral from "../components/RangeOfMotion/AssessmentRLateral";
+import AssessmentDuration from "../components/RangeOfMotion/AssessmentDuration";
 
 import { useDatabase } from "../db/useDatabase";
-import { DB_INSERT_ROM, DB_SELECT_ALL_ROM, DB_DELETE_ALL_ROM } from "../db/dbQuery";
+import { DB_INSERT_ROM } from "../db/dbQuery";
 import { getCurrentDateTime } from "../utils/getDateTime";
 import { ChildROMRef } from "../model/ChildRefGetValue";
 import { KrossDevice } from "../ble/KrossDevice";
-import { BleManager, State, Characteristic } from "react-native-ble-plx";
-import { bleEventEmitter, type BleEmitterProps } from "../utils/BleEmitter";
+import { Characteristic } from "react-native-ble-plx";
+import { bleEventEmitter } from "../utils/BleEmitter";
 import { BLEService } from "../ble/BLEService";
 
 const LuPlay = styled(LucidePlay);
@@ -61,9 +61,9 @@ const RangeOfMotion = () => {
     const refRRotation = useRef<ChildROMRef>(null);
     const refLLateral = useRef<ChildROMRef>(null);
     const refRLateral = useRef<ChildROMRef>(null);
+    const refDuration = useRef<ChildROMRef>(null);
 
     useLayoutEffect(() => {
-        //console.log(`RangeOfMotion - useLayoutEffect`)
         navigation.setOptions({
             title: "",
             headerTitleAlign: "left",
@@ -119,7 +119,6 @@ const RangeOfMotion = () => {
 
     const addROMData = async (key: string) => {
         if (!db) {
-            //console.log("addData db is null !");
             return;
         }
 
@@ -129,10 +128,7 @@ const RangeOfMotion = () => {
         const r_rotation = refRRotation.current?.getValue() || 0.0;
         const l_lateral = refLLateral.current?.getValue() || 0.0;
         const r_lateral = refRLateral.current?.getValue() || 0.0;
-
-        //console.log(`RangeOfMotion key insert: ${key}`)
-        //console.log(`addData: ${extension}`)
-
+        const duration = refDuration.current?.getValue() || 0;
         let { title } = route.params;
         const { localShortDateTime, strNow } = getCurrentDateTime()
         const dt: string = strNow;
@@ -142,8 +138,7 @@ const RangeOfMotion = () => {
             title = `ROM Session - ${localShortDateTime}`;
         }
 
-        await db.runAsync(DB_INSERT_ROM, [key, title, dt, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, 0]);
-        //console.log(`Rom of Motion -> INSERT done! ---> title: ${title}`);
+        await db.runAsync(DB_INSERT_ROM, [key, title, dt, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration]);
     };
 
     const onPressRecording = async () => {
@@ -155,8 +150,6 @@ const RangeOfMotion = () => {
         try {
             const onError = (error: Error): void => {
                 if (error) {
-                    //Alert.alert('BLE Error', error?.message ?? String(error));
-                    //console.error("BLE Error", error);
                     return;
                 }
                 return;
@@ -166,13 +159,9 @@ const RangeOfMotion = () => {
                 let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
                 if (data) {
                     krossDevice.unpack(data);
-                    //krossDevice.log();
-                    //console.log(krossDevice.angle);
                     bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
                     bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
                     bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
-                } else {
-                    // 	// console.log("Received data is null");
                 }
             }
 
@@ -283,6 +272,7 @@ const RangeOfMotion = () => {
                             >
                                 <LuSquare size={20} color="white"></LuSquare>
                                 <Text className="text-white font-semibold ml-2 p-3">Stop Recording</Text>
+                                <AssessmentDuration record={record} ref={refDuration}></AssessmentDuration>
                             </LinearGradient>
                         </TouchableOpacity>
                 }

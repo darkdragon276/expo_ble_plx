@@ -166,7 +166,13 @@ const RangeOfMotionSummary = () => {
 
 						<View className="w-1/2">
 							<Text className="text-xs text-muted-foreground mb-1 text-gray-400">Duration</Text>
-							<Text className="font-medium text-sm">~{data?.duration} min</Text>
+							<Text className="font-medium text-sm">
+								{
+									(data && data.duration >= 60)
+										? (Math.trunc(data.duration / 60)) + " min " + (data.duration % 60) + "s"
+										: data?.duration + "s"
+								}
+							</Text>
 						</View>
 					</View>
 				</View>
