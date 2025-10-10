@@ -117,7 +117,7 @@ const RangeOfMotion = () => {
         };
     }, [])
 
-    const addROMData = async (key: string) => {
+    const addROMData = async (key: string, duration: number) => {
         if (!db) {
             return;
         }
@@ -128,7 +128,7 @@ const RangeOfMotion = () => {
         const r_rotation = refRRotation.current?.getValue() || 0.0;
         const l_lateral = refLLateral.current?.getValue() || 0.0;
         const r_lateral = refRLateral.current?.getValue() || 0.0;
-        const duration = refDuration.current?.getValue() || 0;
+        
         let { title } = route.params;
         const { localShortDateTime, strNow } = getCurrentDateTime()
         const dt: string = strNow;
@@ -174,6 +174,8 @@ const RangeOfMotion = () => {
     };
 
     const onPressStopRecording = async () => {
+        //button "Stop Recording" was unmounted so get "duration" right here
+        const duration = refDuration.current?.getValue() || 0;
 
         await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
         await BLEService.disconnectDevice();
@@ -181,7 +183,7 @@ const RangeOfMotion = () => {
 
         setTimeout(async () => {
             const key: string = Date.now().toString();
-            addROMData(key).then(() => {
+            addROMData(key, duration).then(() => {
                 navigation.replace("RangeOfMotionSummary", { key: key })
             }).catch((error) => {
                 console.log(error)

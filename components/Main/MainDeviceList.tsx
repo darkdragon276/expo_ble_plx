@@ -1,7 +1,7 @@
 import { Text, View, Pressable, Modal, FlatList, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
-import { Device} from 'react-native-ble-plx';
+import { Device } from 'react-native-ble-plx';
 import MainDeviceStatus from './MainDeviceStatus';
 import { BLEService } from '../../ble/BLEService';
 
@@ -12,11 +12,10 @@ const MainDeviceList = () => {
 	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
-		
 		const initBLE = async () => {
-			await BLEService.initializeBLE();
-			await BLEService.requestBluetoothPermission();
+			if (open) {
 			await startScan();
+			}
 		};
 
 		initBLE();
@@ -27,7 +26,7 @@ const MainDeviceList = () => {
 			} catch (cleanupError) {
 			}
 		};
-	}, []);
+	}, [open]);
 
 	const startScan = async () => {
 		setDevices([]);
@@ -59,7 +58,7 @@ const MainDeviceList = () => {
 				visible={open}
 				animationType="fade"
 				transparent
-				onRequestClose={() => setOpen(false)}
+				//onRequestClose={stopScan}
 			>
 				<Pressable
 					style={{ flex: 1 }}

@@ -269,7 +269,7 @@ export class KrossDevice {
                 continue;
             }
             if (this.rxBuff[i + expected_len + 1] === 0xFE &&
-                this.rxBuff[i + expected_len + 2] === 0xFE ) {
+                this.rxBuff[i + expected_len + 2] === 0xFE) {
                 const packet = this.rxBuff.slice(i, i + expected_len + 1);
                 // Remove processed data from rxBuff (FIFO)
                 this.rxBuff = this.rxBuff.slice(i + expected_len + 3);
@@ -367,7 +367,7 @@ export class KrossDevice {
             default:
                 return new Uint8Array(0);
         }
-        
+
         // Set length
         txBuff[0] = dataLength + KrossDevice.SizeOf.CMD + KrossDevice.SizeOf.ID;
 
@@ -378,4 +378,9 @@ export class KrossDevice {
         txBuff[txSize - 1] = 0xFE;
         return txBuff.slice(0, txSize);
     }
+
+    static normalizeAngle(alpha: number) {
+        alpha = ((alpha + 180) % 360 + 360) % 360;
+        return alpha - 180;
+    };
 }

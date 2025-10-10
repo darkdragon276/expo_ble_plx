@@ -48,7 +48,7 @@ type DataProp = {
 	duration: number,
 }
 
-type DtConconvert = {
+type DtConvert = {
 	date_dd_MM_yyyy_hh_mm_ss_ampm: string,
 	date_dd_MM_yyyy_at_hh_mm_ampm: string,
 	date_short: string,
@@ -59,7 +59,7 @@ const RangeOfMotionSummary = () => {
 	const db = useDatabase("headx.db");
 	const route = useRoute<RProp>();
 	const [data, setData] = useState<DataProp | null>(null)
-	const [dateConvert, setDateConvert] = useState<DtConconvert | null>()
+	const [dateConvert, setDateConvert] = useState<DtConvert | null>()
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -95,24 +95,19 @@ const RangeOfMotionSummary = () => {
 		});
 	}, [navigation]);
 
-	//console.log(`RangeOfMotionSummary render!`)
 	useEffect(() => {
 
 		const selectData = async () => {
 			try {
-				//console.log(`RangeOfMotionSummary selectData running}`)
 				if (!db) {
-					//console.log(`db is null`);
 					return;
 				}
 
 				const { key } = route.params;
-				//console.log(`getFirstAsync ${key}`);
 				const rs = await db.getFirstAsync<DataProp>(DB_SELECT_BY_ID_ROM, key);
 				if (rs) {
 					const { date_dd_MM_yyyy_hh_mm_ss_ampm, date_dd_MM_yyyy_at_hh_mm_ampm, date_short } = useConvertDateTime(new Date(rs.date));
 					setData(rs);
-					//console.log(rs);
 					setDateConvert({ date_dd_MM_yyyy_hh_mm_ss_ampm, date_dd_MM_yyyy_at_hh_mm_ampm, date_short })
 				}
 			} catch (error) {

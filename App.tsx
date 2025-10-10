@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/redux/store'
 import { useEffect, useState } from 'react';
 import SplashScreen from './creens/SplashScreen';
+import { BLEService } from './ble/BLEService';
 
 export default function App() {
 
@@ -19,7 +20,9 @@ export default function App() {
   }, []);
 
   const initApp = async (): Promise<void> => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await BLEService.initializeBLE();
+    await BLEService.requestBluetoothPermission();
+    await new Promise(resolve => setTimeout(resolve, 1000));
   };
 
   return (
