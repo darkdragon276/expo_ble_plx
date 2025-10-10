@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { use, useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import {
 	View,
@@ -11,12 +11,12 @@ import {
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import { RotateCcw, PenLine, CircleAlert, ChartColumn, FileText } from 'lucide-react-native'
+import { RotateCcw, PenLine, CircleAlert, ChartColumn, FileText, LucideCheck, LucideX } from 'lucide-react-native'
 import { styled } from 'nativewind';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../model/RootStackParamList";
 import { useDatabase } from "../db/useDatabase";
-import { DB_SELECT_BY_ID_ROM } from "../db/dbQuery";
+import { DB_SELECT_BY_ID_ROM, DB_UPDATE_BY_KEY_ROM } from "../db/dbQuery";
 import useConvertDateTime from "../utils/convertDateTime";
 
 const LuRotateCcw = styled(RotateCcw);
@@ -24,6 +24,8 @@ const LuPenLine = styled(PenLine);
 const LuCircleAlert = styled(CircleAlert);
 const LuChartColumn = styled(ChartColumn);
 const LuFileText = styled(FileText);
+const LuCheck = styled(LucideCheck);
+const LuUnCheck = styled(LucideX);
 
 const ExtensionSrcImage = require("../assets/Extension.png");
 const FlexionSrcImage = require("../assets/Flexion.png");
@@ -53,6 +55,66 @@ type DtConvert = {
 	date_dd_MM_yyyy_at_hh_mm_ampm: string,
 	date_short: string,
 }
+
+const TitleSummary = ({ title, key }: { title: string, key: string }) => {
+	const [text, setText] = useState(title)
+	const [edit, setEditText] = useState(false)
+
+	const editTitle = () => {
+		setEditText(!edit)
+	}
+
+	const saveTitle = async () => {
+		const db = useDatabase("headx.db");
+		try {
+			if (!db) {
+				return;
+			}
+
+			await db.runAsync(DB_UPDATE_BY_KEY_ROM, [text, key]);
+			return true;
+		} catch (error) {
+			console.log(error);
+			return false;
+		}
+	}
+
+	return (
+		<View className="flex-row items-center justify-center">
+			{
+				!edit
+					?
+					<>
+						<Text className="w-rounded-xl px-2 py-2 text-base">{title}</Text>
+						<LuPenLine size={20} color="gray" onPress={editTitle}></LuPenLine>
+					</>
+					:
+					<>
+						<TextInput
+							className="w-rounded-xl px-2 py-2 text-base"
+							defaultValue={title}
+							onChangeText={newText => setText(newText)}
+							placeholderTextColor="black"
+						/>
+						<View className="flex-row items-space-between">
+							<TouchableOpacity onPress={saveTitle}>
+								<View className="border border-green-500 rounded-md py-1 mr-2 z-10">
+									<LuCheck size={20} className="text-green-500 px-6"></LuCheck>
+								</View>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={editTitle}>
+								<View className="border border-green-500 rounded-md py-1 mr-2 z-10">
+									<LuUnCheck size={20} className="border border-red-500 rounded-xl text-red-500 px-6"></LuUnCheck>
+								</View>
+							</TouchableOpacity>
+
+						</View>
+					</>
+			}
+
+		</View>
+	)
+};
 
 const RangeOfMotionSummary = () => {
 	const navigation = useNavigation<NavigationProp>();
@@ -129,14 +191,10 @@ const RangeOfMotionSummary = () => {
 		<ScrollView className="flex-1 bg-gray-50 p-4">
 			<View className="w-full">
 				<View className="items-center mb-6">
-					<View className="flex-row items-center justify-center">
-						<TextInput
-							className="w-rounded-xl px-2 py-2 text-base"
-							value={data?.title}
-							placeholderTextColor="black"
-						/>
-						<LuPenLine size={17} color="gray"></LuPenLine>
-					</View>
+					<TitleSummary
+						title={data ? data?.title : ""}
+						key={data ? data?.key : ""}>
+					</TitleSummary>
 					<Text className="text-lg text-gray-500 text-center">
 						ROM Assessment - {dateConvert?.date_dd_MM_yyyy_at_hh_mm_ampm}
 					</Text>
