@@ -13,17 +13,75 @@ const FtherIcon = styled(Feather);
 
 type SettingsDeviceProps = {
 	deviceName?: string;
+	isConnected: boolean;
 	deviceState?: string;
 	firmwareVersion?: string;
 };
+
+const CalibrateButton = ({ isConnected }: { isConnected: boolean }) => {
+	return (
+		isConnected ?
+			<View className={`flex-row items-center bg-blue-500 px-4 py-2 rounded-xl`}>
+				<FtherIcon className="mr-2" name="rotate-ccw" size={15} color="white" />
+				<Text className="text-white font-medium">
+					Calibrate
+				</Text>
+			</View>
+			:
+			<View className={`flex-row items-center bg-gray-500 px-4 py-2 rounded-xl`}>
+				<FtherIcon className="mr-2" name="rotate-ccw" size={15} color="white" />
+				<Text className="text-white font-medium">
+					Calibrate
+				</Text>
+			</View>
+	)
+}
 
 const SettingsDevice = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [deviceInfo, setDeviceInfo] = useState<SettingsDeviceProps>()
 	const krossDevice = new KrossDevice();
 
-	const onPressGotoDeviceCalibration = () => {
+	const onPressGotoDeviceCalibration = async () => {
+		if (!deviceInfo?.isConnected === true) {
 		navigation.replace("DeviceCalibration")
+		}
+
+		// function alert() {
+		// 	Alert.alert('Connect error', `No connected device!`, [
+		// 		{
+		// 			text: 'Connect error',
+		// 			onPress: () => navigation.replace("Main"),
+		// 		}
+		// 	]);
+		// }
+		//return;
+		//console.log(`isConnected 1`);
+		//const device = await BLEService.checkDeviceConnected() //(BLEService.getDevice()?.id ?? "");
+		//console.log(`isConnected: ${device}`);
+		// .then((rs) =>{
+		// 	console.log(`isConnected: ${rs}`);
+		// }).catch((e) => {
+		// 	alert();
+		// 	return;
+		// })
+
+		//BLEService.stopDeviceScan();
+		// //console.log(`isConnected: ${device}`);
+		// if (!device) {
+		// 	alert();
+		// 	return;
+		// }
+		
+		// await device.isConnected().then((isConnected) => {
+		// 	console.log(`isConnected: ${isConnected}`);
+		// 	if (isConnected) {
+		// 		navigation.replace("DeviceCalibration")
+		// 	} else {
+		// 		alert();
+		// 		return;
+		// 	}
+		// });
 	}
 
 	useLayoutEffect(() => {
@@ -65,10 +123,12 @@ const SettingsDevice = () => {
 			let deviceInfo: SettingsDeviceProps = {
 				deviceName: device.name ?? "Unknown Device",
 				firmwareVersion: "",
+				isConnected: false,
 			};
 
 			await device.isConnected().then((isConnected) => {
 				deviceInfo.deviceState = isConnected ? "Device Connected" : "No Device Connected";
+				deviceInfo.isConnected = isConnected;
 			});
 
 			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
@@ -134,18 +194,8 @@ const SettingsDevice = () => {
 						<Text className="text-green-700 font-bold">{deviceInfo?.deviceState}</Text>
 						<Text className="text-sm text-green-500">{deviceInfo?.deviceName}</Text>
 					</View>
-					<Pressable
-						onPress={onPressGotoDeviceCalibration}
-					// className={({ pressed }: any) => [
-					// 	(pressed) ? "bg-green-500" : "bg-red-500"
-					// ]}
-					>
-						<View className="flex-row items-center bg-blue-500 px-4 py-2 rounded-xl">
-							<FtherIcon className="mr-2" name="rotate-ccw" size={15} color="white" />
-							<Text className="text-white font-medium">
-								Calibrate
-							</Text>
-						</View>
+					<Pressable onPress={onPressGotoDeviceCalibration}>
+						<CalibrateButton isConnected={deviceInfo?.isConnected ?? false} />
 					</Pressable>
 				</View>
 

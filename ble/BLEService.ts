@@ -12,7 +12,7 @@ import {
 	type Base64,
 	type Subscription
 } from 'react-native-ble-plx'
-import { PermissionsAndroid, Platform } from 'react-native'
+import { Alert, PermissionsAndroid, Platform } from 'react-native'
 import Toast from 'react-native-toast-message';
 
 const deviceNotConnectedErrorText = 'Device is not connected'
@@ -85,19 +85,26 @@ class BLEServiceInstance {
 			}, true)
 		})
 
-	disconnectDevice = async () => {
+	disconnectDevice = async (timeout: number = 500) => {
 		if (!this.device) {
 			this.showErrorToast(deviceNotConnectedErrorText)
 			throw new Error(deviceNotConnectedErrorText)
 		}
-		return this.manager
+
+		let cancelFunction = await this.manager
 			.cancelDeviceConnection(this.device.id)
-			.then(() => this.showSuccessToast('Device disconnected'))
+			.then(() => {
+				//do nothing
+			})
 			.catch(error => {
 				if (error?.code !== BleErrorCode.DeviceDisconnected) {
 					this.onError(error)
 				}
 			})
+
+		await new Promise(resolve => setTimeout(resolve, timeout));
+
+		return cancelFunction;
 	}
 
 	disconnectDeviceById = (id: DeviceId) =>
@@ -111,7 +118,11 @@ class BLEServiceInstance {
 			})
 
 	onBluetoothPowerOff = () => {
-		this.showErrorToast('Bluetooth is turned off')
+		Alert.alert('Bluetooth is turned off', `Please turn on Bluetooth`, [
+			{
+				text: 'OK',
+			}
+		]);
 	}
 
 	scanDevices = async (onDeviceFound: (device: Device) => void, UUIDs: UUID[] | null = null, legacyScan?: boolean) => {
