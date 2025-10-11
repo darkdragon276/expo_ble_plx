@@ -1,4 +1,4 @@
-import { use, useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import {
 	View,
@@ -56,26 +56,34 @@ type DtConvert = {
 	date_short: string,
 }
 
-const TitleSummary = ({ title, key }: { title: string, key: string }) => {
+const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) => {
 	const [text, setText] = useState(title)
+	const [oldtext, setOldText] = useState(title)
 	const [edit, setEditText] = useState(false)
+	const db = useDatabase("headx.db");
 
-	const editTitle = () => {
-		setEditText(!edit)
+	useEffect(() => {
+		setText(title)
+		setOldText(title);
+	}, [title])
+
+	const rollbackTitle = () => {
+		setText(oldtext);
+		setEditText(false);
 	}
 
 	const saveTitle = async () => {
-		const db = useDatabase("headx.db");
 		try {
 			if (!db) {
 				return;
 			}
 
-			await db.runAsync(DB_UPDATE_BY_KEY_ROM, [text, key]);
-			return true;
+			await db.runAsync(DB_UPDATE_BY_KEY_ROM, [text, dataKey]);
+			setText(text);
+			setOldText(text);
 		} catch (error) {
-			console.log(error);
-			return false;
+		} finally {
+			setEditText(false)
 		}
 	}
 
@@ -85,14 +93,14 @@ const TitleSummary = ({ title, key }: { title: string, key: string }) => {
 				!edit
 					?
 					<>
-						<Text className="w-rounded-xl px-2 py-2 text-base">{title}</Text>
-						<LuPenLine size={20} color="gray" onPress={editTitle}></LuPenLine>
+						<Text className="w-rounded-xl px-2 py-2 text-base">{text}</Text>
+						<LuPenLine size={20} color="gray" onPress={() => setEditText(true)}></LuPenLine>
 					</>
 					:
 					<>
 						<TextInput
 							className="w-rounded-xl px-2 py-2 text-base"
-							defaultValue={title}
+							defaultValue={text}
 							onChangeText={newText => setText(newText)}
 							placeholderTextColor="black"
 						/>
@@ -102,7 +110,7 @@ const TitleSummary = ({ title, key }: { title: string, key: string }) => {
 									<LuCheck size={20} className="text-green-500 px-6"></LuCheck>
 								</View>
 							</TouchableOpacity>
-							<TouchableOpacity onPress={editTitle}>
+							<TouchableOpacity onPress={rollbackTitle}>
 								<View className="border border-green-500 rounded-md py-1 mr-2 z-10">
 									<LuUnCheck size={20} className="border border-red-500 rounded-xl text-red-500 px-6"></LuUnCheck>
 								</View>
@@ -183,9 +191,9 @@ const RangeOfMotionSummary = () => {
 
 	}, [db])
 
-	const onPressGotoMain = useCallback(() => {
+	const onPressGotoMain = () => {
 		navigation.replace("Main")
-	}, []);
+	}
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
@@ -193,7 +201,7 @@ const RangeOfMotionSummary = () => {
 				<View className="items-center mb-6">
 					<TitleSummary
 						title={data ? data?.title : ""}
-						key={data ? data?.key : ""}>
+						dataKey={data ? data?.key : ""}>
 					</TitleSummary>
 					<Text className="text-lg text-gray-500 text-center">
 						ROM Assessment - {dateConvert?.date_dd_MM_yyyy_at_hh_mm_ampm}
