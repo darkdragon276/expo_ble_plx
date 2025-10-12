@@ -2,10 +2,8 @@ import { styled } from "nativewind";
 import { Text, View, Pressable, Alert } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 // import { colorMap, colorMapBg, type ColorVariant } from '../../model/DotStatusColor';
-import { KrossDevice } from '../../ble/KrossDevice';
 import { useEffect, useState } from "react";
 import { BLEService } from "../../ble/BLEService";
-import { Characteristic } from "react-native-ble-plx";
 
 const Icon = styled(Ionicons);
 
@@ -18,78 +16,35 @@ type StatusDevice = {
 };
 
 const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: any }) => {
-    const krossDevice = new KrossDevice();
     const [dvInfo, setDvInfo] = useState<StatusDevice>();
-    const [localDeviceId, setLocalDeviceId] = useState<string>(deviceId);
 
     useEffect(() => {
-        let IdDeviceSeleted = setDeviceSelected();
-        if (IdDeviceSeleted) {
-            deviceId = IdDeviceSeleted;
-        }
+        let cyclingIntervalId: NodeJS.Timeout | undefined;
 
-        //setLocalDeviceId(deviceId)
-        connectToDevice(deviceId)
+        cyclingIntervalId = setInterval(() => {
+            if(BLEService.deviceId !== deviceId) {
+                BLEService.setDeviceById(deviceId);
+            }
+
+            let soc = BLEService.deviceSupportInfo?.batteryLevel || 0;
+            const objDevice: StatusDevice = {
+                id: deviceId,
+                battery: soc === -1 ? null : soc,
+                name: BLEService.deviceSupportInfo?.name || "",
+                status: BLEService.deviceSupportInfo?.visible ? "Connected" : "",
+                color: (soc >= 60) ? "green"
+                    : (soc > 25 && soc < 60) ? "yellow"
+                        : "red",
+            };
+            setDvInfo(objDevice);
+        }, 2000);
+
+        return () => {
+            if (cyclingIntervalId) {
+                clearInterval(cyclingIntervalId);
+            }
+        }
     }, [deviceId]);
-
-    const connectToDevice = async (deviceId: string) => {
-        try {
-
-            if (deviceId === "") {
-                return;
-            }
-
-            const connected = await BLEService.connectToDevice(deviceId);
-            if (!connected) {
-                //Alert.alert('connect error', 'Device not connected');
-                return;
-            }
-
-            await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-            let char = await BLEService.readCharacteristicForDevice(BLEService.BATTERY_SERVICE_UUID, BLEService.BATTERY_LEVEL_UUID);
-
-            if (char?.value) {
-                let soc = KrossDevice.decodeBattery(char?.value);
-                // console.log("Battery level: " + soc);
-                setDvInfo((prev) => {
-                    if (prev?.battery === soc) return prev;
-                    return {
-                        id: "",
-                        battery: soc,
-                        name: connected.name,
-                        status: "Connected",
-                        color: (soc >= 60) ? "green"
-                            : (soc > 25 && soc < 60) ? "yellow"
-                                : "red",
-                    };
-                });
-            }
-
-            await BLEService.disconnectDevice();
-
-        } catch (e: any) {
-            //Alert.alert('connect error', e?.message ?? String(e));
-        }
-    };
-
-    const setDeviceSelected = () => {
-        const deviceSeleted = BLEService.getDevice();
-        if (!deviceSeleted)
-            return undefined;
-
-        const objDevice: StatusDevice = {
-            id: deviceSeleted.id,
-            battery: null,
-            name: deviceSeleted.name,
-            status: "",
-            color: "",
-        };
-
-        setDvInfo(objDevice);
-
-        return objDevice.id
-
-    };
 
     // const color: ColorVariant = "green";
     // const colorbg: ColorVariant = "green";

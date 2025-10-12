@@ -16,7 +16,7 @@ const YAxisStep = ({ yAxis }: { yAxis: string }) => {
 	return (
 		<View className={`flex-row items-center p-3 my-2 rounded-xl ${statusColor}`}>
 			<View className="mr-2">
-				{status === "done" ? <LuCircleBig size={20} color="green"></LuCircleBig> : status === "active" ? <CalibrationSpinning /> : <IconDefault />}
+				{status === "done" ? <LuCircleBig size={20} color="green"></LuCircleBig> : (status === "active" || status === "active_accel") ? <CalibrationSpinning /> : <IconDefault />}
 			</View>
 			<View>
 				<Text className={`font-bold text-base ${textColor}`}>{data.label}</Text>

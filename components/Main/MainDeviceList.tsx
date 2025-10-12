@@ -12,37 +12,21 @@ const MainDeviceList = () => {
 	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
-		const initBLE = async () => {
-			if (open) {
-			await startScan();
-			}
-		};
+		if (open) {
+			setDevices(BLEService.listDevices);
+		}
 
-		initBLE();
+		const cyclingIntervalId = setInterval(() => {
+			if (BLEService.deviceId === null) {
+				setSelectedDevice("")
+			}
+
+		}, 1000);
 
 		return () => {
-			try {
-				BLEService.stopDeviceScan();
-			} catch (cleanupError) {
-			}
+			clearInterval(cyclingIntervalId);
 		};
 	}, [open]);
-
-	const startScan = async () => {
-		setDevices([]);
-		try {
-			// On iOS you don't need to request runtime permission here (Info.plist required)
-			// On Android you must request ACCESS_FINE_LOCATION / BLUETOOTH_SCAN depending on SDK level.
-			await BLEService.scanDevices((device) => {
-				setDevices((prev) => {
-					if (prev.find((d) => d.id === device.id)) return prev;
-					return [...prev, device];
-				});
-			}, [BLEService.SERVICE_UUID]);
-		} catch (e: any) {
-			Alert.alert('Failed to start scan', e?.message ?? String(e));
-		}
-	};
 
 	return (
 		<View className="px-4">
@@ -58,7 +42,7 @@ const MainDeviceList = () => {
 				visible={open}
 				animationType="fade"
 				transparent
-				//onRequestClose={stopScan}
+			//onRequestClose={stopScan}
 			>
 				<Pressable
 					style={{ flex: 1 }}
