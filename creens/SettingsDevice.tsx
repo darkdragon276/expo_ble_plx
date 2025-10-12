@@ -5,8 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { Feather } from "@expo/vector-icons";
 import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from '../model/RootStackParamList';
+import useConvertDateTime from "../utils/convertDateTime";
 import { BLEService } from "../ble/BLEService";
-import { KrossDevice } from "../ble/KrossDevice";
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const FtherIcon = styled(Feather);
@@ -16,6 +16,8 @@ type SettingsDeviceProps = {
 	isConnected: boolean;
 	deviceState?: string;
 	firmwareVersion?: string;
+	lastSync?: number;
+	storageUsed?: string;
 };
 
 const CalibrateButton = ({ isConnected }: { isConnected: boolean }) => {
@@ -39,49 +41,12 @@ const CalibrateButton = ({ isConnected }: { isConnected: boolean }) => {
 
 const SettingsDevice = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const [deviceInfo, setDeviceInfo] = useState<SettingsDeviceProps>()
-	const krossDevice = new KrossDevice();
+	const [deviceInfo, setDeviceInfo] = useState<SettingsDeviceProps>();
 
 	const onPressGotoDeviceCalibration = async () => {
-		if (!deviceInfo?.isConnected === true) {
-		navigation.replace("DeviceCalibration")
+		if (deviceInfo?.isConnected === true) {
+			navigation.replace("DeviceCalibration")
 		}
-
-		// function alert() {
-		// 	Alert.alert('Connect error', `No connected device!`, [
-		// 		{
-		// 			text: 'Connect error',
-		// 			onPress: () => navigation.replace("Main"),
-		// 		}
-		// 	]);
-		// }
-		//return;
-		//console.log(`isConnected 1`);
-		//const device = await BLEService.checkDeviceConnected() //(BLEService.getDevice()?.id ?? "");
-		//console.log(`isConnected: ${device}`);
-		// .then((rs) =>{
-		// 	console.log(`isConnected: ${rs}`);
-		// }).catch((e) => {
-		// 	alert();
-		// 	return;
-		// })
-
-		//BLEService.stopDeviceScan();
-		// //console.log(`isConnected: ${device}`);
-		// if (!device) {
-		// 	alert();
-		// 	return;
-		// }
-		
-		// await device.isConnected().then((isConnected) => {
-		// 	console.log(`isConnected: ${isConnected}`);
-		// 	if (isConnected) {
-		// 		navigation.replace("DeviceCalibration")
-		// 	} else {
-		// 		alert();
-		// 		return;
-		// 	}
-		// });
 	}
 
 	useLayoutEffect(() => {
@@ -113,70 +78,38 @@ const SettingsDevice = () => {
 	}, [navigation]);
 
 	useEffect(() => {
+		//const dt: Date = Date.now() - (BLEService.deviceSupportInfo?.lastSync ?? 0);
 
-		const fetchDeviceName = async () => {
-			const device = await BLEService.getDevice();
-			if (!device) {
-				return;
-			}
+		//const { lastSync, hours, minutes, seconds } = useConvertDateTime(dt);
 
-			let deviceInfo: SettingsDeviceProps = {
-				deviceName: device.name ?? "Unknown Device",
-				firmwareVersion: "",
-				isConnected: false,
-			};
-
-			await device.isConnected().then((isConnected) => {
-				deviceInfo.deviceState = isConnected ? "Device Connected" : "No Device Connected";
-				deviceInfo.isConnected = isConnected;
-			});
-
-			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-			let char = await BLEService.readCharacteristicForDevice(BLEService.DEVICE_INFORMATION_SERVICE_UUID, BLEService.FIRMWARE_REVISION_UUID);
-			if (char?.value) {
-				deviceInfo.firmwareVersion = KrossDevice.decodeFirmwareVersion(char?.value);
-			}
-
-			setDeviceInfo(deviceInfo);
+		let deviceInfo: SettingsDeviceProps = {
+			deviceName: BLEService.deviceSupportInfo?.name ?? "Unknown Device",
+			firmwareVersion: BLEService.deviceSupportInfo?.firmwareVersion ?? "",
+			deviceState: BLEService.isDeviceVisible() ? "Device Connected" : "No Device Connected",
+			isConnected: BLEService.isDeviceVisible(),
+			lastSync: Date.now() - (BLEService.deviceSupportInfo?.lastSync ?? 0),
+			storageUsed: "2.3 GB/16 GB",
 		};
 
-		const connectDevice = async () => {
-			if (BLEService.getDevice() == null) {
-				await BLEService.scanDevices((device) => {
-					BLEService.connectToDevice(device.id);
-				}, [BLEService.SERVICE_UUID]);
-			} else {
-				await BLEService.connectToDevice(BLEService.getDevice()!.id);
-			}
-		}
+		setDeviceInfo(deviceInfo);
 
-		const settingInitial = async () => {
-			await connectDevice();
-			await fetchDeviceName();
-		}
-
-		settingInitial();
-
+		return () => {
+			//clearInterval(STDcyclingIntervalId);
+		};
 	}, []);
 
-	// const reSet = async () => {
-	// 	if (BLEService.getDevice() == null) {
-	// 		Alert.alert('Connect error', `No connected device: `);
-	// 		return;
+	// const STDcyclingIntervalId = setInterval(() => {
+	// 	if (!BLEService.isDeviceVisible()) {
+	// 		let deviceInfo: SettingsDeviceProps = {
+	// 			deviceName: "Unknown Device",
+	// 			firmwareVersion: "",
+	// 			deviceState: "No Device Connected",
+	// 			isConnected: false,
+	// 		};
+	// 		setDeviceInfo(deviceInfo);
 	// 	}
 
-	// 	try {
-	// 		console.log('Setting Device is pack --- RESET_QUATERNION');
-	// 		await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-	// 		BLEService.writeCharacteristicWithoutResponseForDevice(
-	// 			BLEService.SERVICE_UUID,
-	// 			BLEService.DATA_IN_UUID,
-	// 			KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.RESET_QUATERNION))
-	// 		);
-	// 	} catch (e: any) {
-	// 		//Alert.alert('connect error', e?.message ?? String(e));
-	// 	}
-	// };
+	// }, 2000);
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
@@ -189,10 +122,10 @@ const SettingsDevice = () => {
 					</Text>
 				</View>
 
-				<View className="flex-row items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
+				<View className={`flex-row items-center justify-between ${deviceInfo?.isConnected ? "bg-green-100" : "bg-red-100"} border ${deviceInfo?.isConnected ? "border-green-200" : "border-red-100"} rounded-xl p-3`}>
 					<View>
-						<Text className="text-green-700 font-bold">{deviceInfo?.deviceState}</Text>
-						<Text className="text-sm text-green-500">{deviceInfo?.deviceName}</Text>
+						<Text className={`text-${deviceInfo?.isConnected ? "green-700" : "red-500"} font-bold`}>{deviceInfo?.deviceState}</Text>
+						<Text className={`text-sm text-${deviceInfo?.isConnected ? "green" : "red"}-500`}>{deviceInfo?.deviceName}</Text>
 					</View>
 					<Pressable onPress={onPressGotoDeviceCalibration}>
 						<CalibrateButton isConnected={deviceInfo?.isConnected ?? false} />
@@ -224,13 +157,13 @@ const SettingsDevice = () => {
 					<View className="w-1/2 p-2">
 						<View className="h-10">
 							<Text className="text-xs text-muted-foreground">Last Sync</Text>
-							<Text className="font-mono text-sm">2 minutes ago</Text>
+							<Text className="font-mono text-sm">{deviceInfo?.lastSync ?? ""}</Text>
 						</View>
 					</View>
 					<View className="w-1/2 p-2">
 						<View className="h-10">
 							<Text className="text-xs text-muted-foreground">Storage Used</Text>
-							<Text className="font-mono text-sm">2.3 GB/16 GB</Text>
+							<Text className="font-mono text-sm">{deviceInfo?.storageUsed ?? ""}</Text>
 						</View>
 					</View>
 				</View>

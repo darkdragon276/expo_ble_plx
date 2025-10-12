@@ -9,34 +9,46 @@ import { BLEService } from './ble/BLEService';
 
 export default function App() {
 
-  const [isReady, setIsReady] = useState(false);
+    const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    const initialize = async () => {
-      await initApp();
-      setIsReady(true);
+    useEffect(() => {
+        let cyclingIntervalId: NodeJS.Timeout | undefined;
+
+        cyclingIntervalId = setInterval(() => {
+            BLEService.updateDeviceAndState1s();
+        }, 1000);
+
+        const initialize = async () => {
+            await initApp();
+            setIsReady(true);
+        };
+        initialize();
+
+        return () => {
+            if (cyclingIntervalId) {
+                clearInterval(cyclingIntervalId);
+            }
+        };
+    }, []);
+
+    const initApp = async (): Promise<void> => {
+        await BLEService.initializeBLE();
+        await BLEService.requestBluetoothPermission();
+        await new Promise(resolve => setTimeout(resolve, 1000));
     };
-    initialize();
-  }, []);
 
-  const initApp = async (): Promise<void> => {
-    await BLEService.initializeBLE();
-    await BLEService.requestBluetoothPermission();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  };
-
-  return (
-    <Provider store={store}>
-      <StatusBar style="dark" />
-      {
-        isReady
-          ?
-          <NavigationContainer>
-            <Navigatior></Navigatior>
-          </NavigationContainer>
-          :
-          <SplashScreen></SplashScreen>
-      }
-    </Provider>
-  );
+    return (
+        <Provider store={store}>
+            <StatusBar style="dark" />
+            {
+                isReady
+                    ?
+                    <NavigationContainer>
+                        <Navigatior></Navigatior>
+                    </NavigationContainer>
+                    :
+                    <SplashScreen></SplashScreen>
+            }
+        </Provider>
+    );
 }

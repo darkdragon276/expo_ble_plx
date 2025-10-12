@@ -30,6 +30,9 @@ let _Y_Yaw_Pre: number = 0;
 let _Z_Sum_Angle: number = 0;
 let _Z_Yaw_Pre: number = 0;
 
+const MIN_ACCEL = 0.7;
+const MAX_ACCEL = 1.3;
+
 const CalibrationsProgress = () => {
 	const krossDevice = new KrossDevice();
 
@@ -46,16 +49,10 @@ const CalibrationsProgress = () => {
 		reSet()
 
 		const connectDevice = async () => {
-			if (BLEService.getDevice() == null) {
-				await BLEService.scanDevices((device) => {
-					BLEService.connectToDevice(device.id).then(() => {
-						_connectDeviceStep = true;
-						_initSensorStep = true;
-						_holdDeviceStep = true;
-					})
-				}, [BLEService.SERVICE_UUID]);
+			if (BLEService.deviceId == null) {
+				// TODO: return home
 			} else {
-				await BLEService.connectToDevice(BLEService.getDevice()!.id).then(() => {
+				await BLEService.connectToDevice(BLEService.deviceId).then(() => {
 					_connectDeviceStep = true;
 					_initSensorStep = true;
 					_holdDeviceStep = true;
@@ -67,7 +64,6 @@ const CalibrationsProgress = () => {
 
 		const excuteCalibration = async () => {
 			await connectDevice();
-			await onDataGetAxis();
 		}
 
 		runSequentialCalibarion();
@@ -111,7 +107,6 @@ const CalibrationsProgress = () => {
 			_X_Done = true;
 		}
 		_X_Yaw_Pre = yaw;
-		//console.log("_X_Sum_Angle: ", _X_Sum_Angle);
 	}
 
 	const getYaw_Y = (yaw: number) => {
@@ -121,7 +116,6 @@ const CalibrationsProgress = () => {
 			_Y_Done = true;
 		}
 		_Y_Yaw_Pre = yaw;
-		//console.log("_Y_Sum_Angle: ", _Y_Sum_Angle);
 	}
 
 	const getYaw_Z = (yaw: number) => {
@@ -131,7 +125,6 @@ const CalibrationsProgress = () => {
 			_Z_Done = true;
 		}
 		_Z_Yaw_Pre = yaw;
-		//console.log("_Z_Sum_Angle: ", _Z_Sum_Angle);
 	}
 
 	const onDataGetAxis = async () => {
@@ -147,33 +140,44 @@ const CalibrationsProgress = () => {
 				}
 				return;
 			};
-
+			let count = 0;
 			const onMonitor = (char: Characteristic) => {
 				let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
 				if (data) {
 					krossDevice.unpack(data);
-
-					if (!_X_Done) {
-						if (krossDevice.accel.x <= 1.1 && krossDevice.accel.x >= 0.9
-							|| krossDevice.accel.x >= -1.1 && krossDevice.accel.x <= -0.9
+					count++;
+					if (!_X_Done && !_Y_Done && !_Z_Done) {
+						if (krossDevice.accel.x <= MAX_ACCEL && krossDevice.accel.x >= MIN_ACCEL
+							|| krossDevice.accel.x >= -MAX_ACCEL && krossDevice.accel.x <= -MIN_ACCEL
 						) {
+							setXAxis("active_accel");
 							getYaw_X(krossDevice.angle.yaw);
+							count = 0;
+						} else {
+							setXAxis("active");
 						}
 					}
 
-					if (_X_Done) {
-						if (krossDevice.accel.y <= 1.1 && krossDevice.accel.y >= 0.9
-							|| krossDevice.accel.y >= -1.1 && krossDevice.accel.y <= -0.9
+					if (_X_Done && !_Y_Done) {
+						if (krossDevice.accel.y <= MAX_ACCEL && krossDevice.accel.y >= MIN_ACCEL
+							|| krossDevice.accel.y >= -MAX_ACCEL && krossDevice.accel.y <= -MIN_ACCEL
 						) {
+							setYAxis("active_accel");
 							getYaw_Y(krossDevice.angle.yaw);
+							count = 0;
+						} else if(count % 50 >= 40) {
+							setYAxis("active");
 						}
 					}
 
-					if (_Y_Done) {
-						if (krossDevice.accel.z <= 1.1 && krossDevice.accel.z >= 0.9
-							|| krossDevice.accel.z >= -1.1 && krossDevice.accel.z <= -0.9
+					if (_Y_Done && !_Z_Done) {
+						if (krossDevice.accel.z <= MAX_ACCEL && krossDevice.accel.z >= MIN_ACCEL
+							|| krossDevice.accel.z >= -MAX_ACCEL && krossDevice.accel.z <= -MIN_ACCEL
 						) {
+							setZAxis("active_accel");
 							getYaw_Z(krossDevice.angle.yaw);
+						} else if(count % 50 >= 40) {
+							setZAxis("active");
 						}
 					}
 				}
@@ -308,6 +312,7 @@ const CalibrationsProgress = () => {
 			await tryConnectingDevice();
 			await tryInitSensor();
 			await trytHoldDevice();
+			onDataGetAxis();
 			await tryGetXAxis();
 			await tryGetYAxis();
 			await tryGetZAxis();
@@ -318,7 +323,7 @@ const CalibrationsProgress = () => {
 		}
 	};
 
-	const waitUntil = (condition: () => boolean, intervalMs = 1500): Promise<void> => {
+	const waitUntil = (condition: () => boolean, intervalMs = 1000): Promise<void> => {
 		return new Promise((resolve) => {
 			interval = setInterval(() => {
 				if (condition()) {

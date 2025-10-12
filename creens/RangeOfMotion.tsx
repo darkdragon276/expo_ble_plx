@@ -97,12 +97,17 @@ const RangeOfMotion = () => {
     }, [navigation, record]);
 
     useEffect(() => {
-        if (BLEService.getDevice() == null) {
-            BLEService.scanDevices((device) => {
-                BLEService.connectToDevice(device.id);
-            }, [BLEService.SERVICE_UUID]);
+        if (BLEService.deviceId == null) {
+            // TODO: alert no device connected
+            Alert.alert('Bluetooth is turned off', `Please connect device from Dashboard`, [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.replace("Main"),
+                }
+            ]);
+            return;
         } else {
-            BLEService.connectToDevice(BLEService.getDevice()!.id);
+            BLEService.connectToDevice(BLEService.deviceId);
         }
 
         return () => {
@@ -128,7 +133,7 @@ const RangeOfMotion = () => {
         const r_rotation = refRRotation.current?.getValue() || 0.0;
         const l_lateral = refLLateral.current?.getValue() || 0.0;
         const r_lateral = refRLateral.current?.getValue() || 0.0;
-        
+
         let { title } = route.params;
         const { localShortDateTime, strNow } = getCurrentDateTime()
         const dt: string = strNow;
@@ -143,7 +148,12 @@ const RangeOfMotion = () => {
 
     const onPressRecording = async () => {
         if (BLEService.getDevice() == null) {
-            Alert.alert('Connect error', `No connected device: `);
+            Alert.alert('No device connected', `Please connect device from Dashboard`, [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.replace("Main"),
+                }
+            ]);
             return;
         }
 
