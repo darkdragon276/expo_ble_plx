@@ -22,10 +22,10 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
         let cyclingIntervalId: NodeJS.Timeout | undefined;
 
         cyclingIntervalId = setInterval(() => {
-            if(BLEService.deviceId !== deviceId) {
-                BLEService.setDeviceById(deviceId);
+            if (BLEService.deviceId === null) {
+                setDvInfo(undefined);
+                return;
             }
-
             let soc = BLEService.deviceSupportInfo?.batteryLevel || 0;
             const objDevice: StatusDevice = {
                 id: deviceId,
@@ -37,7 +37,11 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
                         : "red",
             };
             setDvInfo(objDevice);
-        }, 2000);
+        }, 1000);
+
+        if (BLEService.deviceId !== deviceId && deviceId !== "") {
+            BLEService.setDeviceById(deviceId);
+        }
 
         return () => {
             if (cyclingIntervalId) {

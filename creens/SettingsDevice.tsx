@@ -78,38 +78,22 @@ const SettingsDevice = () => {
 	}, [navigation]);
 
 	useEffect(() => {
-		//const dt: Date = Date.now() - (BLEService.deviceSupportInfo?.lastSync ?? 0);
-
-		//const { lastSync, hours, minutes, seconds } = useConvertDateTime(dt);
-
-		let deviceInfo: SettingsDeviceProps = {
-			deviceName: BLEService.deviceSupportInfo?.name ?? "Unknown Device",
-			firmwareVersion: BLEService.deviceSupportInfo?.firmwareVersion ?? "",
-			deviceState: BLEService.isDeviceVisible() ? "Device Connected" : "No Device Connected",
-			isConnected: BLEService.isDeviceVisible(),
-			lastSync: Date.now() - (BLEService.deviceSupportInfo?.lastSync ?? 0),
-			storageUsed: "2.3 GB/16 GB",
-		};
-
-		setDeviceInfo(deviceInfo);
+		const updateInfo2s = setInterval(() => {
+			let deviceInfo: SettingsDeviceProps = {
+				deviceName: BLEService.deviceSupportInfo?.name ?? "Unknown Device",
+				firmwareVersion: BLEService.deviceSupportInfo?.firmwareVersion ?? "N/A",
+				deviceState: BLEService.deviceSupportInfo?.visible === true ? "Connected" : "No Device Connected",
+				lastSync: new Date(Date.now() - BLEService.deviceSupportInfo?.lastSync!).getSeconds(),
+				storageUsed: "23MB / 256MB",
+				isConnected: BLEService.deviceSupportInfo?.visible === true,
+			};
+			setDeviceInfo(deviceInfo);
+		}, 1000);
 
 		return () => {
-			//clearInterval(STDcyclingIntervalId);
+			clearInterval(updateInfo2s);
 		};
 	}, []);
-
-	// const STDcyclingIntervalId = setInterval(() => {
-	// 	if (!BLEService.isDeviceVisible()) {
-	// 		let deviceInfo: SettingsDeviceProps = {
-	// 			deviceName: "Unknown Device",
-	// 			firmwareVersion: "",
-	// 			deviceState: "No Device Connected",
-	// 			isConnected: false,
-	// 		};
-	// 		setDeviceInfo(deviceInfo);
-	// 	}
-
-	// }, 2000);
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">

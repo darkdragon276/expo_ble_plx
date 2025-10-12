@@ -12,10 +12,15 @@ export default function App() {
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        let cyclingIntervalId: NodeJS.Timeout | undefined;
+        let lopp1s: NodeJS.Timeout | undefined;
+        let lopp500ms: NodeJS.Timeout | undefined;
 
-        cyclingIntervalId = setInterval(() => {
-            BLEService.updateDeviceAndState1s();
+        lopp1s = setInterval(() => {
+            BLEService.updateInfo1s();
+        }, 1000);
+
+        lopp500ms = setInterval(() => {
+            BLEService.scan1s();
         }, 1000);
 
         const initialize = async () => {
@@ -25,8 +30,11 @@ export default function App() {
         initialize();
 
         return () => {
-            if (cyclingIntervalId) {
-                clearInterval(cyclingIntervalId);
+            if (lopp1s) {
+                clearInterval(lopp1s);
+            }
+            if (lopp500ms) {
+                clearInterval(lopp500ms);
             }
         };
     }, []);

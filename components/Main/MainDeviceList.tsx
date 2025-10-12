@@ -14,18 +14,8 @@ const MainDeviceList = () => {
 	useEffect(() => {
 		if (open) {
 			setDevices(BLEService.listDevices);
+			setSelectedDevice(BLEService.deviceId! || "");
 		}
-
-		const cyclingIntervalId = setInterval(() => {
-			if (BLEService.deviceId === null) {
-				setSelectedDevice("")
-			}
-
-		}, 1000);
-
-		return () => {
-			clearInterval(cyclingIntervalId);
-		};
 	}, [open]);
 
 	return (
