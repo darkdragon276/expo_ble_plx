@@ -99,7 +99,7 @@ const RangeOfMotion = () => {
     useEffect(() => {
         if (BLEService.deviceId == null) {
             // TODO: alert no device connected
-            Alert.alert('Bluetooth is turned off', `Please connect device from Dashboard`, [
+            Alert.alert('No device connected', `Please connect device from Dashboard`, [
                 {
                     text: 'OK',
                     onPress: () => navigation.replace("Main"),
