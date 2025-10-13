@@ -11,6 +11,10 @@ import { BLEService } from '../../ble/BLEService'
 import { Characteristic } from 'react-native-ble-plx'
 import { KrossDevice } from '../../ble/KrossDevice'
 import { Alert } from 'react-native'
+import { useNavigation} from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from "../../model/RootStackParamList";
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 let _connectDeviceStep: boolean = false;
 let _initSensorStep: boolean = false;
@@ -32,8 +36,8 @@ let _Z_Yaw_Pre: number = 0;
 
 const MIN_ACCEL = 0.7;
 const MAX_ACCEL = 1.3;
-
 const CalibrationsProgress = () => {
+	const navigation = useNavigation<NavigationProp>();
 	const krossDevice = new KrossDevice();
 
 	const [connectDeviceStep, setConnectDeviceStep] = useState("pending");
@@ -48,22 +52,21 @@ const CalibrationsProgress = () => {
 	useEffect(() => {
 		reSet()
 
-		const connectDevice = async () => {
-			if (BLEService.deviceId == null) {
-				// TODO: return home
-			} else {
-				await BLEService.connectToDevice(BLEService.deviceId).then(() => {
-					_connectDeviceStep = true;
-					_initSensorStep = true;
-					_holdDeviceStep = true;
-				})
-			}
-
-			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-		};
-
 		const excuteCalibration = async () => {
-			await connectDevice();
+			if (BLEService.deviceId == null) {
+				Alert.alert('No device connected', `Please connect device from Dashboard`, [
+					{
+						text: 'OK',
+						onPress: () => navigation.replace("Main"),
+					}
+				]);
+				return;
+			}
+			await BLEService.startSequence();
+			_connectDeviceStep = true;
+			_initSensorStep = true;
+			_holdDeviceStep = true;
+			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
 		}
 
 		runSequentialCalibarion();
@@ -75,11 +78,11 @@ const CalibrationsProgress = () => {
 			try {
 				if (BLEService.getDevice() != null) {
 					BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
-					BLEService.disconnectDevice();
 				}
 			} catch (cleanupError) {
 				//console.error("Error to cleanup BleManager:", cleanupError);
 			}
+			BLEService.stopSequence();
 		};
 
 	}, []);

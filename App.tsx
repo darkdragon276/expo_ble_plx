@@ -12,15 +12,10 @@ export default function App() {
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        let lopp1s: NodeJS.Timeout | undefined;
-        let lopp500ms: NodeJS.Timeout | undefined;
+        let loop1s: NodeJS.Timeout | undefined;
 
-        lopp1s = setInterval(() => {
-            BLEService.updateInfo1s();
-        }, 1000);
-
-        lopp500ms = setInterval(() => {
-            BLEService.scan1s();
+        loop1s = setInterval(() => {
+            BLEService.updateInfo();
         }, 1000);
 
         const initialize = async () => {
@@ -30,11 +25,8 @@ export default function App() {
         initialize();
 
         return () => {
-            if (lopp1s) {
-                clearInterval(lopp1s);
-            }
-            if (lopp500ms) {
-                clearInterval(lopp500ms);
+            if (loop1s) {
+                clearInterval(loop1s);
             }
         };
     }, []);

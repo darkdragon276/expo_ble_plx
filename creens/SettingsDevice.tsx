@@ -7,6 +7,7 @@ import type { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from '../model/RootStackParamList';
 import useConvertDateTime from "../utils/convertDateTime";
 import { BLEService } from "../ble/BLEService";
+import app from "../app.json";
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const FtherIcon = styled(Feather);
@@ -129,7 +130,7 @@ const SettingsDevice = () => {
 					<View className="w-1/2 p-2">
 						<View className="h-10">
 							<Text className="text-xs text-muted-foreground">App Version</Text>
-							<Text className="font-mono text-sm">v2.1.3</Text>
+							<Text className="font-mono text-sm">v{app.expo.version}</Text>
 						</View>
 					</View>
 					<View className="w-1/2 p-2">
