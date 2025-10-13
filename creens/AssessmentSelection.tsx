@@ -36,7 +36,7 @@ const romFeatures: Feature[] = [
 	{ id: 'f1', text: 'Flexion/Extension measurement' },
 	{ id: 'f2', text: 'Left/Right rotation tracking' },
 	{ id: 'f3', text: 'Lateral flexion analysis' },
-	{ id: 'f4', text: 'Symmetry and smoothness metrics' },
+	// { id: 'f4', text: 'Symmetry and smoothness metrics' },
 ];
 
 const AssessmentSelection = () => {
@@ -74,8 +74,6 @@ const AssessmentSelection = () => {
 			<Text className="text-sm text-muted">{item.text}</Text>
 		</View>
 	);
-
-	//console.log(`AssessmentSelection render!`)
 
 	const onPressGotoAssessment = () => {
 		dispatch(resetROM());
@@ -158,10 +156,10 @@ const AssessmentSelection = () => {
 							renderItem={renderFeature}
 							scrollEnabled={false}
 						/>
-						<View className="flex-row items-center gap-2">
+						{/* <View className="flex-row items-center gap-2">
 							<LuClock size={15} className="text-xs" color="gray"></LuClock>
 							<Text className="text-xs text-gray-500 text-muted">Duration: ~10-12 minutes</Text>
-						</View>
+						</View> */}
 					</View>
 				</View>
 

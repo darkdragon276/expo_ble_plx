@@ -29,7 +29,7 @@ export const ss_init: Omit<StepProps, "status"> =
 export const hold_dv: Omit<StepProps, "status"> =
 {
 	label: "Hold Device Steady",
-	description: "Hold device steady in neutral position for baseline",
+	description: "Hold device steady with the power button facing upward",
 	IconLoading: () => <CalibrationSpinning />,
 	Icon: () => <LuHand size={20} color="gray"></LuHand>,
 };
@@ -37,7 +37,7 @@ export const hold_dv: Omit<StepProps, "status"> =
 export const x_asis: Omit<StepProps, "status"> =
 {
 	label: "X-Axis Calibration",
-	description: "Rotate device left and right (yaw rotation)",
+	description: "Pitch Calibration - Rotate the device 360 degrees up or down",
 	IconLoading: () => <CalibrationSpinning />,
 	Icon: () => <LuRotateCw size={20} color="gray"></LuRotateCw>,
 };
@@ -45,7 +45,7 @@ export const x_asis: Omit<StepProps, "status"> =
 export const y_asis: Omit<StepProps, "status"> =
 {
 	label: "Y-Axis Calibration",
-	description: "Tilt device forward and backward (pitch rotation)",
+	description: "Roll Calibration - Rotate the device 360 degrees clockwise or counter clockwise",
 	IconLoading: () => <CalibrationSpinning />,
 	Icon: () => <LuArrowUpDown size={20} color="gray"></LuArrowUpDown>,
 };
@@ -53,7 +53,7 @@ export const y_asis: Omit<StepProps, "status"> =
 export const z_asis: Omit<StepProps, "status"> =
 {
 	label: "Z-Axis Calibration",
-	description: "Roll device side to side (roll rotation)",
+	description: "Yaw Calibration - Rotate the device 360 degrees left or right",
 	IconLoading: () => <CalibrationSpinning />,
 	Icon: () => <LuRotateCcw size={20} color="gray"></LuRotateCcw>,
 }

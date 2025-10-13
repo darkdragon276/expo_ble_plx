@@ -31,7 +31,7 @@ const SplashScreen = () => {
 			>
 				<Animated.View style={[styles.logoWrapper, { opacity, transform: [{ scale }] }]}>
 					<Image
-						source={require("../assets/WhiteLogo.png")}
+						source={require("../assets/DarkLogo2.png")}
 						style={styles.logo}
 						resizeMode="cover"
 					/>

@@ -31,8 +31,8 @@ const ExtensionSrcImage = require("../assets/Extension.png");
 const FlexionSrcImage = require("../assets/Flexion.png");
 const LeftRotationSrcImage = require("../assets/LeftRotation.png");
 const RightRotationSrcImage = require("../assets/RightRotation.png");
-const LeftLateralSrcImage = require("../assets/LeftLateral.png");
-const RightLateralSrcImage = require("../assets/RightLateral.png");
+const LeftLateralSrcImage = require("../assets/LeftLateral2.png");
+const RightLateralSrcImage = require("../assets/RightLateral2.png");
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 type RProp = RouteProp<RootStackParamList, "RangeOfMotionSummary">;
@@ -209,11 +209,11 @@ const RangeOfMotionSummary = () => {
 				</View>
 
 				{/* ROM Card */}
-				<View className="flex flex-col bg-white rounded-xl px-6 [&:last-child]:pb-6 mb-6">
+				{/* <View className="flex flex-col bg-white rounded-xl px-6 [&:last-child]:pb-6 mb-6">
 					<View className="flex-row items-center py-4">
-						{/* Icon circle */}
+
 						<View className="items-center justify-center mr-2">
-							{/* small rotation icon */}
+
 							<LuRotateCcw size={22} className="text-gray-400"></LuRotateCcw>
 						</View>
 						<Text className="text-xl">Range of Motion Summary</Text>
@@ -236,7 +236,7 @@ const RangeOfMotionSummary = () => {
 							</Text>
 						</View>
 					</View>
-				</View>
+				</View> */}
 
 				{/* ROM Card */}
 				<View className="flex flex-col bg-white rounded-xl px-6 [&:last-child]:pb-6 mb-6">
@@ -295,6 +295,7 @@ const RangeOfMotionSummary = () => {
 								<View className="items-center bg-purple-50/80 border border-purple-200 rounded-xl p-4">
 									<Image
 										className="w-16 h-16"
+										style={{ transform: [{ rotate: '180deg' }] }}
 										source={LeftRotationSrcImage}
 									/>
 								</View>
@@ -314,6 +315,7 @@ const RangeOfMotionSummary = () => {
 								<View className="items-center bg-orange-50/80 border border-orange-200 rounded-xl p-4">
 									<Image
 										className="w-16 h-16"
+										style={{ transform: [{ rotate: '180deg' }] }}
 										source={RightRotationSrcImage}
 									/>
 								</View>
@@ -367,41 +369,8 @@ const RangeOfMotionSummary = () => {
 
 				</View>
 
-				{/* Card */}
-				<View className="bg-white rounded-xl p-4 shadow-md">
-					<View className="flex-row items-center">
-						<View className="w-8 h-8 rounded-full items-center justify-center mr-3">
-							<LuCircleAlert size={20} color="gray"></LuCircleAlert>
-						</View>
-						<Text className="text-lg font-semibold text-gray-800">Clinical Considerations</Text>
-					</View>
-
-					{/* Inner blue note box */}
-					<View className="mt-4 bg-blue-50 border border-blue-100 rounded-lg p-4">
-						<Text className="text-sm font-semibold text-blue-800 mb-2">Range of Motion Assessment Notes:</Text>
-
-						<View className="pl-2">
-							<View className="flex-row items-start mb-1">
-								<Text className="text-sm text-blue-800 flex-1">• Values shown represent maximum achievable ranges in each direction</Text>
-							</View>
-
-							<View className="flex-row items-start mb-1">
-								<Text className="text-sm text-blue-800 flex-1">• Symmetry index compares left/right movement patterns</Text>
-							</View>
-
-							<View className="flex-row items-start mb-1">
-								<Text className="text-sm text-blue-800 flex-1">• Consider pain levels and patient comfort during interpretation</Text>
-							</View>
-
-							<View className="flex-row items-start">
-								<Text className="text-sm text-blue-800 flex-1">• Compare with age-matched normative data and previous assessments</Text>
-							</View>
-						</View>
-					</View>
-				</View>
-
 				{/* Buttons area */}
-				<View className="mt-6">
+				<View className="mt-1">
 					<TouchableOpacity
 						onPress={onPressGotoMain}
 						activeOpacity={0.8}
@@ -420,6 +389,38 @@ const RangeOfMotionSummary = () => {
 					</TouchableOpacity>
 				</View>
 
+				{/* Card */}
+				<View className="bg-white rounded-xl p-4 shadow-md">
+					<View className="flex-row items-center">
+						<View className="w-8 h-8 rounded-full items-center justify-center mr-3">
+							<LuCircleAlert size={20} color="gray"></LuCircleAlert>
+						</View>
+						<Text className="text-lg font-semibold text-gray-800">Clinical Considerations</Text>
+					</View>
+
+					{/* Inner blue note box */}
+					<View className="mt-4 bg-blue-50 border border-blue-100 rounded-lg p-4">
+						<Text className="text-sm font-semibold text-blue-800 mb-2">Range of Motion Assessment Notes:</Text>
+
+						<View className="pl-2">
+							<View className="flex-row items-start mb-1">
+								<Text className="text-sm text-blue-800 flex-1">• Values shown represent maximum achievable ranges in each direction</Text>
+							</View>
+
+							{/* <View className="flex-row items-start mb-1">
+								<Text className="text-sm text-blue-800 flex-1">• Symmetry index compares left/right movement patterns</Text>
+							</View> */}
+
+							<View className="flex-row items-start mb-1">
+								<Text className="text-sm text-blue-800 flex-1">• Consider pain levels and patient comfort during interpretation</Text>
+							</View>
+
+							<View className="flex-row items-start">
+								<Text className="text-sm text-blue-800 flex-1">• Compare with age-matched normative data and previous assessments</Text>
+							</View>
+						</View>
+					</View>
+				</View>
 				<View className="h-12"></View>
 			</View>
 		</ScrollView >
