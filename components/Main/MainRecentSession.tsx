@@ -1,16 +1,18 @@
 import React, { memo, useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import { LucideHistory, LucideTrendingUp } from "lucide-react-native";
+import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
+import { LucideHistory, LucideTrendingUp, LucideTrash2 } from "lucide-react-native";
 import { useDatabase } from "../../db/useDatabase";
-import { DB_SELECT_RECENT_ROM } from "../../db/dbQuery";
+import { DB_SELECT_RECENT_ROM, DB_DELETE_BY_KEY_ROM } from "../../db/dbQuery";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../model/RootStackParamList";
 import { styled } from 'nativewind';
 import useConvertDateTime from "../../utils/convertDateTime";
+import { SQLiteDatabase } from "expo-sqlite";
 
 const LuTrendUp = styled(LucideTrendingUp);
 const LucHistory = styled(LucideHistory);
+const LucTrash = styled(LucideTrash2);
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -22,9 +24,7 @@ type Session = {
 	type: "JPS" | "ROM";
 };
 
-let sessions: Session[] = [];
-
-const SessionItem = memo(({ item, gotoHistory }: { item: Session, gotoHistory: any }) => {
+const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHistory: any, delROM: any }) => {
 	const { date_dd_MM_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
 
 	return (
@@ -34,12 +34,21 @@ const SessionItem = memo(({ item, gotoHistory }: { item: Session, gotoHistory: a
 			<View className="bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
 				<View className="flex-row justify-between items-center">
 					<Text className="text-md font-bold">{item.title}</Text>
-					<View
-						className={`px-3 py-1 rounded-full ${item.type === "JPS" ? "bg-teal-100" : "bg-indigo-100"}`}>
-						<Text
-							className={`text-xs font-semibold ${item.type === "JPS" ? "text-teal-600" : "text-indigo-600"}`}>
-							{item.type}
-						</Text>
+					<View className="flex-column items-center">
+						<View
+							className={`px-3 py-1 rounded-full ${item.type === "JPS" ? "bg-teal-100" : "bg-indigo-100"}`}>
+							<Text
+								className={`text-xs font-semibold ${item.type === "JPS" ? "text-teal-600" : "text-indigo-600"}`}>
+								{item.type}
+							</Text>
+						</View>
+						<View className="flex-1 rounded-full bg-green-100">
+							<TouchableOpacity
+								onPress={(key) => delROM(key)}
+							>
+								<LucTrash size={20} color={"gray"} />
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 				<Text className="text-xs text-muted-foreground">{date_dd_MM_yyyy_hh_mm_ss_ampm}</Text>
@@ -55,19 +64,18 @@ const SessionItem = memo(({ item, gotoHistory }: { item: Session, gotoHistory: a
 export default function MainRecentSession() {
 	let db = useDatabase("headx.db");
 	const [init, setInit] = useState(false);
+	const [data, setData] = useState<Session[]>([]);
 	const navigation = useNavigation<NavigationProp>();
 
 	useEffect(() => {
 		const selectAllSession = async () => {
 			if (!db) {
-				//console.log(`MainRecentSession db is null`)
 				return;
 			}
-			//console.log(`MainRecentSession render`)
+
 			const rs = await db.getAllAsync<Session>(DB_SELECT_RECENT_ROM);
-			//console.log(rs.length);
 			if (rs) {
-				sessions = rs
+				setData(rs);
 				setInit(true);
 			}
 		};
@@ -75,17 +83,35 @@ export default function MainRecentSession() {
 		if (db) selectAllSession();
 
 		return () => {
-			//console.log(`MainRecentSession unmount`)
 			db = null;
-			sessions = [];
 			setInit(false)
 		}
 
 	}, [db])
 
 	const gotoHistory = (key: string) => {
-		//console.log(`MainRecentSession: ${key}`)
 		navigation.replace("RangeOfMotionSummary", { key: key });
+	};
+
+	const delROM = async (key: string) => {
+		if (!db) {
+			return;
+		}
+
+		const del = async (db: SQLiteDatabase) => {
+			await db.runAsync(DB_DELETE_BY_KEY_ROM, [key])
+			setData(prev => prev.filter(item => item.key !== key));
+		}
+
+		Alert.alert("", "Are you sure?", [
+			{
+				text: "Yes",
+				onPress: () => { del(db!) }
+			},
+			{
+				text: "No",
+			}
+		]);
 	};
 
 	return (
@@ -106,9 +132,9 @@ export default function MainRecentSession() {
 
 			{/* Session list */}
 			<FlatList
-				data={sessions}
+				data={data}
 				keyExtractor={(item) => item.id}
-				renderItem={({ item }) => <SessionItem item={item} gotoHistory={() => { gotoHistory(item.key) }} />}
+				renderItem={({ item }) => <SessionItem item={item} delROM={() => delROM(item.key)} gotoHistory={() => { gotoHistory(item.key) }} />}
 				showsVerticalScrollIndicator={false}
 				removeClippedSubviews={true}
 			/>

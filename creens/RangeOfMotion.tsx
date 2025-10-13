@@ -44,8 +44,8 @@ const ExtensionSrcImage = require("../assets/Extension.png");
 const FlexionSrcImage = require("../assets/Flexion.png");
 const LeftRotationSrcImage = require("../assets/LeftRotation.png");
 const RightRotationSrcImage = require("../assets/RightRotation.png");
-const LeftLateralSrcImage = require("../assets/LeftLateral.png");
-const RightLateralSrcImage = require("../assets/RightLateral.png");
+const LeftLateralSrcImage = require("../assets/LeftLateral2.png");
+const RightLateralSrcImage = require("../assets/RightLateral2.png");
 let NowObj = { localShortDateTime: "", strNow: "" };
 
 const RangeOfMotion = () => {
@@ -216,11 +216,10 @@ const RangeOfMotion = () => {
                 {/* Card Instructions */}
                 <View className="bg-blue-50 rounded-xl px-4 py-3 shadow-sm">
                     {/* Header */}
-                    <View className="flex-row items-center justify-center">
-                        {/* Small icon */}
+                    {/* <View className="flex-row items-center justify-center">
                         <LuUsers size={20}></LuUsers>
                         <Text className="ml-2 font-semibold text-blue-700">Instructions</Text>
-                    </View>
+                    </View> */}
 
                     {/* List Steps */}
                     <View className="space-y-2">
@@ -331,6 +330,7 @@ const RangeOfMotion = () => {
                         <View className="items-center">
                             <Image
                                 className="w-14 h-14"
+                                style={{ transform: [{ rotate: '180deg' }] }}
                                 source={LeftRotationSrcImage}
                             />
                         </View>
@@ -347,6 +347,7 @@ const RangeOfMotion = () => {
                         <View className="items-center">
                             <Image
                                 className="w-14 h-14"
+                                style={{ transform: [{ rotate: '180deg' }] }}
                                 source={RightRotationSrcImage}
                             />
                         </View>
