@@ -47,7 +47,7 @@ export default function DeviceCalibration() {
 			<View className="items-center mb-4">
 				<View className="bg-blue-100 px-3 py-1 rounded-full">
 					<Text className="text-blue-600 font-medium text-xs">
-						Step 2 of 3
+						Step 2 of 2
 					</Text>
 				</View>
 			</View>

@@ -142,7 +142,7 @@ const SettingsDevice = () => {
 					<View className="w-1/2 p-2">
 						<View className="h-10">
 							<Text className="text-xs text-muted-foreground">Last Sync</Text>
-							<Text className="font-mono text-sm">{deviceInfo?.lastSync ?? ""}</Text>
+							<Text className="font-mono text-sm">{deviceInfo?.lastSync ?? ""} seconds ago</Text>
 						</View>
 					</View>
 					<View className="w-1/2 p-2">
