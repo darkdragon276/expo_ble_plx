@@ -13,8 +13,14 @@ const MainDeviceList = () => {
 
 	useEffect(() => {
 		if (open) {
-			setDevices(BLEService.listDevices);
+			BLEService.startSequence();
+			BLEService.scanDeivces((listDevices) => {
+				setDevices(listDevices);
+			});
 			setSelectedDevice(BLEService.deviceId! || "");
+		} else {
+			setDevices([]);
+			BLEService.stopSequence();
 		}
 	}, [open]);
 

@@ -106,19 +106,18 @@ const RangeOfMotion = () => {
                 }
             ]);
             return;
-        } else {
-            BLEService.connectToDevice(BLEService.deviceId);
         }
+        BLEService.startSequence();
 
         return () => {
             try {
                 if (BLEService.getDevice() != null) {
                     BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
-                    BLEService.disconnectDevice();
                 }
             } catch (cleanupError) {
                 //console.error("Error to cleanup BleManager:", cleanupError);
             }
+            BLEService.stopSequence();
         };
     }, [])
 

@@ -1,5 +1,6 @@
 import { StyleSheet, Animated, Text, View, Image, ImageBackground, StatusBar, Platform } from 'react-native'
 import React, { useEffect, useRef } from 'react'
+import app from "../app.json";
 
 const SplashScreen = () => {
 	const opacity = useRef(new Animated.Value(0)).current;
@@ -36,7 +37,7 @@ const SplashScreen = () => {
 					/>
 					<Text style={styles.title}>HEADX</Text>
 					<Text style={styles.title}>Motion Analytics Platform</Text>
-					<Text style={styles.subtitle}>v2.1.0 Professional</Text>
+					<Text style={styles.subtitle}> v{app.expo.version} Professional</Text>
 				</Animated.View>
 			</ImageBackground >
 		</View>

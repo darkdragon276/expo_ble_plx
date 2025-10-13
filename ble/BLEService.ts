@@ -24,16 +24,15 @@ class BLEServiceInstance {
 	device: Device | null
 	deviceId: DeviceId | null = null
 
-	deviceSupportInfo: { 
+	deviceSupportInfo: {
 		name?: string | null;
-		visible?: boolean; 
-		lastSync?: number; 
+		visible?: boolean;
+		lastSync?: number;
 		batteryLevel?: number;
 		firmwareVersion?: string;
 	} = {}
 
 	listDevices: Device[] = []
-	listTempDevices: Device[] = []
 
 	characteristicMonitor: Subscription | null
 
@@ -41,11 +40,20 @@ class BLEServiceInstance {
 
 	timeoutHandle: NodeJS.Timeout | null = null
 
-	secCounter: number = 0;
-	msCounter: number = 0;
+	secCounter: number = -1;
 
-	private isLockedUpdate: boolean = false;
-	private isLockedConnect: boolean = false;
+	private lockUpdate: boolean = false;
+
+	startSequence = () => new Promise<void>((resolve, reject) => {
+		this.lockUpdate = true;
+		setTimeout(() => {
+			resolve();
+		}, 1000);
+	});
+
+	stopSequence = () => {
+		this.lockUpdate = false;
+	}
 
 	readonly SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
 	readonly DATA_IN_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E";
@@ -72,93 +80,100 @@ class BLEServiceInstance {
 
 	setDeviceById = (id: DeviceId) => {
 		console.log("Set device by id: " + id);
-		this.deviceId = id;
+		if (this.deviceId !== id) {
+			// if (this.deviceId !== null) {
+			// 	this.manager.cancelDeviceConnection(this.deviceId).catch(console.error);
+			// }
+			this.deviceId = id;
+		}
+	}
+	
+	scanDeivces = async (onUpdateListDevice: (listDevices: Device[]) => void) => {
+		this.listDevices = [];
+		await this.manager.cancelDeviceConnection(this.deviceId!)
+			.then(() => {
+				// do nothing
+			}).catch((error) => {
+				// console.log("Cancel connection error: " + error.message);
+			});
+
+		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {
+			if (error) {
+				console.error("Scan error: " + error.message);
+				// this.onError(error);
+				this.manager.stopDeviceScan();
+				return;
+			}
+			if (device) {
+				if (!this.listDevices.some(d => d.id === device.id)) {
+					this.listDevices.push(device);
+				}
+				onUpdateListDevice(this.listDevices);
+			}
+		});
 	}
 
-	updateInfo1s = async() => {
-		// Update device visibility state and other info
-		this.msCounter++;
+	updateInfo = async () => {
+		this.secCounter++;
+		// Scan for devices every 60s, scan for 50s and stop for 10s
+		if (this.lockUpdate) return;
 
-		if (this.isLockedUpdate === true)
-			return;
+		if (this.deviceId === null) return;
 
-		if (this.deviceId === null) {
-			this.deviceSupportInfo = {lastSync: this.deviceSupportInfo.lastSync};
-			return;
+		console.log("Update for devices");
+		if (this.secCounter % 20 === 0) {
+			await this.manager.stopDeviceScan().then(() => {
+				
+			}).catch((error) => {
+				// this.onError(error);
+			});
 		}
-
-		// Lock
-		this.isLockedConnect = true;
-		await this.manager.connectToDevice(this.deviceId, { timeout: 1000 })
+		await this.manager.connectToDevice(this.deviceId, { timeout: 1000, autoConnect: true })
 			.then(device => {
 				this.device = device
 				this.deviceSupportInfo!.name = device.name;
 				this.deviceSupportInfo!.visible = true;
 				this.deviceSupportInfo!.lastSync = Date.now();
+
 			}).catch(error => {
 				if (error.errorCode === BleErrorCode.DeviceAlreadyConnected) {
 					return;
 				}
 			});
 
-		await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId);
-		await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
-			.then(char => {
-				if (char?.value) {
-					this.deviceSupportInfo!.batteryLevel = KrossDevice.decodeBattery(char?.value);
-				}
-			})
-			.catch(console.error);
 
-		await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
-			.then(char => {
-				if (char?.value) {
-					this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(char?.value);
+		await this.manager.isDeviceConnected(this.deviceId)
+			.then((isConnected) => {
+				if (!isConnected) {
+					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+					this.deviceId = null;
 				}
-			})
-			.catch(console.error);
-
-		await this.manager.cancelDeviceConnection(this.deviceId)
-			.then(() => {
-				this.isLockedConnect = false;
-			}).catch(error => {
-				this.isLockedConnect = false;
+			}).catch((error) => {
+				// this.onError(error);
 			});
-	}
+		if (this.secCounter % 2 === 0) {
+			await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId)
+				.then(device => {
+					// do nothing
+				}).catch((error) => {
 
-	scan1s = async() => {
-		if (this.isLockedUpdate === true || this.isLockedConnect === true) {
-			return;
-		}
-		this.secCounter++;
-		// Scan for devices every 60s, scan for 50s and stop for 10s
-		if (this.secCounter % 10 >= 0 && this.secCounter % 10 < 7) {
-			this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {
-				if (error) {
-					this.onError(error);
-					this.manager.stopDeviceScan();
-					return;
-				}
-				if (device) {
-					if (!this.listTempDevices.some(d => d.id === device.id)) {
-						this.listTempDevices.push(device);
+				});
+
+			await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
+				.then(char => {
+					if (char?.value) {
+						this.deviceSupportInfo!.batteryLevel = KrossDevice.decodeBattery(char?.value);
 					}
-					if (!this.listDevices.some(d => d.id === device.id)) {
-						this.listDevices.push(device);
+				})
+				.catch(console.error);
+
+			await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
+				.then(char => {
+					if (char?.value) {
+						this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(char?.value);
 					}
-				}
-			});
-		} else if (this.secCounter % 10 === 7) {
-			this.manager.stopDeviceScan();
-			this.listDevices = this.listDevices.filter(device =>
-				this.listTempDevices.some(tempDevice => tempDevice.id === device.id)
-			);
-			if (!this.listDevices.some(device => device.id === this.deviceId) || this.listDevices.length === 0) {
-				this.deviceId = null;
-			}
-			this.listTempDevices = [];
-		} else {
-			// Waiting off 10s
+				})
+				.catch(console.error);
 		}
 	}
 
@@ -167,7 +182,7 @@ class BLEServiceInstance {
 		this.manager.setLogLevel(LogLevel.Verbose)
 	}
 
-	isDeviceVisible = () : boolean => {
+	isDeviceVisible = (): boolean => {
 		return this.deviceSupportInfo?.visible === true;
 	}
 
@@ -204,9 +219,6 @@ class BLEServiceInstance {
 		})
 
 	disconnectDevice = async () => {
-		if (this.isLockedConnect === true) {
-			return;
-		}
 		if (!this.device) {
 			this.showErrorToast(deviceNotConnectedErrorText)
 			throw new Error(deviceNotConnectedErrorText)
@@ -222,7 +234,6 @@ class BLEServiceInstance {
 					this.onError(error)
 				}
 			})
-		this.isLockedUpdate = false;
 		return cancelFunction;
 	}
 
@@ -267,11 +278,6 @@ class BLEServiceInstance {
 
 	connectToDevice = (deviceId: DeviceId, timeout?: number, ignoreError = false) =>
 		new Promise<Device>((resolve, reject) => {
-			if (this.isLockedConnect === true) {
-				reject(new Error('Another connection is in progress'));
-				return;
-			}
-			this.isLockedUpdate = true;
 			this.manager
 				.connectToDevice(deviceId, { timeout })
 				.then(device => {
