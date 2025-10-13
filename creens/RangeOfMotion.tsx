@@ -46,6 +46,7 @@ const LeftRotationSrcImage = require("../assets/LeftRotation.png");
 const RightRotationSrcImage = require("../assets/RightRotation.png");
 const LeftLateralSrcImage = require("../assets/LeftLateral.png");
 const RightLateralSrcImage = require("../assets/RightLateral.png");
+let NowObj = { localShortDateTime: "", strNow: "" };
 
 const RangeOfMotion = () => {
     const navigation = useNavigation<NavigationProp>();
@@ -121,11 +122,10 @@ const RangeOfMotion = () => {
         };
     }, [])
 
-    const addROMData = async (key: string, duration: number) => {
+    const addROMData = async (key: string, duration: number, nowObj: { localShortDateTime: string, strNow: string }) => {
         if (!db) {
             return;
         }
-
         const extension = refExtension.current?.getValue() || 0.0;
         const flexion = refFlexion.current?.getValue() || 0.0;
         const l_rotation = refLRotation.current?.getValue() || 0.0;
@@ -134,18 +134,20 @@ const RangeOfMotion = () => {
         const r_lateral = refRLateral.current?.getValue() || 0.0;
 
         let { title } = route.params;
-        const { localShortDateTime, strNow } = getCurrentDateTime()
-        const dt: string = strNow;
+        const dt: string = nowObj.strNow;
         const type: string = "ROM";
 
         if (title == "") {
-            title = `ROM Session - ${localShortDateTime}`;
+            title = `ROM Session - ${nowObj.localShortDateTime}`;
         }
 
         await db.runAsync(DB_INSERT_ROM, [key, title, dt, type, extension, flexion, l_rotation, r_rotation, l_lateral, r_lateral, duration]);
     };
 
     const onPressRecording = async () => {
+        NowObj.strNow = getCurrentDateTime().strNow;
+        NowObj.localShortDateTime = getCurrentDateTime().localShortDateTime;
+
         if (BLEService.getDevice() == null) {
             Alert.alert('No device connected', `Please connect device from Dashboard`, [
                 {
@@ -187,12 +189,11 @@ const RangeOfMotion = () => {
         const duration = refDuration.current?.getValue() || 0;
 
         await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
-        await BLEService.disconnectDevice();
         setRecord(false);
 
         setTimeout(async () => {
             const key: string = Date.now().toString();
-            addROMData(key, duration).then(() => {
+            addROMData(key, duration, NowObj).then(() => {
                 navigation.replace("RangeOfMotionSummary", { key: key })
             }).catch((error) => {
                 console.log(error)
