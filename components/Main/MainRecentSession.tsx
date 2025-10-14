@@ -28,36 +28,34 @@ const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHi
 	const { date_dd_MM_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
 
 	return (
-		<TouchableOpacity
-			onPress={(key) => gotoHistory(key)}
-		>
-			<View className="bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
+		<View className="flex-row static bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
+			<TouchableOpacity
+				onPress={(key) => gotoHistory(key)}
+				className="mr-5"
+			>
 				<View className="flex-row justify-between items-center">
 					<Text className="text-md font-bold">{item.title}</Text>
-					<View className="flex-column items-center">
-						<View
-							className={`px-3 py-1 rounded-full ${item.type === "JPS" ? "bg-teal-100" : "bg-indigo-100"}`}>
-							<Text
-								className={`text-xs font-semibold ${item.type === "JPS" ? "text-teal-600" : "text-indigo-600"}`}>
-								{item.type}
-							</Text>
-						</View>
-						<View className="flex-1 rounded-full bg-green-100">
-							<TouchableOpacity
-								onPress={(key) => delROM(key)}
-							>
-								<LucTrash size={20} color={"gray"} />
-							</TouchableOpacity>
-						</View>
-					</View>
 				</View>
 				<Text className="text-xs text-muted-foreground">{date_dd_MM_yyyy_hh_mm_ss_ampm}</Text>
-
 				<Text className="text-xs text-blue-600 mt-1">
 					Tap to view full report
 				</Text>
+			</TouchableOpacity>
+			<View className="flex-column absolute justify-between items-center right-1 top-3 bottom-3">
+				<View
+					className={`px-3 py-1 rounded-full ${item.type === "JPS" ? "bg-teal-100" : "bg-indigo-100"}`}>
+					<Text
+						className={`text-xs font-semibold ${item.type === "JPS" ? "text-teal-600" : "text-indigo-600"}`}>
+						{item.type}
+					</Text>
+				</View>
+				<TouchableOpacity
+					onPress={(key) => delROM(key)}
+				>
+					<LucTrash size={20} color={"gray"} />
+				</TouchableOpacity>
 			</View>
-		</TouchableOpacity>
+		</View>
 	);
 });
 
