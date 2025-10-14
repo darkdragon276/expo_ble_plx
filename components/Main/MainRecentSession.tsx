@@ -28,7 +28,7 @@ const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHi
 	const { date_dd_MM_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
 
 	return (
-		<View className="flex-row static bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
+		<View className="flex-1 static bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
 			<TouchableOpacity
 				onPress={(key) => gotoHistory(key)}
 				className="mr-5"

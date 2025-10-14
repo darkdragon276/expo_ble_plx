@@ -4,11 +4,11 @@
     "slug": "HeadX",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/DarkLogo2.png",
+    "icon": "./assets/HeadX-adaptive-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/DarkLogo2.png",
+      "image": "./assets/HeadX-adaptive-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/DarkLogo2.png",
+        "foregroundImage": "./assets/HeadX-adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
