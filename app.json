@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "expo_ble_plx",
-    "slug": "expo_ble_plx",
+    "name": "HeadX",
+    "slug": "HeadX",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/DarkLogo2.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/DarkLogo2.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,12 +17,13 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/DarkLogo2.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.expo_ble_plx"
+      //"package": "com.anonymous.HeadX"
+      "package": "com.HeadX.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
