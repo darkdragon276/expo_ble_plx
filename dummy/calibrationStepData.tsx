@@ -36,24 +36,24 @@ export const hold_dv: Omit<StepProps, "status"> =
 
 export const x_asis: Omit<StepProps, "status"> =
 {
-	label: "X-Axis Calibration",
-	description: "Pitch Calibration - Rotate the device 360 degrees up or down",
+	label: "Pitch Calibration",
+	description: "Rotate the device 360 degrees up or down",
 	IconLoading: () => <CalibrationSpinning />,
 	Icon: () => <LuRotateCw size={20} color="gray"></LuRotateCw>,
 };
 
 export const y_asis: Omit<StepProps, "status"> =
 {
-	label: "Y-Axis Calibration",
-	description: "Roll Calibration - Rotate the device 360 degrees clockwise or counter clockwise",
+	label: "Roll Calibration",
+	description: "Rotate the device 360 degrees clockwise or counter clockwise",
 	IconLoading: () => <CalibrationSpinning />,
 	Icon: () => <LuArrowUpDown size={20} color="gray"></LuArrowUpDown>,
 };
 
 export const z_asis: Omit<StepProps, "status"> =
 {
-	label: "Z-Axis Calibration",
-	description: "Yaw Calibration - Rotate the device 360 degrees left or right",
+	label: "Yaw Calibration",
+	description: "Rotate the device 360 degrees left or right",
 	IconLoading: () => <CalibrationSpinning />,
 	Icon: () => <LuRotateCcw size={20} color="gray"></LuRotateCcw>,
 }

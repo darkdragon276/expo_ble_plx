@@ -93,13 +93,13 @@ const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) =>
 				!edit
 					?
 					<>
-						<Text className="w-rounded-xl px-2 py-2 text-base">{text}</Text>
+						<Text className="w-rounded-xl px-2 py-2 text-lg">{text}</Text>
 						<LuPenLine size={20} color="gray" onPress={() => setEditText(true)}></LuPenLine>
 					</>
 					:
 					<>
 						<TextInput
-							className="w-rounded-xl px-2 py-2 text-base"
+							className="w-rounded-xl px-2 py-2 text-lg"
 							defaultValue={text}
 							onChangeText={newText => setText(newText)}
 							placeholderTextColor="black"
@@ -115,7 +115,6 @@ const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) =>
 									<LuUnCheck size={20} className="border border-red-500 rounded-xl text-red-500 px-6"></LuUnCheck>
 								</View>
 							</TouchableOpacity>
-
 						</View>
 					</>
 			}
@@ -203,7 +202,7 @@ const RangeOfMotionSummary = () => {
 						title={data ? data?.title : ""}
 						dataKey={data ? data?.key : ""}>
 					</TitleSummary>
-					<Text className="text-lg text-gray-500 text-center">
+					<Text className="text-sm text-gray-500 text-center">
 						ROM Assessment - {dateConvert?.date_dd_MM_yyyy_at_hh_mm_ampm}
 					</Text>
 				</View>
