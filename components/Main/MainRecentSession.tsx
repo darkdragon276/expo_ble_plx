@@ -28,34 +28,36 @@ const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHi
 	const { date_dd_MM_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
 
 	return (
-		<View className="flex-1 static bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
-			<TouchableOpacity
-				onPress={(key) => gotoHistory(key)}
-				className="mr-5"
-			>
+		<TouchableOpacity
+			onPress={(key) => gotoHistory(key)}
+		>
+			<View className="bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
 				<View className="flex-row justify-between items-center">
 					<Text className="text-md font-bold">{item.title}</Text>
+					<View className="flex-column items-center">
+						<View
+							className={`px-3 py-1 rounded-full ${item.type === "JPS" ? "bg-teal-100" : "bg-indigo-100"}`}>
+							<Text
+								className={`text-xs font-semibold ${item.type === "JPS" ? "text-teal-600" : "text-indigo-600"}`}>
+								{item.type}
+							</Text>
+						</View>
+					</View>
 				</View>
 				<Text className="text-xs text-muted-foreground">{date_dd_MM_yyyy_hh_mm_ss_ampm}</Text>
-				<Text className="text-xs text-blue-600 mt-1">
-					Tap to view full report
-				</Text>
-			</TouchableOpacity>
-			<View className="flex-column absolute justify-between items-center right-1 top-3 bottom-3">
-				<View
-					className={`px-3 py-1 rounded-full ${item.type === "JPS" ? "bg-teal-100" : "bg-indigo-100"}`}>
-					<Text
-						className={`text-xs font-semibold ${item.type === "JPS" ? "text-teal-600" : "text-indigo-600"}`}>
-						{item.type}
+				<View className="flex-row space-between">
+					<Text className="flex-1 text-xs text-blue-600 mt-1">
+						Tap to view full report
 					</Text>
+					<TouchableOpacity
+						className="px-3"
+						onPress={(key) => delROM(key)}
+					>
+						<LucTrash size={20} color={"gray"} />
+					</TouchableOpacity>
 				</View>
-				<TouchableOpacity
-					onPress={(key) => delROM(key)}
-				>
-					<LucTrash size={20} color={"gray"} />
-				</TouchableOpacity>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 });
 
