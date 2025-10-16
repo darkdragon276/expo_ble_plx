@@ -93,13 +93,13 @@ const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) =>
 				!edit
 					?
 					<>
-						<Text className="w-rounded-xl px-2 py-2 text-lg">{text}</Text>
+						<Text className="w-rounded-xl font-bold px-2 py-2 text-lg">{text}</Text>
 						<LuPenLine size={20} color="gray" onPress={() => setEditText(true)}></LuPenLine>
 					</>
 					:
 					<>
 						<TextInput
-							className="w-rounded-xl px-2 py-2 text-lg"
+							className="w-rounded-xl font-bold px-2 py-2 text-lg"
 							defaultValue={text}
 							onChangeText={newText => setText(newText)}
 							placeholderTextColor="black"
