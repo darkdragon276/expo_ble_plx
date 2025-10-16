@@ -149,7 +149,12 @@ const RangeOfMotion = () => {
         await BLEService.startSequence();
 
         const onError = (error: Error): void => {
-            console.log("Monitor onError: ", error);
+            // Alert.alert('No device connected', `Please connect device from Dashboard`, [
+            //     {
+            //         text: 'OK',
+            //         onPress: () => navigation.replace("Main"),
+            //     }
+            // ]);
         };
 
         let count = 0;
