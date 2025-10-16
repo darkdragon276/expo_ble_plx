@@ -98,17 +98,10 @@ const RangeOfMotion = () => {
     }, [navigation, record]);
 
     useEffect(() => {
-        if (BLEService.deviceId == null) {
-            // TODO: alert no device connected
-            Alert.alert('No device connected', `Please connect device from Dashboard`, [
-                {
-                    text: 'OK',
-                    onPress: () => navigation.replace("Main"),
-                }
-            ]);
-            return;
+        const startUpCheck = async () => {
+            await BLEService.startSequence();
         }
-        BLEService.startSequence();
+        startUpCheck();
 
         return () => {
             try {
@@ -158,30 +151,39 @@ const RangeOfMotion = () => {
             return;
         }
 
-        try {
-            const onError = (error: Error): void => {
-                if (error) {
-                    return;
-                }
-                return;
-            };
+        const onError = (error: Error): void => {
+            console.log("Monitor onError: ", error);
+        };
 
-            const onMonitor = (char: Characteristic) => {
-                let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
-                if (data) {
-                    krossDevice.unpack(data);
-                    bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
-                    bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
-                    bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
-                }
+        let count = 0;
+        const onMonitor = (char: Characteristic) => {
+            let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
+            if (data) {
+                krossDevice.unpack(data);
+                bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
+                bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
+                bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
+                count++;
             }
-
-            await BLEService.discoverAllServicesAndCharacteristicsForDevice();
-            setRecord(true);
-            BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
-        } catch (e: any) {
-            //Alert.alert('connect error', e?.message ?? String(e));
+            console.log("Monitor: ", char?.value);
         }
+
+        let device = await BLEService.discoverAllServicesAndCharacteristicsForDevice()
+            .catch((error) => {
+                console.log("Error discover services: ", error);
+                return;
+            });
+        if (!device) {
+            Alert.alert('No device connected', `Please connect device from Dashboard`, [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.replace("Main"),
+                }
+            ]);
+            return;
+        }
+        BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
+        setRecord(true);
     };
 
     const onPressStopRecording = async () => {

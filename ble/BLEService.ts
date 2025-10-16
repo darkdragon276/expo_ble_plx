@@ -44,12 +44,30 @@ class BLEServiceInstance {
 
 	private lockUpdate: boolean = false;
 
-	startSequence = () => new Promise<void>((resolve, reject) => {
+	startSequence = async () => {
 		this.lockUpdate = true;
-		setTimeout(() => {
-			resolve();
-		}, 1000);
-	});
+		const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+		
+		await this.manager.cancelDeviceConnection(this.deviceId!);
+		console.log("cancelDeviceConnection");
+
+		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {});
+		console.log("startDeviceScan");
+ 
+		await delay(1000);
+		await this.manager.stopDeviceScan();
+		console.log("stopDeviceScan");
+
+		let device = await this.manager.connectToDevice(this.deviceId!, { timeout: 1000, autoConnect: false })
+			.catch(error => {
+				if (error.errorCode === BleErrorCode.DeviceAlreadyConnected) {
+					return;
+				}
+				this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+				this.deviceId = null;
+				console.log("Connect error: " + error.message);
+			});
+	};
 
 	stopSequence = () => {
 		this.lockUpdate = false;
@@ -122,58 +140,49 @@ class BLEServiceInstance {
 
 		console.log("Update for devices");
 		if (this.secCounter % 20 === 0) {
-			await this.manager.stopDeviceScan().then(() => {
-				
-			}).catch((error) => {
+			await this.manager.stopDeviceScan().catch((error) => {
 				// this.onError(error);
 			});
 		}
-		await this.manager.connectToDevice(this.deviceId, { timeout: 1000, autoConnect: true })
-			.then(device => {
-				this.device = device
-				this.deviceSupportInfo!.name = device.name;
-				this.deviceSupportInfo!.visible = true;
-				this.deviceSupportInfo!.lastSync = Date.now();
-
-			}).catch(error => {
+		let device = await this.manager.connectToDevice(this.deviceId, { timeout: 1000, autoConnect: false })
+			.catch(error => {
 				if (error.errorCode === BleErrorCode.DeviceAlreadyConnected) {
 					return;
 				}
+				console.log("Connect error: " + error.message);
 			});
+		if (!device) {
+			this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+			this.deviceId = null;
+			return;
+		};
 
+		this.device = device
+		this.deviceSupportInfo!.name = device.name;
+		this.deviceSupportInfo!.visible = true;
+		this.deviceSupportInfo!.lastSync = Date.now();
 
-		await this.manager.isDeviceConnected(this.deviceId)
-			.then((isConnected) => {
-				if (!isConnected) {
-					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
-					this.deviceId = null;
-				}
-			}).catch((error) => {
-				// this.onError(error);
-			});
 		if (this.secCounter % 2 === 0) {
-			await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId)
-				.then(device => {
-					// do nothing
-				}).catch((error) => {
-
+			let device = await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId)
+				.catch((error) => {
+					console.log("Discover error: " + error.message);
 				});
 
-			await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
-				.then(char => {
-					if (char?.value) {
-						this.deviceSupportInfo!.batteryLevel = KrossDevice.decodeBattery(char?.value);
-					}
-				})
-				.catch(console.error);
+			let battChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
+				.catch(error => {
+					console.log("Read battery level error: " + error.message);
+				});
+			if (battChar?.value) {
+				this.deviceSupportInfo!.batteryLevel = KrossDevice.decodeBattery(battChar?.value);
+			}
 
-			await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
-				.then(char => {
-					if (char?.value) {
-						this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(char?.value);
-					}
-				})
-				.catch(console.error);
+			let FWChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
+				.catch(error => {
+					console.log("Read firmware version error: " + error.message);
+				});
+			if (FWChar?.value) {
+				this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(FWChar?.value);
+			}
 		}
 	}
 
@@ -374,11 +383,11 @@ class BLEServiceInstance {
 			characteristicUUID,
 			(error, characteristic) => {
 				if (error) {
+					onError(error)
 					if (error.errorCode === 2 && this.isCharacteristicMonitorDisconnectExpected) {
 						this.isCharacteristicMonitorDisconnectExpected = false
 						return
 					}
-					onError(error)
 					if (!hideErrorDisplay) {
 						this.onError(error)
 						this.characteristicMonitor?.remove()
