@@ -66,7 +66,20 @@ const CalibrationsProgress = () => {
 			_connectDeviceStep = true;
 			_initSensorStep = true;
 			_holdDeviceStep = true;
-			await BLEService.discoverAllServicesAndCharacteristicsForDevice();
+			let device = await BLEService.discoverAllServicesAndCharacteristicsForDevice()
+				.catch((error) => {
+					console.log("Error discover services: ", error);
+					return;
+				});
+			if (!device) {
+				Alert.alert('No device connected', `Please connect device from Dashboard`, [
+					{
+						text: 'OK',
+						onPress: () => navigation.replace("Main"),
+					}
+				]);
+				return;
+			};
 		}
 
 		runSequentialCalibarion();
