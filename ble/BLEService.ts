@@ -48,7 +48,9 @@ class BLEServiceInstance {
 		this.lockUpdate = true;
 		const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 		
-		await this.manager.cancelDeviceConnection(this.deviceId!);
+		if(this.deviceId == null) return;
+
+		await this.manager.cancelDeviceConnection(this.deviceId);
 		console.log("cancelDeviceConnection");
 
 		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {});

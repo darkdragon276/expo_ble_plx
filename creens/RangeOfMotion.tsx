@@ -98,10 +98,15 @@ const RangeOfMotion = () => {
     }, [navigation, record]);
 
     useEffect(() => {
-        const startUpCheck = async () => {
-            await BLEService.startSequence();
-        }
-        startUpCheck();
+        if (BLEService.deviceId === null) {
+            Alert.alert('No device connected', `Please connect device from Dashboard`, [
+                {
+                    text: 'OK',
+                    onPress: () => navigation.replace("Main"),
+                }
+            ]);
+            return;
+        };
 
         return () => {
             try {
@@ -141,15 +146,7 @@ const RangeOfMotion = () => {
         NowObj.strNow = getCurrentDateTime().strNow;
         NowObj.localShortDateTime = getCurrentDateTime().localShortDateTime;
 
-        if (BLEService.getDevice() == null) {
-            Alert.alert('No device connected', `Please connect device from Dashboard`, [
-                {
-                    text: 'OK',
-                    onPress: () => navigation.replace("Main"),
-                }
-            ]);
-            return;
-        }
+        await BLEService.startSequence();
 
         const onError = (error: Error): void => {
             console.log("Monitor onError: ", error);
