@@ -39,7 +39,7 @@ export const x_asis: Omit<StepProps, "status"> =
 	label: "Pitch Calibration",
 	description: "Rotate the device 360 degrees up or down",
 	IconLoading: () => <CalibrationSpinning />,
-	Icon: () => <LuRotateCw size={20} color="gray"></LuRotateCw>,
+	Icon: () => <LuArrowUpDown size={20} color="gray"></LuArrowUpDown>,
 };
 
 export const y_asis: Omit<StepProps, "status"> =
@@ -47,7 +47,7 @@ export const y_asis: Omit<StepProps, "status"> =
 	label: "Roll Calibration",
 	description: "Rotate the device 360 degrees clockwise or counter clockwise",
 	IconLoading: () => <CalibrationSpinning />,
-	Icon: () => <LuArrowUpDown size={20} color="gray"></LuArrowUpDown>,
+	Icon: () => <LuRotateCw size={20} color="gray"></LuRotateCw>,
 };
 
 export const z_asis: Omit<StepProps, "status"> =
