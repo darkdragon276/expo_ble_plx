@@ -29,7 +29,7 @@ import { DB_INSERT_ROM } from "../db/dbQuery";
 import { getCurrentDateTime } from "../utils/getDateTime";
 import { ChildROMRef } from "../model/ChildRefGetValue";
 import { KrossDevice } from "../ble/KrossDevice";
-import { Characteristic } from "react-native-ble-plx";
+import { BleError, Characteristic } from "react-native-ble-plx";
 import { bleEventEmitter } from "../utils/BleEmitter";
 import { BLEService } from "../ble/BLEService";
 
@@ -148,13 +148,15 @@ const RangeOfMotion = () => {
 
         await BLEService.startSequence();
 
-        const onError = (error: Error): void => {
-            // Alert.alert('No device connected', `Please connect device from Dashboard`, [
-            //     {
-            //         text: 'OK',
-            //         onPress: () => navigation.replace("Main"),
-            //     }
-            // ]);
+        const onError = (error: BleError): void => {
+            if (BLEService.isDisconnectError(error)) {
+                Alert.alert('No device connected', `Please connect device from Dashboard`, [
+                    {
+                        text: 'OK',
+                        onPress: () => navigation.replace("Main"),
+                    }
+                ]);
+            }
         };
 
         let count = 0;
@@ -170,20 +172,17 @@ const RangeOfMotion = () => {
             console.log("Monitor: ", char?.value);
         }
 
-        let device = await BLEService.discoverAllServicesAndCharacteristicsForDevice()
+        await BLEService.discoverAllServicesAndCharacteristicsForDevice()
             .catch((error) => {
-                console.log("Error discover services: ", error);
-                return;
-            });
-        if (!device) {
-            Alert.alert('No device connected', `Please connect device from Dashboard`, [
-                {
-                    text: 'OK',
-                    onPress: () => navigation.replace("Main"),
+                if (BLEService.isDisconnectError(error)) {
+                    Alert.alert('No device connected', `Please connect device from Dashboard`, [
+                        {
+                            text: 'OK',
+                            onPress: () => navigation.replace("Main"),
+                        }
+                    ]);
                 }
-            ]);
-            return;
-        }
+            });
         BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
         setRecord(true);
     };
