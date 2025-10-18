@@ -46,6 +46,7 @@ class BLEServiceInstance {
 
 	startSequence = async () => {
 		this.lockUpdate = true;
+		return;
 		const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 		
 		if(this.deviceId == null) return;
@@ -133,6 +134,14 @@ class BLEServiceInstance {
 		});
 	}
 
+	isDisconnectError = (error: BleError) => {
+		console.log("isDisconnectError check: " + error.errorCode);
+		return error.errorCode === BleErrorCode.DeviceDisconnected ||
+			error.errorCode === BleErrorCode.DeviceConnectionFailed ||
+			error.errorCode === BleErrorCode.DeviceNotFound ||
+			error.errorCode === BleErrorCode.DeviceNotConnected;
+	}
+
 	updateInfo = async () => {
 		this.secCounter++;
 		// Scan for devices every 60s, scan for 50s and stop for 10s
@@ -148,10 +157,10 @@ class BLEServiceInstance {
 		}
 		let device = await this.manager.connectToDevice(this.deviceId, { timeout: 1000, autoConnect: false })
 			.catch(error => {
-				if (error.errorCode === BleErrorCode.DeviceAlreadyConnected) {
-					return;
+				if (this.isDisconnectError(error)) {
+					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+					this.deviceId = null;
 				}
-				console.log("Connect error: " + error.message);
 			});
 		if (!device) {
 			this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
@@ -164,15 +173,21 @@ class BLEServiceInstance {
 		this.deviceSupportInfo!.visible = true;
 		this.deviceSupportInfo!.lastSync = Date.now();
 
-		if (this.secCounter % 2 === 0) {
-			let device = await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId)
-				.catch((error) => {
-					console.log("Discover error: " + error.message);
-				});
+		await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId)
+			.catch((error) => {
+				if (this.isDisconnectError(error)) {
+					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+					this.deviceId = null;
+				}
+			});
 
+		if (this.secCounter % 2 === 0) {
 			let battChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
 				.catch(error => {
-					console.log("Read battery level error: " + error.message);
+					if (this.isDisconnectError(error)) {
+						this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+						this.deviceId = null;
+					}
 				});
 			if (battChar?.value) {
 				this.deviceSupportInfo!.batteryLevel = KrossDevice.decodeBattery(battChar?.value);
@@ -180,7 +195,10 @@ class BLEServiceInstance {
 
 			let FWChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
 				.catch(error => {
-					console.log("Read firmware version error: " + error.message);
+					if (this.isDisconnectError(error)) {
+						this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+						this.deviceId = null;
+					}
 				});
 			if (FWChar?.value) {
 				this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(FWChar?.value);
@@ -371,7 +389,7 @@ class BLEServiceInstance {
 		serviceUUID: UUID,
 		characteristicUUID: UUID,
 		onCharacteristicReceived: (characteristic: Characteristic) => void,
-		onError: (error: Error) => void,
+		onError: (error: BleError) => void,
 		transactionId?: TransactionId,
 		hideErrorDisplay?: boolean
 	) => {
@@ -391,7 +409,6 @@ class BLEServiceInstance {
 						return
 					}
 					if (!hideErrorDisplay) {
-						this.onError(error)
 						this.characteristicMonitor?.remove()
 					}
 					return
