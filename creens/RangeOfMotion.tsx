@@ -29,7 +29,7 @@ import { DB_INSERT_ROM } from "../db/dbQuery";
 import { getCurrentDateTime } from "../utils/getDateTime";
 import { ChildROMRef } from "../model/ChildRefGetValue";
 import { KrossDevice } from "../ble/KrossDevice";
-import { BleError, Characteristic } from "react-native-ble-plx";
+import { BleError, BleErrorCode, Characteristic } from "react-native-ble-plx";
 import { bleEventEmitter } from "../utils/BleEmitter";
 import { BLEService } from "../ble/BLEService";
 
@@ -107,6 +107,8 @@ const RangeOfMotion = () => {
             ]);
             return;
         };
+        
+        BLEService.startSequence();
 
         return () => {
             try {
@@ -145,11 +147,13 @@ const RangeOfMotion = () => {
     const onPressRecording = async () => {
         NowObj.strNow = getCurrentDateTime().strNow;
         NowObj.localShortDateTime = getCurrentDateTime().localShortDateTime;
-
-        await BLEService.startSequence();
+        setRecord(true);
 
         const onError = (error: BleError): void => {
-            if (BLEService.isDisconnectError(error)) {
+            if (BLEService.isDisconnectError(error) || 
+                error.errorCode === BleErrorCode.CharacteristicNotifyChangeFailed ||
+                error.errorCode === BleErrorCode.CharacteristicReadFailed) {
+                BLEService.deviceId = null;
                 Alert.alert('No device connected', `Please connect device from Dashboard`, [
                     {
                         text: 'OK',
@@ -173,8 +177,12 @@ const RangeOfMotion = () => {
         }
 
         await BLEService.discoverAllServicesAndCharacteristicsForDevice()
+            .then(() => {
+                BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
+            })
             .catch((error) => {
                 if (BLEService.isDisconnectError(error)) {
+                    BLEService.deviceId = null;
                     Alert.alert('No device connected', `Please connect device from Dashboard`, [
                         {
                             text: 'OK',
@@ -183,8 +191,6 @@ const RangeOfMotion = () => {
                     ]);
                 }
             });
-        BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
-        setRecord(true);
     };
 
     const onPressStopRecording = async () => {

@@ -8,7 +8,7 @@ import DeviceConnectionStep from "./CalibrationSteps/DeviceConnectionStep";
 import CalibrationCompleteStep from "./CalibrationSteps/CalibrationCompleteStep";
 import { useEffect, useState } from 'react'
 import { BLEService } from '../../ble/BLEService'
-import { BleError, Characteristic } from 'react-native-ble-plx'
+import { BleError, BleErrorCode, Characteristic } from 'react-native-ble-plx'
 import { KrossDevice } from '../../ble/KrossDevice'
 import { Alert } from 'react-native'
 import { useNavigation} from '@react-navigation/native';
@@ -50,25 +50,26 @@ const CalibrationsProgress = () => {
 	let interval: ReturnType<typeof setInterval>;
 
 	useEffect(() => {
+		if (BLEService.deviceId == null) {
+			Alert.alert('No device connected', `Please connect device from Dashboard`, [
+				{
+					text: 'OK',
+					onPress: () => navigation.replace("Main"),
+				}
+			]);
+			return;
+		}
+		BLEService.startSequence();
 		reSet()
 
 		const excuteCalibration = async () => {
-			if (BLEService.deviceId == null) {
-				Alert.alert('No device connected', `Please connect device from Dashboard`, [
-					{
-						text: 'OK',
-						onPress: () => navigation.replace("Main"),
-					}
-				]);
-				return;
-			}
-			await BLEService.startSequence();
 			_connectDeviceStep = true;
 			_initSensorStep = true;
 			_holdDeviceStep = true;
 			await BLEService.discoverAllServicesAndCharacteristicsForDevice()
 				.catch((error) => {
 					if (BLEService.isDisconnectError(error)) {
+						BLEService.deviceId = null;
 						Alert.alert('No device connected', `Please connect device from Dashboard`, [
 							{
 								text: 'OK',
@@ -148,7 +149,10 @@ const CalibrationsProgress = () => {
 
 		try {
 			const onError = (error: BleError): void => {
-				if (BLEService.isDisconnectError(error)) {
+				if (BLEService.isDisconnectError(error) || 
+					error.errorCode === BleErrorCode.CharacteristicNotifyChangeFailed ||
+					error.errorCode === BleErrorCode.CharacteristicReadFailed) {
+					BLEService.deviceId = null;
 					Alert.alert('No device connected', `Please connect device from Dashboard`, [
 						{
 							text: 'OK',
@@ -311,13 +315,14 @@ const CalibrationsProgress = () => {
 
 		setComplete("active");
 		await waitUntil(() => _Z_Done === true)
-			.then(() => {
+			.then(async () => {
+				await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
+				await BLEService.writeCharacteristicWithResponseForDevice(
+					BLEService.SERVICE_UUID,
+					BLEService.DATA_IN_UUID,
+					KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_STOP))
+				);
 				setTimeout(() => {
-					BLEService.writeCharacteristicWithResponseForDevice(
-						BLEService.SERVICE_UUID,
-						BLEService.DATA_IN_UUID,
-						KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.MAGNET_CALIB_STOP))
-					);
 					_completeStep = true;
 					setComplete("done");
 				}, 1500);
