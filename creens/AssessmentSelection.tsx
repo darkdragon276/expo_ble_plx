@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useRef } from "react";
+import { useState, useLayoutEffect, useRef, useEffect } from "react";
 import { useNavigation } from '@react-navigation/native';
 import {
 	View,
@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	FlatList,
+	Alert,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -19,6 +20,7 @@ import { useDispatch } from "react-redux";
 import { resetROM } from "../store/redux/rangeOfMotionSlice"
 import AssessmentTitle from "../components/AssessmentSelection/AssessmentTitle";
 import { ChildInputRef } from "../model/ChildRefGetValue";
+import { BLEService } from "../ble/BLEService";
 
 const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
@@ -44,6 +46,26 @@ const AssessmentSelection = () => {
 	const dispatch = useDispatch();
 	const [title, setTitle] = useState('');
 	const titleRef = useRef<ChildInputRef>(null);
+
+	useEffect(() => {
+
+		const updateInfo2s = setInterval(() => {
+			if (BLEService.deviceId === null) {
+				clearInterval(updateInfo2s);
+				Alert.alert('No device connected', `Please connect device from Dashboard`, [
+					{
+						text: 'OK',
+						onPress: () => navigation.replace("Main"),
+					}
+				]);
+				return;
+			};
+		}, 1000);
+
+		return () => {
+			clearInterval(updateInfo2s);
+		};
+	}, []);
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
