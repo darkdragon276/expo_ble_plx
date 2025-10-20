@@ -50,9 +50,6 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
         }
     }, [deviceId]);
 
-    // const color: ColorVariant = "green";
-    // const colorbg: ColorVariant = "green";
-
     return (
         <View className="bg-white rounded-2xl p-4 shadow">
             <View className="flex-row items-center space-x-2 mb-2">
@@ -64,8 +61,25 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
                         dvInfo && dvInfo?.battery
                             ?
                             <View className="flex-row items-center space-x-2">
-                                <Icon name="battery-half-outline" className={`text-${dvInfo.color}-600`} size={18} />
-                                <Text className={`text-${dvInfo.color}-600`}>{dvInfo?.battery}%</Text>
+                                {
+                                    dvInfo.battery >= 60 ?
+                                        <View className="flex-row items-center space-x-1">
+                                            <Icon name="battery-half-outline" className="text-green-600" size={18} />
+                                            <Text className="text-green-600">{dvInfo?.battery}%</Text>
+                                        </View>
+                                        : dvInfo.battery >= 25 ?
+                                            <View className="flex-row items-center space-x-1">
+                                                <Icon name="battery-half-outline" className="text-yellow-600" size={18} />
+                                                <Text className="text-yellow-600">{dvInfo?.battery}%</Text>
+                                            </View>
+                                            :
+                                            <View className="flex-row items-center space-x-1">
+                                                <Icon name="battery-half-outline" className="text-red-600" size={18} />
+                                                <Text className="text-red-600">{dvInfo?.battery}%</Text>
+                                            </View>
+                                }
+                                {/* <Icon name="battery-half-outline" className={`text-${dvInfo.color}-600`} size={18} />
+                                <Text className={`text-${dvInfo.color}-600`}>{dvInfo?.battery}%</Text> */}
                                 <View className="w-2.5 h-2.5 rounded-xl bg-green-500 ml-2" />
                                 <Text className="text-green-600 font-medium">{dvInfo?.status}</Text>
                             </View>

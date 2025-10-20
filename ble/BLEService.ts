@@ -102,26 +102,27 @@ class BLEServiceInstance {
 	setDeviceById = (id: DeviceId) => {
 		console.log("Set device by id: " + id);
 		if (this.deviceId !== id) {
-			// if (this.deviceId !== null) {
-			// 	this.manager.cancelDeviceConnection(this.deviceId).catch(console.error);
-			// }
+			if (this.deviceId !== null) {
+				this.manager.cancelDeviceConnection(this.deviceId);
+			}
 			this.deviceId = id;
 		}
 	}
-	
-	scanDeivces = async (onUpdateListDevice: (listDevices: Device[]) => void) => {
+
+	// Flag to avoid multiple alerts
+	isAlertShown = false;
+	customsScanDevices = async (onUpdateListDevice: (listDevices: Device[]) => void, onError : (error: BleError) => void) => {
 		this.listDevices = [];
-		await this.manager.cancelDeviceConnection(this.deviceId!)
-			.then(() => {
-				// do nothing
-			}).catch((error) => {
-				// console.log("Cancel connection error: " + error.message);
-			});
+		if (this.deviceId != null) {
+			this.listDevices.push(this.device!);
+		}
 
 		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {
 			if (error) {
-				console.error("Scan error: " + error.message);
-				// this.onError(error);
+				if(!this.isAlertShown) {
+					onError(error);
+					this.isAlertShown = true;
+				}
 				this.manager.stopDeviceScan();
 				return;
 			}
@@ -157,7 +158,7 @@ class BLEServiceInstance {
 		}
 		let device = await this.manager.connectToDevice(this.deviceId, { timeout: 1000, autoConnect: false })
 			.catch(error => {
-				if (this.isDisconnectError(error)) {
+				if (this.isDisconnectError(error) && !this.lockUpdate) {
 					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
 					this.deviceId = null;
 				}
@@ -175,7 +176,7 @@ class BLEServiceInstance {
 
 		await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId)
 			.catch((error) => {
-				if (this.isDisconnectError(error)) {
+				if (this.isDisconnectError(error) && !this.lockUpdate) {
 					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
 					this.deviceId = null;
 				}
@@ -184,7 +185,7 @@ class BLEServiceInstance {
 		if (this.secCounter % 2 === 0) {
 			let battChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
 				.catch(error => {
-					if (this.isDisconnectError(error)) {
+					if (this.isDisconnectError(error) && !this.lockUpdate) {
 						this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
 						this.deviceId = null;
 					}
@@ -195,7 +196,7 @@ class BLEServiceInstance {
 
 			let FWChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
 				.catch(error => {
-					if (this.isDisconnectError(error)) {
+					if (this.isDisconnectError(error) && !this.lockUpdate) {
 						this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
 						this.deviceId = null;
 					}

@@ -12,14 +12,34 @@ const MainDeviceList = () => {
 	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
+		let updateInfo2s: NodeJS.Timeout | undefined;
+		let alertShown = false;
 		if (open) {
 			BLEService.startSequence();
-			BLEService.scanDeivces((listDevices) => {
+			BLEService.customsScanDevices((listDevices) => {
+				setDevices([]);
 				setDevices(listDevices);
+			}, (error) => {
+				Alert.alert('Scan multiple times', "Waiting 20s before continue scan", [
+					{
+						text: 'OK',
+						onPress: () => {
+							BLEService.isAlertShown = false;
+						}
+					}
+				]);
 			});
+
+			updateInfo2s = setInterval(() => {
+				setDevices([]);
+				setDevices(BLEService.listDevices);
+			}, 1000);
 			setSelectedDevice(BLEService.deviceId! || "");
 		} else {
-			setDevices([]);
+			if (updateInfo2s) {
+				clearInterval(updateInfo2s);
+			}
+			alertShown = false;
 			BLEService.stopSequence();
 		}
 	}, [open]);
