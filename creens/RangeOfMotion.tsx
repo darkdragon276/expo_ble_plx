@@ -99,7 +99,7 @@ const RangeOfMotion = () => {
 
     useEffect(() => {
         if (BLEService.deviceId === null) {
-            Alert.alert('No device connected', `Please connect device from Dashboard`, [
+            Alert.alert('Device disconnected', `Force stop ROM session!`, [
                 {
                     text: 'OK',
                     onPress: () => navigation.replace("Main"),
@@ -154,10 +154,13 @@ const RangeOfMotion = () => {
                 error.errorCode === BleErrorCode.CharacteristicNotifyChangeFailed ||
                 error.errorCode === BleErrorCode.CharacteristicReadFailed) {
                 BLEService.deviceId = null;
-                Alert.alert('No device connected', `Please connect device from Dashboard`, [
+                Alert.alert('Device disconnected', `Force stop ROM session!`, [
                     {
                         text: 'OK',
-                        onPress: () => navigation.replace("Main"),
+                        onPress: () => {
+                            onPressStopRecording();
+                            //navigation.replace("Main")
+                        },
                     }
                 ]);
             }
@@ -183,10 +186,12 @@ const RangeOfMotion = () => {
             .catch((error) => {
                 if (BLEService.isDisconnectError(error)) {
                     BLEService.deviceId = null;
-                    Alert.alert('No device connected', `Please connect device from Dashboard`, [
+                    Alert.alert('Device disconnected', `Force stop ROM session!`, [
                         {
                             text: 'OK',
-                            onPress: () => navigation.replace("Main"),
+                            onPress: () => {
+                                onPressStopRecording();
+                            } //navigation.replace("Main"),
                         }
                     ]);
                 }
