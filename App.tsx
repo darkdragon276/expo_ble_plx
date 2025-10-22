@@ -1,8 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import Navigatior from './Navigation';
-import { Provider } from 'react-redux';
-import { store } from './store/redux/store'
 import { useEffect, useState } from 'react';
 import SplashScreen from './creens/SplashScreen';
 import { BLEService } from './ble/BLEService';
@@ -38,7 +36,7 @@ export default function App() {
     };
 
     return (
-        <Provider store={store}>
+        <>
             <StatusBar style="dark" />
             {
                 isReady
@@ -49,6 +47,6 @@ export default function App() {
                     :
                     <SplashScreen></SplashScreen>
             }
-        </Provider>
+        </>
     );
 }
