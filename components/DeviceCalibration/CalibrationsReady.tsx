@@ -2,16 +2,12 @@ import { Animated, Pressable, Text, View } from 'react-native'
 import { useRef } from 'react'
 import { Feather } from "@expo/vector-icons";
 import { styled } from "nativewind";
-// import LinearGradient from "react-native-linear-gradient";
 import { LinearGradient } from "expo-linear-gradient";
-import { useDispatch } from 'react-redux';
-import { updateStep, resetStep } from '../../store/redux/calibrationStepSlice';
 
 const FtherIcon = styled(Feather)
 
 const CalibrationsReady = ({ runProgress }: any) => {
 	const scale = useRef(new Animated.Value(1)).current;
-	const dispatch = useDispatch();
 
 	const onPressIn = () => {
 		Animated.spring(scale, {
@@ -30,7 +26,6 @@ const CalibrationsReady = ({ runProgress }: any) => {
 	};
 
 	const RunCalibrationProgress = () => {
-		dispatch(resetStep())
 		runProgress(true)
 	};
 
