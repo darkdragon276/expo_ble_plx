@@ -13,7 +13,13 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.HeadX.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSBluetoothAlwaysUsageDescription": "The app needs Bluetooth access to connect devices.",
+        "NSBluetoothPeripheralUsageDescription": "The application uses Bluetooth to communicate with peripheral devices."
+      }
     },
     "android": {
       "adaptiveIcon": {
