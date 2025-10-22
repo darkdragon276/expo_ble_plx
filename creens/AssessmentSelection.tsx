@@ -16,8 +16,6 @@ import { RotateCcw, PenLine, CircleCheckBig, Clock } from 'lucide-react-native'
 import { styled } from 'nativewind';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../model/RootStackParamList";
-import { useDispatch } from "react-redux";
-import { resetROM } from "../store/redux/rangeOfMotionSlice"
 import AssessmentTitle from "../components/AssessmentSelection/AssessmentTitle";
 import { ChildInputRef } from "../model/ChildRefGetValue";
 import { BLEService } from "../ble/BLEService";
@@ -43,7 +41,6 @@ const romFeatures: Feature[] = [
 
 const AssessmentSelection = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const dispatch = useDispatch();
 	const [title, setTitle] = useState('');
 	const titleRef = useRef<ChildInputRef>(null);
 
@@ -98,7 +95,6 @@ const AssessmentSelection = () => {
 	);
 
 	const onPressGotoAssessment = () => {
-		dispatch(resetROM());
 		const title = titleRef.current?.getValue() || "";
 		navigation.replace("RangeOfMotion", { title: title })
 	}
