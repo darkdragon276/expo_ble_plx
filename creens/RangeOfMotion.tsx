@@ -30,7 +30,7 @@ import { getCurrentDateTime } from "../utils/getDateTime";
 import { ChildROMRef } from "../model/ChildRefGetValue";
 import { KrossDevice } from "../ble/KrossDevice";
 import { BleError, BleErrorCode, Characteristic } from "react-native-ble-plx";
-// import { bleEventEmitter } from "../utils/BleEmitter";
+import { bleEventEmitter } from "../utils/BleEmitter";
 import { BLEService } from "../ble/BLEService";
 
 const LuPlay = styled(LucidePlay);
@@ -171,9 +171,9 @@ const RangeOfMotion = () => {
             let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
             if (data) {
                 krossDevice.unpack(data);
-                // bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
-                // bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
-                // bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
+                bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
+                bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
+                bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
                 count++;
             }
             console.log("Monitor: ", char?.value);
