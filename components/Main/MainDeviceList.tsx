@@ -34,7 +34,7 @@ const MainDeviceList = () => {
 				setDevices([]);
 				setDevices(BLEService.listDevices);
 			}, 1000);
-			setSelectedDevice(BLEService.deviceId! || "");
+			setSelectedDevice(BLEService.deviceId! || ""); 
 		} else {
 			if (updateInfo2s) {
 				clearInterval(updateInfo2s);

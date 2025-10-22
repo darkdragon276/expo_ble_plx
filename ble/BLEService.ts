@@ -158,10 +158,11 @@ class BLEServiceInstance {
 		}
 		let device = await this.manager.connectToDevice(this.deviceId, { timeout: 1000, autoConnect: false })
 			.catch(error => {
-				if (this.isDisconnectError(error) && !this.lockUpdate) {
-					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
-					this.deviceId = null;
-				}
+				// By pass error handler for other phones
+				// if (this.isDisconnectError(error) && !this.lockUpdate) {
+				// 	this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+				// 	this.deviceId = null;
+				// }
 			});
 		if (!device) {
 			this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
@@ -176,35 +177,37 @@ class BLEServiceInstance {
 
 		await this.manager.discoverAllServicesAndCharacteristicsForDevice(this.deviceId)
 			.catch((error) => {
-				if (this.isDisconnectError(error) && !this.lockUpdate) {
-					this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
-					this.deviceId = null;
-				}
+				// By pass error handler for other phones
+				// if (this.isDisconnectError(error) && !this.lockUpdate) {
+				// 	this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+				// 	this.deviceId = null;
+				// }
 			});
 
-		if (this.secCounter % 2 === 0) {
-			let battChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
-				.catch(error => {
-					if (this.isDisconnectError(error) && !this.lockUpdate) {
-						this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
-						this.deviceId = null;
-					}
-				});
-			if (battChar?.value) {
-				this.deviceSupportInfo!.batteryLevel = KrossDevice.decodeBattery(battChar?.value);
-			}
-
-			let FWChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
-				.catch(error => {
-					if (this.isDisconnectError(error) && !this.lockUpdate) {
-						this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
-						this.deviceId = null;
-					}
-				});
-			if (FWChar?.value) {
-				this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(FWChar?.value);
-			}
+		let battChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.BATTERY_SERVICE_UUID, this.BATTERY_LEVEL_UUID)
+			.catch(error => {
+				// By pass error handler for other phones
+				// if (this.isDisconnectError(error) && !this.lockUpdate) {
+				// 	this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+				// 	this.deviceId = null;
+				// }
+			});
+		if (battChar?.value) {
+			this.deviceSupportInfo!.batteryLevel = KrossDevice.decodeBattery(battChar?.value);
 		}
+
+		let FWChar = await this.manager.readCharacteristicForDevice(this.deviceId, this.DEVICE_INFORMATION_SERVICE_UUID, this.FIRMWARE_REVISION_UUID)
+			.catch(error => {
+				// By pass error handler for other phones
+				// if (this.isDisconnectError(error) && !this.lockUpdate) {
+				// 	this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+				// 	this.deviceId = null;
+				// }
+			});
+		if (FWChar?.value) {
+			this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(FWChar?.value);
+		}
+		
 	}
 
 	createNewManager = () => {

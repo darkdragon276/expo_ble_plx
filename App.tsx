@@ -16,7 +16,7 @@ export default function App() {
 
         loop1s = setInterval(() => {
             BLEService.updateInfo();
-        }, 1000);
+        }, 1500);
 
         const initialize = async () => {
             await initApp();
