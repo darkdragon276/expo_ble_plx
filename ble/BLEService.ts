@@ -117,7 +117,7 @@ class BLEServiceInstance {
 			this.listDevices.push(this.device!);
 		}
 
-		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {
+		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false, allowDuplicates: true}, (error, device) => {
 			if (error) {
 				if(!this.isAlertShown) {
 					onError(error);
