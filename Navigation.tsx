@@ -5,7 +5,6 @@ import SettingsDevice from './creens/SettingsDevice';
 import DeviceCalibration from './creens/DeviceCalibration';
 import AssessmentSelection from './creens/AssessmentSelection';
 import RangeOfMotion from './creens/RangeOfMotion';
-import BLEScanner from "./creens/BLEScanner";
 import RangeOfMotionSummary from './creens/RangeOfMotionSummary';
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -16,13 +15,6 @@ const Navigatior = () => {
 			screenOptions={{
 				cardStyle: { backgroundColor: '#f3f4f6' }
 			}}>
-			{/* <Stack.Screen
-				name='BLEScanner'
-				component={BLEScanner}
-				options={{
-					headerShown: false
-				}} >
-			</Stack.Screen> */}
 			<Stack.Screen
 				name="Main"
 				component={Main}
