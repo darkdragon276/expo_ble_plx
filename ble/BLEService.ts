@@ -47,29 +47,29 @@ class BLEServiceInstance {
 	startSequence = async () => {
 		this.lockUpdate = true;
 		return;
-		const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
-		
-		if(this.deviceId == null) return;
+		// const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
-		await this.manager.cancelDeviceConnection(this.deviceId);
-		console.log("cancelDeviceConnection");
+		// if (this.deviceId == null) return;
 
-		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {});
-		console.log("startDeviceScan");
- 
-		await delay(1000);
-		await this.manager.stopDeviceScan();
-		console.log("stopDeviceScan");
+		// await this.manager.cancelDeviceConnection(this.deviceId);
+		// console.log("cancelDeviceConnection");
 
-		let device = await this.manager.connectToDevice(this.deviceId!, { timeout: 1000, autoConnect: false })
-			.catch(error => {
-				if (error.errorCode === BleErrorCode.DeviceAlreadyConnected) {
-					return;
-				}
-				this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
-				this.deviceId = null;
-				console.log("Connect error: " + error.message);
-			});
+		// await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => { });
+		// console.log("startDeviceScan");
+
+		// await delay(1000);
+		// await this.manager.stopDeviceScan();
+		// console.log("stopDeviceScan");
+
+		// let device = await this.manager.connectToDevice(this.deviceId!, { timeout: 1000, autoConnect: false })
+		// 	.catch(error => {
+		// 		if (error.errorCode === BleErrorCode.DeviceAlreadyConnected) {
+		// 			return;
+		// 		}
+		// 		this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+		// 		this.deviceId = null;
+		// 		console.log("Connect error: " + error.message);
+		// 	});
 	};
 
 	stopSequence = () => {
@@ -111,15 +111,15 @@ class BLEServiceInstance {
 
 	// Flag to avoid multiple alerts
 	isAlertShown = false;
-	customsScanDevices = async (onUpdateListDevice: (listDevices: Device[]) => void, onError : (error: BleError) => void) => {
+	customsScanDevices = async (onUpdateListDevice: (listDevices: Device[]) => void, onError: (error: BleError) => void) => {
 		this.listDevices = [];
 		if (this.deviceId != null) {
 			this.listDevices.push(this.device!);
 		}
 
-		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => {
+		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false, allowDuplicates: true }, (error, device) => {
 			if (error) {
-				if(!this.isAlertShown) {
+				if (!this.isAlertShown) {
 					onError(error);
 					this.isAlertShown = true;
 				}
@@ -207,7 +207,7 @@ class BLEServiceInstance {
 		if (FWChar?.value) {
 			this.deviceSupportInfo!.firmwareVersion = KrossDevice.decodeFirmwareVersion(FWChar?.value);
 		}
-		
+
 	}
 
 	createNewManager = () => {
