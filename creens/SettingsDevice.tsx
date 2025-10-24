@@ -82,7 +82,7 @@ const SettingsDevice = () => {
 		const updateInfo2s = setInterval(() => {
 			let deviceInfo: SettingsDeviceProps = {
 				deviceName: BLEService.deviceSupportInfo?.name ?? "Unknown Device",
-				firmwareVersion: BLEService.deviceSupportInfo?.firmwareVersion ?? "N/A",
+				firmwareVersion: BLEService.deviceSupportInfo?.firmwareVersion ?? "-",
 				deviceState: BLEService.deviceSupportInfo?.visible === true ? "Connected" : "No Device Connected",
 				lastSync: new Date(Date.now() - BLEService.deviceSupportInfo?.lastSync!).getSeconds(),
 				storageUsed: "23MB / 256MB",
