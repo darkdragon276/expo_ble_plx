@@ -30,8 +30,8 @@ export default function App() {
     }, []);
 
     const initApp = async (): Promise<void> => {
-        //await BLEService.initializeBLE();
-        //await BLEService.requestBluetoothPermission();
+        await BLEService.initializeBLE();
+        await BLEService.requestBluetoothPermission();
         await new Promise(resolve => setTimeout(resolve, 1000));
     };
 

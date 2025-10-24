@@ -47,29 +47,6 @@ class BLEServiceInstance {
 	startSequence = async () => {
 		this.lockUpdate = true;
 		return;
-		// const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
-
-		// if (this.deviceId == null) return;
-
-		// await this.manager.cancelDeviceConnection(this.deviceId);
-		// console.log("cancelDeviceConnection");
-
-		// await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false }, (error, device) => { });
-		// console.log("startDeviceScan");
-
-		// await delay(1000);
-		// await this.manager.stopDeviceScan();
-		// console.log("stopDeviceScan");
-
-		// let device = await this.manager.connectToDevice(this.deviceId!, { timeout: 1000, autoConnect: false })
-		// 	.catch(error => {
-		// 		if (error.errorCode === BleErrorCode.DeviceAlreadyConnected) {
-		// 			return;
-		// 		}
-		// 		this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
-		// 		this.deviceId = null;
-		// 		console.log("Connect error: " + error.message);
-		// 	});
 	};
 
 	stopSequence = () => {
@@ -110,29 +87,39 @@ class BLEServiceInstance {
 	}
 
 	// Flag to avoid multiple alerts
-	isAlertShown = false;
+	isAlertShown: boolean = false;
+	private timeCurr: number = 0;
+	private timePre: number = -31;
 	customsScanDevices = async (onUpdateListDevice: (listDevices: Device[]) => void, onError: (error: BleError) => void) => {
-		this.listDevices = [];
 		if (this.deviceId != null) {
-			this.listDevices.push(this.device!);
+			if (!this.listDevices.some(d => d.id === this.deviceId)) {
+				this.listDevices.push(this.device!);
+			}
 		}
 
-		await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false, allowDuplicates: true }, (error, device) => {
-			if (error) {
-				if (!this.isAlertShown) {
-					onError(error);
-					this.isAlertShown = true;
+		this.timeCurr = this.secCounter;
+		if ((this.timeCurr - this.timePre) >= (20 / 1.5)) {
+			this.timePre = this.timeCurr;
+
+			this.listDevices = [];
+			await this.manager.startDeviceScan([this.SERVICE_UUID], { legacyScan: false, allowDuplicates: true }, (error, device) => {
+				if (error) {
+					if (!this.isAlertShown) {
+						onError(error);
+						this.isAlertShown = true;
+					}
+					this.manager.stopDeviceScan();
+					return;
 				}
-				this.manager.stopDeviceScan();
-				return;
-			}
-			if (device) {
-				if (!this.listDevices.some(d => d.id === device.id)) {
-					this.listDevices.push(device);
+				if (device) {
+					console.log("scan")
+					if (!this.listDevices.some(d => d.id === device.id)) {
+						this.listDevices.push(device);
+					}
+					onUpdateListDevice(this.listDevices);
 				}
-				onUpdateListDevice(this.listDevices);
-			}
-		});
+			});
+		}
 	}
 
 	isDisconnectError = (error: BleError) => {
@@ -166,6 +153,7 @@ class BLEServiceInstance {
 			});
 		if (!device) {
 			this.deviceSupportInfo = { lastSync: this.deviceSupportInfo!.lastSync };
+			this.listDevices = this.listDevices.filter(d => d.id !== this.deviceId);
 			this.deviceId = null;
 			return;
 		};
