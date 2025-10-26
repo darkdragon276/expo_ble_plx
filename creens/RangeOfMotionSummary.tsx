@@ -238,8 +238,8 @@ const RangeOfMotionSummary = () => {
 				</View> */}
 
 				{/* ROM Card */}
-				<View className="flex flex-col bg-white rounded-xl px-6 [&:last-child]:pb-6 mb-6">
-					<View className="flex-row items-center py-4">
+				<View className="flex flex-col bg-white rounded-xl [&:last-child]:pb-6 mb-6">
+					<View className="flex-row items-center p-4">
 						{/* Icon circle */}
 						<View className="items-center justify-center mr-2">
 							{/* small rotation icon */}
@@ -250,10 +250,10 @@ const RangeOfMotionSummary = () => {
 
 					<View className="flex-row flex-wrap">
 						{/* Extension */}
-						<View className="w-1/3 p-2">
-							<View className="text-center space-y-3">
+						<View className="w-1/3">
+							<View className="text-center space-y-3 items-center">
 								{/* Icon + description */}
-								<View className="items-center bg-blue-50/80 border border-blue-200 rounded-xl p-4">
+								<View className="items-center bg-blue-50/80 border border-blue-200 rounded-xl p-4 w-4/5">
 									<Image
 										className="w-16 h-16"
 										source={ExtensionSrcImage}
@@ -269,10 +269,10 @@ const RangeOfMotionSummary = () => {
 						</View>
 
 						{/* Flexion */}
-						<View className="w-1/3 p-2">
-							<View className="text-center space-y-3">
+						<View className="w-1/3">
+							<View className="text-center space-y-3 items-center">
 								{/* Icon + description */}
-								<View className="items-center bg-green-50/80 border border-green-200 rounded-xl p-4">
+								<View className="items-center bg-green-50/80 border border-green-200 rounded-xl p-4 w-4/5">
 									<Image
 										className="w-16 h-16"
 										source={FlexionSrcImage}
@@ -288,10 +288,10 @@ const RangeOfMotionSummary = () => {
 						</View>
 
 						{/* Left Rotation */}
-						<View className="w-1/3 p-2">
-							<View className="text-center space-y-3">
+						<View className="w-1/3">
+							<View className="text-center space-y-3 items-center">
 								{/* Icon + description */}
-								<View className="items-center bg-purple-50/80 border border-purple-200 rounded-xl p-4">
+								<View className="items-center bg-purple-50/80 border border-purple-200 rounded-xl p-4 w-4/5">
 									<Image
 										className="w-16 h-16"
 										style={{ transform: [{ rotate: '180deg' }] }}
@@ -308,10 +308,10 @@ const RangeOfMotionSummary = () => {
 						</View>
 
 						{/* Right Rotation */}
-						<View className="w-1/3 p-2">
-							<View className="text-center space-y-3">
+						<View className="w-1/3">
+							<View className="text-center space-y-3 items-center">
 								{/* Icon + description */}
-								<View className="items-center bg-orange-50/80 border border-orange-200 rounded-xl p-4">
+								<View className="items-center bg-orange-50/80 border border-orange-200 rounded-xl p-4 w-4/5">
 									<Image
 										className="w-16 h-16"
 										style={{ transform: [{ rotate: '180deg' }] }}
@@ -328,10 +328,10 @@ const RangeOfMotionSummary = () => {
 						</View>
 
 						{/* Left Lateral */}
-						<View className="w-1/3 p-2">
-							<View className="text-center space-y-3">
+						<View className="w-1/3">
+							<View className="text-center space-y-3 items-center">
 								{/* Icon + description */}
-								<View className="items-center bg-teal-50/80 border border-teal-200 rounded-xl p-4">
+								<View className="items-center bg-teal-50/80 border border-teal-200 rounded-xl p-4 w-4/5">
 									<Image
 										className="w-16 h-16"
 										source={LeftLateralSrcImage}
@@ -347,10 +347,10 @@ const RangeOfMotionSummary = () => {
 						</View>
 
 						{/* Right Lateral */}
-						<View className="w-1/3 p-2">
-							<View className="text-center space-y-3">
+						<View className="w-1/3">
+							<View className="text-center space-y-3 items-center">
 								{/* Icon + description */}
-								<View className="items-center bg-pink-50/80 border border-pink-200 rounded-xl p-4">
+								<View className="items-center bg-pink-50/80 border border-pink-200 rounded-xl p-4 w-4/5">
 									<Image
 										className="w-16 h-16"
 										source={RightLateralSrcImage}
@@ -365,7 +365,6 @@ const RangeOfMotionSummary = () => {
 							</View>
 						</View>
 					</View>
-
 				</View>
 
 				{/* Buttons area */}
@@ -387,6 +386,8 @@ const RangeOfMotionSummary = () => {
 						</View>
 					</TouchableOpacity>
 				</View>
+
+				<View className="h-4"></View>
 
 				{/* Card */}
 				<View className="bg-white rounded-xl p-4 shadow-md">
@@ -420,7 +421,9 @@ const RangeOfMotionSummary = () => {
 						</View>
 					</View>
 				</View>
+
 				<View className="h-12"></View>
+
 			</View>
 		</ScrollView >
 	);
