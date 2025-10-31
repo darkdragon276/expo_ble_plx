@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
-import { LucidePlay, LucideSquare, LucideUsers } from 'lucide-react-native'
+import { LucidePlay, LucideSquare, RotateCcw } from 'lucide-react-native'
 import { Ionicons } from "@expo/vector-icons";
 import { styled } from 'nativewind';
 import { RootStackParamList } from "../model/RootStackParamList";
@@ -34,8 +34,9 @@ import { bleEventEmitter } from "../utils/BleEmitter";
 import { BLEService } from "../ble/BLEService";
 
 const LuPlay = styled(LucidePlay);
-const LuUsers = styled(LucideUsers);
+// const LuUsers = styled(LucideUsers);
 const LuSquare = styled(LucideSquare);
+const LuRotateCcw = styled(RotateCcw);
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 type RProp = RouteProp<RootStackParamList, "RangeOfMotion">;
@@ -53,6 +54,7 @@ const RangeOfMotion = () => {
     const [record, setRecord] = useState(false);
     const db = useDatabase("headx.db");
     const route = useRoute<RProp>();
+    const [key, setKey] = useState(0);
 
     const krossDevice = new KrossDevice();
 
@@ -215,8 +217,17 @@ const RangeOfMotion = () => {
         }, 50)
     };
 
+    const onPressReset = async () => {
+        if (!record)
+            return;
+
+        await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
+        setRecord(false);
+        setKey(prev => prev + 1)
+    }
+
     return (
-        <ScrollView className="flex-1 p-4 space-y-6">
+        <ScrollView key={key} className="flex-1 p-4 space-y-6">
             <View className="items-center">
                 <Text className="text-lg font-semibold mb-1">
                     Range of Motion Assessment
@@ -274,12 +285,12 @@ const RangeOfMotion = () => {
                         ?
                         <TouchableOpacity
                             onPress={onPressRecording}
-                            activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
+                            activeOpacity={0.9} className="rounded-xl overflow-hidden shadow w-2/3">
                             <LinearGradient
                                 colors={["#0a66ff", "#00a3ff"]}
                                 start={[0, 0]}
                                 end={[1, 0]}
-                                className="flex-row items-center justify-center w-full py-4 px-12"
+                                className="flex-row items-center justify-center w-full py-4 px-8"
                             >
                                 <LuPlay size={20} color="white"></LuPlay>
                                 <Text className="text-white font-semibold ml-2 p-3">Start Assessment</Text>
@@ -288,12 +299,12 @@ const RangeOfMotion = () => {
                         :
                         <TouchableOpacity
                             onPress={onPressStopRecording}
-                            activeOpacity={0.9} className="rounded-xl overflow-hidden shadow">
+                            activeOpacity={0.9} className="rounded-xl overflow-hidden shadow w-2/3">
                             <LinearGradient
                                 colors={["#B91C1C", "#B91C1C"]}
                                 start={[0, 0]}
                                 end={[1, 0]}
-                                className="flex-row bg-red-700 items-center justify-center w-full py-4 px-12"
+                                className="flex-row bg-red-700 items-center justify-center w-full py-4 px-8"
                             >
                                 <LuSquare size={20} color="white"></LuSquare>
                                 <Text className="text-white font-semibold ml-2 p-3">Stop Recording</Text>
@@ -301,6 +312,20 @@ const RangeOfMotion = () => {
                             </LinearGradient>
                         </TouchableOpacity>
                 }
+
+                <TouchableOpacity
+                    onPress={onPressReset}
+                    activeOpacity={0.9} className="rounded-xl overflow-hidden shadow ml-4 w-1/3">
+                    <LinearGradient
+                        colors={["#16a34a", "#16a34a"]}
+                        start={[0, 0]}
+                        end={[1, 0]}
+                        className="flex-row items-center justify-center w-full py-4"
+                    >
+                        <LuRotateCcw size={20} color="white"></LuRotateCcw>
+                        <Text className="text-white font-semibold p-3">Reset</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
             </View>
 
             <View className="flex-row flex-wrap">
