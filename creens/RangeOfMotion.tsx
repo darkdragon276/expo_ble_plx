@@ -221,8 +221,8 @@ const RangeOfMotion = () => {
         if (!record)
             return;
 
-        await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
-        setRecord(false);
+        // await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
+        // setRecord(false);
         setKey(prev => prev + 1)
     }
 
