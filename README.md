@@ -43,4 +43,6 @@ pod install
 * Open xcode with project workspace file in ./ios folder
 * Edit schema to release
 * Add signing & certificate
+* Set: General => AppIcon => 'check' include all app icon assets
+* Set: General => Launch Screen File => "SplashScreen.storyboard"
 * Build & Archive to Apple Store connect.
