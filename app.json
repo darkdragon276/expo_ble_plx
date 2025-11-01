@@ -14,8 +14,11 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.headx.kross",
+      "bundleIdentifier": "com.HeadX.app",
+      "version": "1.0.7",
+      "buildNumber": "1",
       "infoPlist": {
+        "CFBundleDisplayName": "HeadX",
         "ITSAppUsesNonExemptEncryption": false,
         "NSBluetoothAlwaysUsageDescription": "The app needs Bluetooth access to connect devices.",
         "NSBluetoothPeripheralUsageDescription": "The application uses Bluetooth to communicate with peripheral devices."
