@@ -114,6 +114,10 @@ export default function MainRecentSession() {
 		]);
 	};
 
+	const gotoAssessmentHistory = () => {
+		navigation.navigate("AssessmentHistory");
+	};
+
 	return (
 		<View className="flex-1 bg-white rounded-2xl m-4 px-6 py-4">
 			{/* Header */}
@@ -124,7 +128,9 @@ export default function MainRecentSession() {
 						Recent Sessions
 					</Text>
 				</View>
-				<TouchableOpacity className="flex-row rounded-xl items-center border border-gray-200 p-2 space-x-1">
+				<TouchableOpacity className="flex-row rounded-xl items-center border border-gray-200 p-2 space-x-1"
+					onPress={gotoAssessmentHistory}
+				>
 					<LuTrendUp size={18} className="text-green-600 mr-2" />
 					<Text className="font-medium">View All</Text>
 				</TouchableOpacity>
