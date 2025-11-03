@@ -6,4 +6,5 @@ export type RootStackParamList = {
 	RangeOfMotion: { title: string };
 	BLEScanner: undefined;
 	RangeOfMotionSummary: { key: string };
+	AssessmentHistory: undefined;
 };
