@@ -1,31 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { CartesianChart, Line, useChartPressState } from 'victory-native';
+import { CartesianChart, Line, PointsArray, useChartPressState, useLinePath } from 'victory-native';
 import { useFont, Circle, Path, Canvas, Text as SKText } from '@shopify/react-native-skia';
 import { SharedValue, useDerivedValue } from 'react-native-reanimated';
-import { useDatabase } from '../../db/useDatabase';
-import { DB_SELECT_ALL_ROM } from '../../db/dbQuery';
 import { styled } from 'nativewind';
 import { RotateCcw } from 'lucide-react-native';
+import type { DataROMProp } from "../../model/AssessmentHistory";
 
 // const LuDownload = styled(LucideDownload);
 const LuRotateCcw = styled(RotateCcw);
-
-type DataProp = {
-	xIndex: number,
-	id: number,
-	key: string,
-	date: string,
-	date_n: number,
-	title: string,
-	extension: number,
-	flexion: number,
-	l_rotation: number,
-	r_rotation: number,
-	l_lateral: number,
-	r_lateral: number,
-	duration: number,
-}
 
 const colors = {
 	extension: "#10b981",
@@ -77,10 +60,9 @@ const ToolTip = ({ x
 	)
 }
 
-const AssessmentHistorROMChart = () => {
+const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataROMProp[] }) => {
 
-	const db = useDatabase("headx.db");
-	const [data, setData] = useState<DataProp[]>([])
+	const [data, setData] = useState<DataROMProp[]>([])
 	const font = useFont(require("../../assets/fonts/calibrii.ttf"), 12);
 	const { state, isActive } = useChartPressState({ x: 0, y: { extension: 0, flexion: 0, l_lateral: 0, l_rotation: 0, r_lateral: 0, r_rotation: 0 } });
 
@@ -88,8 +70,7 @@ const AssessmentHistorROMChart = () => {
 		let date = "";
 		const index = state.x.value.value;
 		if (data[index]) {
-			//date = `${data[index].date_n.toString().substring(0, 2)}/${data[index].date_n.toString().substring(4, 2)}/${data[index].date_n.toString().substring(8, 4)}`
-			date = data[index].date.toString().substring(0, 10);
+			date = data[index].date_str;
 		}
 		return date
 	}, [state, data])
@@ -120,35 +101,8 @@ const AssessmentHistorROMChart = () => {
 	}, [state])
 
 	useEffect(() => {
-
-		const selectData = async () => {
-			try {
-				if (!db) {
-					return;
-				}
-
-				let result = await db.getAllAsync<DataProp>(DB_SELECT_ALL_ROM);
-				if (!result) {
-					return;
-				}
-
-				result = result.map((item, index) => ({
-					...item,
-					xIndex: index,
-				}));
-
-				setData(result);
-
-			} catch (error) {
-				console.log(error);
-			}
-		};
-
-		if (db) {
-			selectData();
-		}
-
-	}, [db])
+		setData(dataChart);
+	}, [dataChart])
 
 	// const NaturalLine = ({ points, color, strokeWidth }: { points: PointsArray, color: string, strokeWidth: number }) => {
 	// 	const { path } = useLinePath(points, { curveType: "natural" });
@@ -178,9 +132,12 @@ const AssessmentHistorROMChart = () => {
 					},
 					tickValues: {
 						x: data.map((d) => d.xIndex),
-						y: [-20, 0, 60, 100, 140, 180],
+						y: [0, 60, 100, 140, 180],
 					},
-					formatXLabel: (index) => `${data[index].date_n.toString().substring(0, 2)}/${data[index].date_n.toString().substring(4, 2)}/${data[index].date_n.toString().substring(8, 4)}`
+					formatXLabel: (index) => {
+						let date = data[index].date_str;
+						return date
+					}
 				}}
 			>
 				{({ points }) => (
