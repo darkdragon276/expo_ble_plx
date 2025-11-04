@@ -17,7 +17,6 @@ const DB_SELECT_ALL_ROM =
         id
         , key
         , date
-        , CAST(replace(replace(replace(replace(date, '/', ''), ',', ''), ' ', ''), ":", "") AS REAL) AS date_n
         , extension
         , flexion
         , l_rotation

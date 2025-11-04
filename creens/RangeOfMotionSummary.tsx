@@ -194,6 +194,10 @@ const RangeOfMotionSummary = () => {
 		navigation.replace("Main")
 	}
 
+	const gotoAssessmentHistory = () => {
+		navigation.replace("AssessmentHistory");
+	};
+
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
 			<View className="w-full">
@@ -379,7 +383,10 @@ const RangeOfMotionSummary = () => {
 						</View>
 					</TouchableOpacity>
 
-					<TouchableOpacity activeOpacity={0.8} className="mt-3 bg-white border border-gray-300 rounded-xl py-4 items-center justify-center">
+					<TouchableOpacity
+						activeOpacity={0.8}
+						onPress={gotoAssessmentHistory}
+						className="mt-3 bg-white border border-gray-300 rounded-xl py-4 items-center justify-center">
 						<View className="flex-row items-center">
 							<LuChartColumn size={20} color="gray" className="mr-2"></LuChartColumn>
 							<Text className="text-gray-700 text-base">View History</Text>
