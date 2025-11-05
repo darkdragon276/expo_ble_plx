@@ -15,20 +15,20 @@ const useConvertDateTime = (date?: Date): any => {
 	hours = hours ? hours : 12;
 
 	const options: Intl.DateTimeFormatOptions = {
-		month: "short",   // Oct
-		day: "2-digit",   // 04
-		hour: "2-digit",  // 08
-		minute: "2-digit",// 44
-		hour12: true,     // AM/PM format
+		month: "short",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: true,
 	};
 
-	const date_dd_MM_yyyy_hh_mm_ss_ampm = `${day}/${month}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
-	const date_dd_MM_yyyy_at_hh_mm_ampm = `${day}/${month}/${year} at ${hours}:${minutes}:${ampm}`;
+	const date_MM_dd_yyyy_hh_mm_ss_ampm = `${month}/${day}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
+	const date_MM_dd_yyyy_at_hh_mm_ampm = `${month}/${day}/${year} at ${hours}:${minutes}:${ampm}`;
 	const date_short = Intl.DateTimeFormat("en-US", options).format(date).toString().replace(" at", ",");
-	//console.log(`${date_dd_MM_yyyy_hh_mm_ss_ampm} - ${date_dd_MM_yyyy_at_hh_mm_ampm} - ${date_short}`)
+
 	return {
-		date_dd_MM_yyyy_hh_mm_ss_ampm,
-		date_dd_MM_yyyy_at_hh_mm_ampm,
+		date_MM_dd_yyyy_hh_mm_ss_ampm,
+		date_MM_dd_yyyy_at_hh_mm_ampm,
 		date_short
 	}
 }

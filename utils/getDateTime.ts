@@ -20,8 +20,10 @@ export const getCurrentDateTime = (): any => {
 
 	const localShortDateTime = Intl.DateTimeFormat("en-US", options).format(now).toString().replace(" at", ",");
 	const strNow = now.toString();
+	const strNowISO = now.toISOString();
 
 	return {
+		strNowISO,
 		strNow,
 		year,
 		month,
