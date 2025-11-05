@@ -25,7 +25,7 @@ type Session = {
 };
 
 const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHistory: any, delROM: any }) => {
-	const { date_dd_MM_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
+	const { date_MM_dd_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
 
 	return (
 		<TouchableOpacity
@@ -44,7 +44,7 @@ const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHi
 						</View>
 					</View>
 				</View>
-				<Text className="text-xs text-muted-foreground">{date_dd_MM_yyyy_hh_mm_ss_ampm}</Text>
+				<Text className="text-xs text-muted-foreground">{date_MM_dd_yyyy_hh_mm_ss_ampm}</Text>
 				<View className="flex-row space-between">
 					<Text className="flex-1 text-xs text-blue-600 mt-1">
 						Tap to view full report

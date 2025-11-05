@@ -51,8 +51,8 @@ type DataProp = {
 }
 
 type DtConvert = {
-	date_dd_MM_yyyy_hh_mm_ss_ampm: string,
-	date_dd_MM_yyyy_at_hh_mm_ampm: string,
+	date_MM_dd_yyyy_hh_mm_ss_ampm: string,
+	date_MM_dd_yyyy_at_hh_mm_ampm: string,
 	date_short: string,
 }
 
@@ -175,9 +175,9 @@ const RangeOfMotionSummary = () => {
 				const { key } = route.params;
 				const rs = await db.getFirstAsync<DataProp>(DB_SELECT_BY_ID_ROM, key);
 				if (rs) {
-					const { date_dd_MM_yyyy_hh_mm_ss_ampm, date_dd_MM_yyyy_at_hh_mm_ampm, date_short } = useConvertDateTime(new Date(rs.date));
+					const { date_MM_dd_yyyy_hh_mm_ss_ampm, date_MM_dd_yyyy_at_hh_mm_ampm, date_short } = useConvertDateTime(new Date(rs.date));
 					setData(rs);
-					setDateConvert({ date_dd_MM_yyyy_hh_mm_ss_ampm, date_dd_MM_yyyy_at_hh_mm_ampm, date_short })
+					setDateConvert({ date_MM_dd_yyyy_hh_mm_ss_ampm, date_MM_dd_yyyy_at_hh_mm_ampm, date_short })
 				}
 			} catch (error) {
 				console.log(error);
@@ -207,7 +207,7 @@ const RangeOfMotionSummary = () => {
 						dataKey={data ? data?.key : ""}>
 					</TitleSummary>
 					<Text className="text-sm text-gray-500 text-center">
-						ROM Assessment - {dateConvert?.date_dd_MM_yyyy_at_hh_mm_ampm}
+						ROM Assessment - {dateConvert?.date_MM_dd_yyyy_at_hh_mm_ampm}
 					</Text>
 				</View>
 
@@ -225,7 +225,7 @@ const RangeOfMotionSummary = () => {
 					<View className="flex-row flex-wrap py-4">
 						<View className="w-1/2">
 							<Text className="text-xs text-muted-foreground mb-1 text-gray-400">Date & Time</Text>
-							<Text className="font-medium text-sm">{dateConvert?.date_dd_MM_yyyy_hh_mm_ss_ampm}</Text>
+							<Text className="font-medium text-sm">{dateConvert?.date_MM_dd_yyyy_hh_mm_ss_ampm}</Text>
 						</View>
 
 						<View className="w-1/2">

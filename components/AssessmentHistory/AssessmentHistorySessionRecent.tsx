@@ -7,12 +7,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { styled } from 'nativewind';
 import { RotateCcw } from 'lucide-react-native';
 import type { DataROMProp } from "../../model/AssessmentHistory";
+import useConvertDateTime from '../../utils/convertDateTime';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const LuRotateCcw = styled(RotateCcw);
 
-
 const AssessmentHistorySessionItems = memo(({ item, gotoHistory }: { item: DataROMProp, gotoHistory: any }) => {
+
+	const { date_MM_dd_yyyy_at_hh_mm_ampm } = useConvertDateTime(new Date(item.date));
+
 	return (
 		<View className="bg-blue-50/40 rounded-2xl border border-gray-200 p-4 mb-3 w-full">
 			{/* Header */}
@@ -31,7 +34,7 @@ const AssessmentHistorySessionItems = memo(({ item, gotoHistory }: { item: DataR
 				Progress Review
 			</Text>
 			<Text className="text-gray-500 text-sm mb-3">
-				{item.date_str} at {item.time_str}
+				{date_MM_dd_yyyy_at_hh_mm_ampm}
 			</Text>
 
 			{/* Stats */}

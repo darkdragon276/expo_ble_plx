@@ -25,6 +25,7 @@ const DB_SELECT_ALL_ROM =
         , r_lateral
         , duration
     FROM TableROM
+    ORDER BY id DESC
 `;
 
 export {

@@ -147,7 +147,7 @@ const RangeOfMotion = () => {
     };
 
     const onPressRecording = async () => {
-        NowObj.strNow = getCurrentDateTime().strNow;
+        NowObj.strNow = getCurrentDateTime().strNowISO;
         NowObj.localShortDateTime = getCurrentDateTime().localShortDateTime;
         setRecord(true);
 
@@ -178,7 +178,7 @@ const RangeOfMotion = () => {
                 bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
                 count++;
             }
-            console.log("Monitor: ", char?.value);
+            //console.log("Monitor: ", char?.value);
         }
 
         await BLEService.discoverAllServicesAndCharacteristicsForDevice()
