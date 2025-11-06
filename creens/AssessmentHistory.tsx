@@ -10,6 +10,7 @@ import AssessmentHistoryFilter from "../components/AssessmentHistory/AssessmentH
 import AssessmentHistorySessionRecent from "../components/AssessmentHistory/AssessmentHistorySessionRecent";
 import AssessmentHistoryTags from "../components/AssessmentHistory/AssessmentHistoryTags";
 import AssessmentHistorROMChart from "../components/AssessmentHistory/AssessmentHistorROMChart";
+import AssessmentHistoryJPSChart from "../components/AssessmentHistory/AssessmentHistoryJPSChart";
 import { useDatabase } from '../db/useDatabase';
 import { DB_SELECT_ALL_ROM } from '../db/dbQuery';
 import type { DataROMProp } from "../model/AssessmentHistory";
@@ -76,6 +77,7 @@ const AssessmentHistory = () => {
 				if (!result) {
 					return;
 				}
+
 				result = result.map((item, index) => {
 					const dt = new Date(item.date);
 
@@ -136,8 +138,11 @@ const AssessmentHistory = () => {
 			{/* Stats Section */}
 			<AssessmentHistoryTags></AssessmentHistoryTags>
 
-			{/* Chart Section */}
+			{/* ROM Chart Section */}
 			<AssessmentHistorROMChart dataChart={data}></AssessmentHistorROMChart>
+
+			{/* JPSChart Section */}
+			<AssessmentHistoryJPSChart></AssessmentHistoryJPSChart>
 
 			{/* Session Recent Section */}
 			<AssessmentHistorySessionRecent dataRecent={data}></AssessmentHistorySessionRecent>
