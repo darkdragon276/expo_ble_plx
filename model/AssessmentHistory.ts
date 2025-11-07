@@ -1,7 +1,8 @@
-type DataROMProp = {
+type DataHistory = {
 	xIndex: number,
 	id: string,
 	key: string,
+	dt: Date,
 	date: string,
 	date_n: number,
 	date_str: string,
@@ -14,6 +15,7 @@ type DataROMProp = {
 	l_lateral: number,
 	r_lateral: number,
 	duration: number,
+	type: string,
 }
 
-export { type DataROMProp }
+export { type DataHistory }

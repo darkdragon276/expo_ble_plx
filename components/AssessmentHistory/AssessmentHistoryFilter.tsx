@@ -3,20 +3,32 @@ import React, { useState } from 'react'
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { styled } from 'nativewind';
 import { LucideFunnel } from 'lucide-react-native';
+import { type Combobox, TimeOptions as timeOptions, MetricOptions as metricOptions } from '../../dummy/masterData'
 
 const LuFunnel = styled(LucideFunnel);
 
-const AssessmentHistoryFilter = () => {
-	const [timePeriod, setTimePeriod] = useState("All Time");
-	const [metricFocus, setMetricFocus] = useState("All Metrics");
+const AssessmentHistoryFilter = ({ onSelectTime, onSelectMetric }: { onSelectTime: any, onSelectMetric: any }) => {
+	const [timePeriod, setTimePeriod] = useState(timeOptions[0]);
+	const [metricFocus, setMetricFocus] = useState(metricOptions[0]);
 	const [openDropdown, setOpenDropdown] = useState<"time" | "metric" | null>(null);
 
-	const timeOptions = ["All Time", "Last Week", "Last Month", "Last 3 Month"];
-	const metricOptions = ["All Metrics", "ROM Tests", "JPS Tests"];
+	//const timeOptions = t; //["All Time", "Last Week", "Last Month", "Last 3 Month"];
+	//const metricOptions = m;// ["All Metrics", "ROM Tests", "JPS Tests"];
 
-	const handleSelect = (type: "time" | "metric", value: string) => {
-		if (type === "time") setTimePeriod(value);
-		else setMetricFocus(value);
+	const handleSelect = (type: "time" | "metric", value: Combobox) => {
+
+		//console.log(`AssessmentHistoryFilter - tpye: ${type} value: ${value}`)
+
+		if (type === "time") {
+			setTimePeriod(value);
+			onSelectTime(value);
+		}
+		else {
+			setMetricFocus(value);
+			onSelectMetric(value)
+		}
+
+		//console.log(value)
 		setOpenDropdown(null);
 	};
 
@@ -34,7 +46,7 @@ const AssessmentHistoryFilter = () => {
 				onPress={() => setOpenDropdown(openDropdown === "time" ? null : "time")}
 				className="flex-row justify-between items-center py-2 border-b border-gray-100"
 			>
-				<Text className="text-gray-800">{timePeriod}</Text>
+				<Text className="text-gray-800">{timePeriod.name}</Text>
 				<Entypo
 					name={openDropdown === "time" ? "chevron-up" : "chevron-down"}
 					size={16}
@@ -48,7 +60,7 @@ const AssessmentHistoryFilter = () => {
 				onPress={() => setOpenDropdown(openDropdown === "metric" ? null : "metric")}
 				className="flex-row justify-between items-center py-2 border-b border-gray-100"
 			>
-				<Text className="text-gray-800">{metricFocus}</Text>
+				<Text className="text-gray-800">{metricFocus.name}</Text>
 				<Entypo
 					name={openDropdown === "metric" ? "chevron-up" : "chevron-down"}
 					size={16}
@@ -72,7 +84,7 @@ const AssessmentHistoryFilter = () => {
 					>
 						<FlatList
 							data={openDropdown === "time" ? timeOptions : metricOptions}
-							keyExtractor={(item) => item}
+							keyExtractor={(item) => item.name}
 							renderItem={({ item }) => (
 								<TouchableOpacity
 									className="py-3 px-2 rounded-xl flex-row justify-between items-center"
@@ -87,7 +99,7 @@ const AssessmentHistoryFilter = () => {
 											: "text-gray-700"
 											}`}
 									>
-										{item}
+										{item.name}
 									</Text>
 									{((openDropdown === "time" && item === timePeriod) ||
 										(openDropdown === "metric" && item === metricFocus)) && (

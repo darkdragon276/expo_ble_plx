@@ -111,8 +111,8 @@ const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) =>
 								</View>
 							</TouchableOpacity>
 							<TouchableOpacity onPress={rollbackTitle}>
-								<View className="border border-green-500 rounded-md py-1 mr-2 z-10">
-									<LuUnCheck size={20} className="border border-red-500 rounded-xl text-red-500 px-6"></LuUnCheck>
+								<View className="border border-red-500 rounded-md py-1 mr-2 z-10">
+									<LuUnCheck size={20} className="text-red-500 px-6"></LuUnCheck>
 								</View>
 							</TouchableOpacity>
 						</View>

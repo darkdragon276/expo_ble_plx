@@ -5,7 +5,7 @@ import { useFont, Circle, Path, Canvas, Text as SKText, Paint, Line as SkiaLine,
 import { SharedValue, useDerivedValue, useSharedValue, withDecay } from 'react-native-reanimated';
 import { styled } from 'nativewind';
 import { RotateCcw } from 'lucide-react-native';
-import type { DataROMProp } from "../../model/AssessmentHistory";
+import type { DataHistory } from "../../model/AssessmentHistory";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 // const LuDownload = styled(LucideDownload);
@@ -91,9 +91,9 @@ const ToolTip = ({ x
 	)
 }
 
-const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataROMProp[] }) => {
+const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) => {
 
-	const [data, setData] = useState<DataROMProp[]>([])
+	const [data, setData] = useState<DataHistory[]>([])
 	const font = useFont(require("../../assets/fonts/calibrii.ttf"), 12);
 	const { state, isActive } = useChartPressState({ x: 0, y: { extension: 0, flexion: 0, l_lateral: 0, l_rotation: 0, r_lateral: 0, r_rotation: 0 } });
 	//const xGusturePan = useSharedValue(0);
@@ -112,7 +112,7 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataROMProp[] }) =
 	const valToolTipDate = useDerivedValue((): string => {
 		let date = "";
 		const index = state.x.value.value;
-		if (data[index]) {
+		if (data[index] && data[index].date_str) {
 			date = data[index].date_str;
 		}
 
@@ -148,7 +148,10 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataROMProp[] }) =
 	}, [state])
 
 	useEffect(() => {
-		setData(dataChart);
+		const result = dataChart.filter(item => {
+			return item.type == "ROM";
+		})
+		setData(result);
 	}, [dataChart])
 
 	const NaturalLine = ({ points, color, strokeWidth }: { points: PointsArray, color: string, strokeWidth: number }) => {
@@ -196,7 +199,10 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataROMProp[] }) =
 						y: [0, 60, 100, 140, 180],
 					},
 					formatXLabel: (index) => {
-						let date = data[index].date_str;
+						let date = "";
+						if (data[index] && data[index].date_str) {
+							date = data[index].date_str;
+						}
 						return date
 					}
 				}}
