@@ -18,6 +18,10 @@ import { RootStackParamList } from "../model/RootStackParamList";
 import { useDatabase } from "../db/useDatabase";
 import { DB_SELECT_BY_ID_ROM, DB_UPDATE_BY_KEY_ROM } from "../db/dbQuery";
 import useConvertDateTime from "../utils/convertDateTime";
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import { Asset } from "expo-asset";
+import * as FileSystem from 'expo-file-system/legacy';
 
 const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
@@ -153,7 +157,7 @@ const RangeOfMotionSummary = () => {
 			headerRight: () => (
 				<View className="flex-row items-center justify-center mb-1 mr-4">
 					<Pressable
-						onPress={() => { }}
+						onPress={printPDF}
 						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
 					>
 						<LuFileText size={18} color="black" />
@@ -196,6 +200,59 @@ const RangeOfMotionSummary = () => {
 
 	const gotoAssessmentHistory = () => {
 		navigation.replace("AssessmentHistory");
+	};
+
+	const loadImg = async (localSrc: any) => {
+		const src = Asset.fromModule(localSrc)
+		await src.downloadAsync();
+		const base64 = await FileSystem.readAsStringAsync(src.localUri || "", {
+			encoding: "base64"
+		});
+
+		return `data:image/png;base64,${base64}`;
+	}
+
+	const printPDF = async () => {
+
+		const extensionSrcImage = await loadImg(ExtensionSrcImage);
+		const flexionSrcImage = await loadImg(FlexionSrcImage);
+		const leftRotationSrcImage = await loadImg(LeftRotationSrcImage);
+		const rightRotationSrcImage = await loadImg(RightRotationSrcImage);
+		const leftLateralSrcImage = await loadImg(LeftLateralSrcImage);
+		const rightLateralSrcImage = await loadImg(RightLateralSrcImage);
+
+		const template = Asset.fromModule(require('../assets/PDFTemplate/ROMTemplate.html'));
+		await template.downloadAsync();
+
+		const htmlTemplate = await FileSystem.readAsStringAsync(template.localUri || "");
+
+		//console.log(data?.extension)
+		//return;
+		const html = htmlTemplate
+			.replace('{{title}}', data?.title || "")
+			.replace('{{datetime}}', `ROM Assessment - ${dateConvert?.date_MM_dd_yyyy_at_hh_mm_ampm}`)
+			//assessments
+			.replace('{{extension}}', data?.extension?.toString() || "")
+			.replace('{{flexion}}', data?.flexion?.toString() || "")
+			.replace('{{leftRotation}}', data?.l_rotation?.toString() || "")
+			.replace('{{rightRotation}}', data?.r_rotation?.toString() || "")
+			.replace('{{leftLateral}}', data?.l_lateral?.toString() || "")
+			.replace('{{rightLateral}}', data?.r_lateral?.toString() || "")
+			//src base64 for <img>
+			.replace('{{base64_extension}}', extensionSrcImage)
+			.replace('{{base64_flexion}}', flexionSrcImage)
+			.replace('{{base64_leftRotation}}', leftRotationSrcImage)
+			.replace('{{base64_rightRotation}}', rightRotationSrcImage)
+			.replace('{{base64_leftLateral}}', leftLateralSrcImage)
+			.replace('{{base64_rightLateral}}', rightLateralSrcImage)
+
+		// create PDF from .html
+		const { uri } = await Print.printToFileAsync({ html });
+
+		// Open or share file PDF
+		if (await Sharing.isAvailableAsync()) {
+			await Sharing.shareAsync(uri);
+		}
 	};
 
 	return (
