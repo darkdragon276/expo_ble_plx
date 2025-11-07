@@ -16,6 +16,7 @@ const DB_SELECT_ALL_ROM =
     `SELECT 
         id
         , key
+        , title
         , date
         , extension
         , flexion
@@ -24,7 +25,30 @@ const DB_SELECT_ALL_ROM =
         , l_lateral
         , r_lateral
         , duration
+        , 0 AS mean_err
+        , 0 AS variability
+        , type
     FROM TableROM
+
+    UNION ALL
+
+    SELECT
+        (id + id) AS id
+        , key || key AS key
+        , title
+        , date
+        , 0 AS extension
+        , 0 AS flexion
+        , 0 AS l_rotation
+        , 0 AS r_rotation
+        , 0 AS l_lateral
+        , 0 AS r_lateral
+        , 0 AS duration
+        , 2.6 AS mean_err
+        , 7.8 AS variability
+        , 'JPS' AS type
+    FROM TableROM
+
     ORDER BY id DESC
 `;
 

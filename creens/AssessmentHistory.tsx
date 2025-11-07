@@ -13,19 +13,24 @@ import AssessmentHistorROMChart from "../components/AssessmentHistory/Assessment
 import AssessmentHistoryJPSChart from "../components/AssessmentHistory/AssessmentHistoryJPSChart";
 import { useDatabase } from '../db/useDatabase';
 import { DB_SELECT_ALL_ROM } from '../db/dbQuery';
-import type { DataROMProp } from "../model/AssessmentHistory";
+import type { DataHistory } from "../model/AssessmentHistory";
+import { type Combobox, TimeOptions as timeOptions, MetricOptions as metricOptions } from '../dummy/masterData'
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
+type ComboboxFilter = {
+	metric: Combobox,
+	time: Combobox,
+}
 const LuDownload = styled(LucideDownload);
 
 const AssessmentHistory = () => {
 	const navigation = useNavigation<NavigationProp>();
-	const [data, setData] = useState<DataROMProp[]>([])
+	const [data, setData] = useState<DataHistory[]>([])
 	const db = useDatabase("headx.db");
 
-	const [formData, setFormData] = useState({
-		metric: "",
-		time: "",
+	const [formData, setFormData] = useState<ComboboxFilter>({
+		metric: timeOptions[0],
+		time: metricOptions[0],
 	});
 
 	const handleSelect = (key: keyof typeof formData, value: string) => {
@@ -34,8 +39,8 @@ const AssessmentHistory = () => {
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
-			title: "",
-			headerTitleAlign: "left",
+			title: "Assessment History",
+			headerTitleAlign: "center",
 			headerStyle: {
 				elevation: 0,
 				shadowOpacity: 0,
@@ -72,37 +77,14 @@ const AssessmentHistory = () => {
 				if (!db) {
 					return;
 				}
-
-				let result = await db.getAllAsync<DataROMProp>(DB_SELECT_ALL_ROM);
+				//console.log(`AssessmentHistory time: ${formData.time.prop} , metric: ${formData.metric.prop}`)
+				let result = await db.getAllAsync<DataHistory>(DB_SELECT_ALL_ROM);
 				if (!result) {
 					return;
 				}
 
-				result = result.map((item, index) => {
-					const dt = new Date(item.date);
-
-					const pad = (n: number) => n.toString().padStart(2, "0");
-					const formatted =
-						pad(dt.getMonth() + 1) +
-						pad(dt.getDate()) +
-						dt.getFullYear() +
-						pad(dt.getHours()) +
-						pad(dt.getMinutes()) +
-						pad(dt.getSeconds());
-
-					const asNumber = Number(formatted);
-					const asString = `${pad(dt.getMonth() + 1)}/${pad(dt.getDate())}/${dt.getFullYear()}`;
-					const timeStr = `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-
-					return {
-						...item
-						, xIndex: index
-						, date_str: asString
-						, time_str: timeStr
-						, date_n: asNumber
-					};
-				});
-
+				result = convertData(result);
+				result = filerConditionSearch(result);
 				setData(result);
 
 			} catch (error) {
@@ -114,15 +96,101 @@ const AssessmentHistory = () => {
 			selectData();
 		}
 
-	}, [db, formData])
+	}, [db, formData.metric, formData.time])
+
+	const filerConditionSearch = (result: DataHistory[]) => {
+		const time = formData.time.prop;
+		const metric = formData.metric.prop;
+
+		// filter date
+		let date = new Date();
+		let lastDay;
+		switch (time) {
+			case "last_week":
+				date.setDate(date.getDate() - 7);
+				break;
+			case "last_month":
+				date.setMonth(date.getMonth() - 1);
+				lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+				date.setDate(lastDay);
+				break;
+
+			case "last_3_month":
+				date.setMonth(date.getMonth() - 3);
+				lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+				date.setDate(lastDay);
+				break;
+
+			default:
+				break;
+		}
+		//console.log(`filerConditionSearch date: ${date}`)
+		if (time !== "all") {
+			result = result.filter(item => {
+				return item.dt > date;
+			})
+		}
+
+		//filter metric
+		let type = ""
+		switch (metric) {
+			case "rom":
+				type = "ROM"
+				break;
+			case "jps":
+				type = "JPS"
+				break;
+
+			default:
+				break;
+		}
+
+		if (metric !== "all") {
+			result = result.filter(item => {
+				return item.type == type
+			})
+		}
+
+		return result;
+	};
+
+	const convertData = (result: DataHistory[]) => {
+		result = result.map((item, index) => {
+			const dt = new Date(item.date);
+
+			const pad = (n: number) => n.toString().padStart(2, "0");
+			const formatted =
+				pad(dt.getMonth() + 1) +
+				pad(dt.getDate()) +
+				dt.getFullYear() +
+				pad(dt.getHours()) +
+				pad(dt.getMinutes()) +
+				pad(dt.getSeconds());
+
+			const asNumber = Number(formatted);
+			const asString = `${pad(dt.getMonth() + 1)}/${pad(dt.getDate())}/${dt.getFullYear()}`;
+			const timeStr = `${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+
+			return {
+				...item
+				, xIndex: index
+				, date_str: asString
+				, time_str: timeStr
+				, date_n: asNumber
+				, dt: dt
+			};
+		});
+
+		return result;
+	};
 
 	return (
-		<ScrollView className="flex-1 bg-gray-50 p-4">
+		<ScrollView className="flex-1 bg-gray-50 py-2 px-4">
 			<View className="w-full">
-				<View className="items-center mb-6">
-					<Text className="text-lg font-semibold mb-1">
+				<View className="items-center mb-2">
+					{/* <Text className="text-lg font-semibold mb-1">
 						Assessment History
-					</Text>
+					</Text> */}
 					<Text className="text-sm text-gray-500 text-center">
 						Session tracking and progress analysis
 					</Text>
@@ -131,18 +199,31 @@ const AssessmentHistory = () => {
 
 			{/* Filter Section */}
 			<AssessmentHistoryFilter
-			//onSelect={(value: any) => handleSelect("metric", value)}
+				onSelectTime={(value: any) => handleSelect("time", value)}
+				onSelectMetric={(value: any) => handleSelect("metric", value)}
 			>
 			</AssessmentHistoryFilter>
 
 			{/* Stats Section */}
-			<AssessmentHistoryTags></AssessmentHistoryTags>
+			<AssessmentHistoryTags dataChart={data}></AssessmentHistoryTags>
 
 			{/* ROM Chart Section */}
-			<AssessmentHistorROMChart dataChart={data}></AssessmentHistorROMChart>
+			{
+				(formData.metric.prop == "rom" || formData.metric.prop == "all")
+					?
+					<AssessmentHistorROMChart dataChart={data}></AssessmentHistorROMChart>
+					:
+					<></>
+			}
 
 			{/* JPSChart Section */}
-			<AssessmentHistoryJPSChart></AssessmentHistoryJPSChart>
+			{
+				(formData.metric.prop == "jps" || formData.metric.prop == "all")
+					?
+					<AssessmentHistoryJPSChart></AssessmentHistoryJPSChart>
+					:
+					<></>
+			}
 
 			{/* Session Recent Section */}
 			<AssessmentHistorySessionRecent dataRecent={data}></AssessmentHistorySessionRecent>
@@ -153,7 +234,3 @@ const AssessmentHistory = () => {
 export default AssessmentHistory
 
 const styles = StyleSheet.create({})
-
-function setData(result: DataROMProp[]) {
-	throw new Error('Function not implemented.');
-}

@@ -5,7 +5,7 @@ import { useFont, Circle, Path, Canvas, Text as SKText, Paint, Line as SkiaLine,
 import { SharedValue, useDerivedValue, useSharedValue, withDecay } from 'react-native-reanimated';
 import { styled } from 'nativewind';
 import { LucideTarget } from 'lucide-react-native';
-import type { DataROMProp } from "../../model/AssessmentHistory";
+import type { DataHistory } from "../../model/AssessmentHistory";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 const LuTarget = styled(LucideTarget);
@@ -53,10 +53,10 @@ const ToolTip = ({ x
 					<Paint color="white" style="fill" />
 					<Paint color="gray" style="stroke" strokeWidth={1} />
 				</RoundedRect>
+				<SKText x={45} y={20} font={font} text={valToolTipDate} color="white" />
+				<SKText x={45} y={40} font={font} text={valToolTipMeanError} color="#3b82f6" />
+				<SKText x={45} y={60} font={font} text={valToolTipVariability} color="#10b981" />
 			</Group>
-			{/* <SKText x={45} y={20} font={font} text={valToolTipDate} color="white" /> */}
-			<SKText x={45} y={40} font={font} text={valToolTipMeanError} color="#3b82f6" />
-			<SKText x={45} y={60} font={font} text={valToolTipVariability} color="#10b981" />
 		</>
 	)
 }
@@ -159,10 +159,14 @@ const AssessmentHistoryJPSChart = () => {
 				)}
 			</CartesianChart>
 			{/* Legend */}
-			<View className="flex-row flex-wrap justify-center">
-				<View className="flex-row items-center m-1">
-					<View className="w-3 h-3 rounded-full mr-1" />
-					<Text className="text-[10px] text-gray-600">{"aaa"}</Text>
+			<View className="flex-row justify-center mt-3 space-x-4">
+				<View className="flex-row items-center space-x-2">
+					<View className="w-3 h-3 bg-blue-500" />
+					<Text className="text-xs text-gray-700">Mean Error (°)</Text>
+				</View>
+				<View className="flex-row items-center space-x-2">
+					<View className="w-3 h-3 bg-green-500" />
+					<Text className="text-xs text-gray-700">Variability (°)</Text>
 				</View>
 			</View>
 		</View>
