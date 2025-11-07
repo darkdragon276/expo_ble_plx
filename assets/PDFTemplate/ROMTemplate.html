@@ -1,0 +1,249 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f8f9fa;
+			padding: 20px;
+		}
+
+		h1,
+		h2,
+		p {
+			margin: 0;
+			padding: 0;
+		}
+
+		.card {
+			width: 600px;
+			background: #fff;
+			border-radius: 16px;
+			padding: 20px;
+			/* margin: auto; */
+			margin-bottom: 20px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		}
+
+		.center {
+			text-align: center;
+		}
+
+		.subtitle {
+			color: #6b7280;
+			font-size: 14px;
+		}
+
+		.rom-grid {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+
+		.rom-item {
+			width: 30%;
+			margin: 10px;
+			text-align: center;
+		}
+
+		.rom-box {
+			border: 1px solid #e5e7eb;
+			border-radius: 16px;
+			padding: 16px;
+			display: inline-block;
+			width: 80%;
+			background: #f9fafb;
+		}
+
+		.rom-label {
+			margin-top: 8px;
+			font-weight: 600;
+			font-size: 14px;
+		}
+
+		.rom-value {
+			font-weight: bold;
+			font-size: 18px;
+		}
+
+		.blue {
+			color: #2563eb;
+			border-color: #bfdbfe;
+			background: #eff6ff;
+		}
+
+		.green {
+			color: #16a34a;
+			border-color: #bbf7d0;
+			background: #f0fdf4;
+		}
+
+		.purple {
+			color: #7e22ce;
+			border-color: #e9d5ff;
+			background: #faf5ff;
+		}
+
+		.orange {
+			color: #f97316;
+			border-color: #fed7aa;
+			background: #fff7ed;
+		}
+
+		.teal {
+			color: #0d9488;
+			border-color: #99f6e4;
+			background: #f0fdfa;
+		}
+
+		.pink {
+			color: #db2777;
+			border-color: #fbcfe8;
+			background: #fdf2f8;
+		}
+
+		img {
+			width: 64px;
+			height: 64px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="center" style="margin-bottom:20px;">
+		<h2>{{title}}</h2>
+		<p class="subtitle">{{datetime}}</p>
+	</div>
+
+	<div class="card">
+		<div style="display:flex; align-items:center; margin-bottom:20px;">
+			<span style="font-size:22px; color:#2563eb; margin-right:8px;">&#x21BB;</span>
+			<h2>Range of Motion Visualisation</h2>
+		</div>
+
+		<div class="rom-grid">
+
+			<div class="rom-item">
+				<div class="rom-box blue">
+					<img src={{base64_extension}} />
+					<div class="rom-label blue">Extension</div>
+					<div class="rom-value blue">{{extension}}°</div>
+				</div>
+			</div>
+
+			<div class="rom-item">
+				<div class="rom-box green">
+					<img src={{base64_flexion}} />
+					<div class="rom-label green">Flexion</div>
+					<div class="rom-value green">{{flexion}}°</div>
+				</div>
+
+			</div>
+
+			<div class="rom-item">
+				<div class="rom-box purple">
+					<img src={{base64_leftRotation}} style="transform: rotate(180deg);" />
+					<div class="rom-label purple">Left Rotation</div>
+					<div class="rom-value purple">{{leftRotation}}°</div>
+				</div>
+
+			</div>
+
+			<div class="rom-item">
+				<div class="rom-box orange">
+					<img src={{base64_rightRotation}} style="transform: rotate(180deg);" />
+					<div class="rom-label orange">Right Rotation</div>
+					<div class="rom-value orange">{{rightRotation}}°</div>
+				</div>
+
+			</div>
+
+			<div class="rom-item">
+				<div class="rom-box teal">
+					<img src={{base64_leftLateral}} />
+					<div class="rom-label teal">Left Lateral</div>
+					<div class="rom-value teal">{{leftLateral}}°</div>
+				</div>
+
+			</div>
+
+			<div class="rom-item">
+				<div class="rom-box pink">
+					<img src={{base64_rightLateral}} />
+					<div class="rom-label pink">Right Lateral</div>
+					<div class="rom-value pink">{{rightLateral}}°</div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+	<div style="
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  ">
+		<p style="font-weight: bold;">Clinical Assessment:</p>
+		<br />
+		Based on standard cervical spine range of motion testing. Each visualisation shows the direction and measured
+		range of movement.
+		Perfect score for each direction ranges from 45-90°.
+	</div>
+
+	<div style="
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  ">
+		<!-- Header -->
+		<div style="display: flex; align-items: center;">
+			<div style="
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        background-color: #f9fafb;
+      ">
+				<!-- Alert icon (circle with exclamation mark) -->
+				<span style="font-size: 18px; color: gray;">&#9888;</span>
+			</div>
+			<span style="font-size: 18px; font-weight: 600; color: #1f2937;">Clinical Considerations</span>
+		</div>
+
+		<!-- Inner note box -->
+		<div style="
+      margin-top: 16px;
+      background-color: #eff6ff;
+      border: 1px solid #dbeafe;
+      border-radius: 8px;
+      padding: 16px;
+    ">
+			<p style="font-size: 14px; font-weight: 600; color: #1e40af; margin-bottom: 8px;">
+				Range of Motion Assessment Notes:
+			</p>
+
+			<div style="padding-left: 8px;">
+				<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
+					• Values shown represent maximum achievable ranges in each direction
+				</p>
+				<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
+					• Consider pain levels and patient comfort during interpretation
+				</p>
+				<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
+					• Compare with age-matched normative data and previous assessments
+				</p>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

@@ -12,7 +12,7 @@ import {
 
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { RotateCcw, PenLine, CircleCheckBig, Clock } from 'lucide-react-native'
+import { RotateCcw, LucideTarget, PenLine, CircleCheckBig, Clock } from 'lucide-react-native'
 import { styled } from 'nativewind';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../model/RootStackParamList";
@@ -24,6 +24,7 @@ const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
 const LuCircleCheckBig = styled(CircleCheckBig);
 const LuClock = styled(Clock);
+const LuTarget = styled(LucideTarget);
 
 type Feature = {
 	id: string;
@@ -37,6 +38,13 @@ const romFeatures: Feature[] = [
 	{ id: 'f2', text: 'Left/Right rotation tracking' },
 	{ id: 'f3', text: 'Lateral flexion analysis' },
 	// { id: 'f4', text: 'Symmetry and smoothness metrics' },
+];
+
+const jpsFeatures: Feature[] = [
+	{ id: 'f1', text: 'Neutral position targeting' },
+	{ id: 'f2', text: 'Multiple target positions' },
+	{ id: 'f3', text: 'Mean error calculation' },
+	{ id: 'f4', text: 'Variability scoring' },
 ];
 
 const AssessmentSelection = () => {
@@ -170,6 +178,61 @@ const AssessmentSelection = () => {
 					<View className="space-y-3">
 						<FlatList
 							data={romFeatures}
+							keyExtractor={(i) => i.id}
+							renderItem={renderFeature}
+							scrollEnabled={false}
+						/>
+						{/* <View className="flex-row items-center gap-2">
+							<LuClock size={15} className="text-xs" color="gray"></LuClock>
+							<Text className="text-xs text-gray-500 text-muted">Duration: ~10-12 minutes</Text>
+						</View> */}
+					</View>
+				</View>
+
+				{/* JPS Card */}
+				<View className="bg-white rounded-xl p-5 shadow-md mt-5">
+					<View className="flex-row items-center">
+						{/* Icon circle */}
+						<View className="w-12 h-12 rounded-xl bg-gray-200 items-center justify-center mr-3">
+							{/* small rotation icon */}
+							<LuTarget size={22} className="text-gray-500"></LuTarget>
+						</View>
+						<Text className="text-xl">Joint Position Sense (JPS)</Text>
+
+					</View>
+
+					{/* Start button */}
+					<View className="mt-5">
+						<TouchableOpacity
+							onPress={onPressGotoAssessment}
+							className="rounded-lg overflow-hidden"
+							activeOpacity={0.9}>
+							<LinearGradient
+								colors={['#45556c', '#45556c']}
+								start={[0, 0]}
+								end={[1, 0]}
+								className="rounded-lg"
+								style={{ paddingVertical: 14, alignItems: 'center' }}
+							>
+
+								<View className="flex-row items-center gap-2">
+									<LuRotateCcw size={18} className="" color="white"></LuRotateCcw>
+									<Text className="text-white font-semibold">Start JPS Assessment</Text>
+								</View>
+							</LinearGradient>
+						</TouchableOpacity>
+					</View>
+
+					<View className="flex-1 py-2">
+						<Text className="text-md text-gray-400 mt-1">
+							Evaluate proprioceptive accuracy by measuring the patient's ability to return to target positions with eyes closed.
+						</Text>
+					</View>
+
+					{/* Features list */}
+					<View className="space-y-3">
+						<FlatList
+							data={jpsFeatures}
 							keyExtractor={(i) => i.id}
 							renderItem={renderFeature}
 							scrollEnabled={false}
