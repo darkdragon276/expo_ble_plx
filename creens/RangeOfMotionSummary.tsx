@@ -22,6 +22,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system/legacy';
+import { loadImg } from "../utils/helper";
 
 const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
@@ -127,6 +128,8 @@ const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) =>
 	)
 };
 
+let resultROMSummary: DataProp;
+
 const RangeOfMotionSummary = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const db = useDatabase("headx.db");
@@ -156,13 +159,14 @@ const RangeOfMotionSummary = () => {
 			),
 			headerRight: () => (
 				<View className="flex-row items-center justify-center mb-1 mr-4">
-					<Pressable
+					<TouchableOpacity
+						activeOpacity={0.1}
 						onPress={printPDF}
 						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
 					>
 						<LuFileText size={18} color="black" />
 						<Text className="ml-1 text-sm font-medium">Export PDF</Text>
-					</Pressable >
+					</TouchableOpacity >
 				</View>
 			)
 		});
@@ -180,6 +184,8 @@ const RangeOfMotionSummary = () => {
 				const rs = await db.getFirstAsync<DataProp>(DB_SELECT_BY_ID_ROM, key);
 				if (rs) {
 					const { date_MM_dd_yyyy_hh_mm_ss_ampm, date_MM_dd_yyyy_at_hh_mm_ampm, date_short } = useConvertDateTime(new Date(rs.date));
+					resultROMSummary = rs;
+					resultROMSummary.date = date_MM_dd_yyyy_at_hh_mm_ampm
 					setData(rs);
 					setDateConvert({ date_MM_dd_yyyy_hh_mm_ss_ampm, date_MM_dd_yyyy_at_hh_mm_ampm, date_short })
 				}
@@ -202,18 +208,12 @@ const RangeOfMotionSummary = () => {
 		navigation.replace("AssessmentHistory");
 	};
 
-	const loadImg = async (localSrc: any) => {
-		const src = Asset.fromModule(localSrc)
-		await src.downloadAsync();
-		const base64 = await FileSystem.readAsStringAsync(src.localUri || "", {
-			encoding: "base64"
-		});
-
-		return `data:image/png;base64,${base64}`;
-	}
-
 	const printPDF = async () => {
 
+		// data for .html
+		const data = resultROMSummary
+
+		// convert image to base64
 		const extensionSrcImage = await loadImg(ExtensionSrcImage);
 		const flexionSrcImage = await loadImg(FlexionSrcImage);
 		const leftRotationSrcImage = await loadImg(LeftRotationSrcImage);
@@ -221,16 +221,16 @@ const RangeOfMotionSummary = () => {
 		const leftLateralSrcImage = await loadImg(LeftLateralSrcImage);
 		const rightLateralSrcImage = await loadImg(RightLateralSrcImage);
 
+		// load ROM html template
 		const template = Asset.fromModule(require('../assets/PDFTemplate/ROMTemplate.html'));
 		await template.downloadAsync();
 
 		const htmlTemplate = await FileSystem.readAsStringAsync(template.localUri || "");
 
-		//console.log(data?.extension)
-		//return;
+		// loaded data to html template
 		const html = htmlTemplate
 			.replace('{{title}}', data?.title || "")
-			.replace('{{datetime}}', `ROM Assessment - ${dateConvert?.date_MM_dd_yyyy_at_hh_mm_ampm}`)
+			.replace('{{datetime}}', `ROM Assessment - ${data.date}`)
 			//assessments
 			.replace('{{extension}}', data?.extension?.toString() || "")
 			.replace('{{flexion}}', data?.flexion?.toString() || "")
@@ -249,9 +249,17 @@ const RangeOfMotionSummary = () => {
 		// create PDF from .html
 		const { uri } = await Print.printToFileAsync({ html });
 
-		// Open or share file PDF
+		// rename file
+		const newPath = `${FileSystem.documentDirectory}${data?.title}.pdf`;
+
+		await FileSystem.moveAsync({
+			from: uri,
+			to: newPath,
+		});
+
+		// open or share file PDF
 		if (await Sharing.isAvailableAsync()) {
-			await Sharing.shareAsync(uri);
+			await Sharing.shareAsync(newPath);
 		}
 	};
 
