@@ -1,10 +1,10 @@
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { CartesianChart, ChartBounds, Line, PointsArray, Scatter, useChartPressState, useLinePath } from 'victory-native';
+import React, { useEffect, useRef, useState } from 'react'
+import { CartesianActionsHandle, CartesianChart, ChartBounds, Line, PointsArray, Scatter, useChartPressState, useChartTransformState, useLinePath } from 'victory-native';
 import { useFont, Circle, Path, Canvas, Text as SKText, Paint, Line as SkiaLine, vec, Group, RoundedRect } from '@shopify/react-native-skia';
 import { SharedValue, useDerivedValue, useSharedValue, withDecay } from 'react-native-reanimated';
 import { styled } from 'nativewind';
-import { RotateCcw } from 'lucide-react-native';
+import { RotateCcw, X } from 'lucide-react-native';
 import type { DataHistory } from "../../model/AssessmentHistory";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
@@ -42,7 +42,7 @@ const ToolTip = ({ x
 		, valToolTipLLateral: any
 		, valToolTipRlateral: any
 	}) => {
-	//console.log(valToolTipExtension)
+
 	return (
 		<>
 			<Circle cx={x} cy={y.extension.position} r={3} color={colors.extension} />
@@ -55,7 +55,7 @@ const ToolTip = ({ x
 			<Group
 				transform={[
 					{
-						translateX: x.value,
+						translateX: x.value
 					},
 					{
 						translateY: chartBounds.top + 10,
@@ -91,23 +91,101 @@ const ToolTip = ({ x
 	)
 }
 
+const ActiveValueIndicator = ({
+	xPosition,
+	yPosition,
+	top,
+	bottom,
+	activeValueDate,
+	activeValueExtension,
+	activeValueFlexion,
+	activeValueLRotation,
+	activeValueRRotation,
+	activeValueLLateral,
+	activeValueRlateral,
+	topOffset = 0,
+	font,
+	chartBounds
+}: {
+	xPosition: SharedValue<number>;
+	yPosition: any;
+	activeValueDate: SharedValue<string>;
+	activeValueExtension: SharedValue<string>;
+	activeValueFlexion: SharedValue<string>;
+	activeValueLRotation: SharedValue<string>;
+	activeValueRRotation: SharedValue<string>;
+	activeValueLLateral: SharedValue<string>;
+	activeValueRlateral: SharedValue<string>;
+	bottom: number;
+	top: number;
+	topOffset?: number;
+	font: any;
+	chartBounds: ChartBounds;
+}) => {
+	const start = useDerivedValue(() => vec(xPosition.value, bottom));
+	const end = useDerivedValue(() =>
+		vec(xPosition.value, top)//top + 1.5 * FONT_SIZE + topOffset),
+	);
+
+	const activeValueX = useDerivedValue(
+		() => {
+			if (chartBounds.right - xPosition.value <= 100) {
+				return xPosition.value - 120;
+			}
+			return xPosition.value + 5;
+		}
+	);
+
+	return (
+		<>
+			{ /* straight line */}
+			<SkiaLine p1={start} p2={end} strokeWidth={1} color="gray" />
+			{ /* scatter */}
+			<Circle cx={xPosition} cy={yPosition.extension.position} r={4} color={colors.extension} />
+			<Circle cx={xPosition} cy={yPosition.flexion.position} r={4} color={colors.flexion} />
+			<Circle cx={xPosition} cy={yPosition.l_lateral.position} r={4} color={colors.l_lateral} />
+			<Circle cx={xPosition} cy={yPosition.l_rotation.position} r={4} color={colors.l_rotation} />
+			<Circle cx={xPosition} cy={yPosition.r_rotation.position} r={4} color={colors.r_rotation} />
+			<Circle cx={xPosition} cy={yPosition.r_lateral.position} r={4} color={colors.r_lateral} />
+			{ /* value tooltip */}
+			<SKText x={activeValueX} y={20 + topOffset} font={font} text={activeValueDate} color="black" />
+			<SKText x={activeValueX} y={30 + topOffset} font={font} text={activeValueExtension} color={colors.extension} />
+			<SKText x={activeValueX} y={40 + topOffset} font={font} text={activeValueFlexion} color={colors.flexion} />
+			<SKText x={activeValueX} y={50 + topOffset} font={font} text={activeValueLRotation} color={colors.l_rotation} />
+			<SKText x={activeValueX} y={60 + topOffset} font={font} text={activeValueRRotation} color={colors.r_rotation} />
+			<SKText x={activeValueX} y={70 + topOffset} font={font} text={activeValueLLateral} color={colors.l_lateral} />
+			<SKText x={activeValueX} y={80 + topOffset} font={font} text={activeValueRlateral} color={colors.r_lateral} />
+		</>
+	);
+};
+
 const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) => {
 
 	const [data, setData] = useState<DataHistory[]>([])
 	const font = useFont(require("../../assets/fonts/calibrii.ttf"), 12);
 	const { state, isActive } = useChartPressState({ x: 0, y: { extension: 0, flexion: 0, l_lateral: 0, l_rotation: 0, r_lateral: 0, r_rotation: 0 } });
+	// const ref = useRef<CartesianActionsHandle<typeof state>>(null)
 	//const xGusturePan = useSharedValue(0);
+
+	// const tapGesture = Gesture.Tap().onStart((e) => {
+	// 	state.isActive.value = true;
+	// 	ref.current?.handleTouch(state, e.x, e.y);
+	// });
+
+	// const composed = Gesture.Race(tapGesture);
+	// console.log(composed);
 
 	// const pan =
 	// 	Gesture.Pan()
-	// 		.onStart((e) => {
-	// 			//console.log(e.x)
-	// 			xGusturePan.value += e.x;
-	// 		})
-	// 		.onUpdate((e) => {
-	// 			xGusturePan.value = e.x;
-	// 			//console.log(xGusturePan.value)
-	// 		});
+	//.onStart((e) => {
+	//console.log(e.x)
+	//xGusturePan.value += e.x;
+	//})
+	//.onTouchesMove((e) => {
+	//xGusturePan.value = e.x;
+	//console.log()
+	//console.log(e.state.toFixed(1))
+	//});
 
 	const valToolTipDate = useDerivedValue((): string => {
 		let date = "";
@@ -143,10 +221,6 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 		return "Right Lateral (°) : " + state.y.r_lateral.value.value.toString();
 	}, [state])
 
-	const valToolTipX = useDerivedValue((): string => {
-		return state.x.position.value.toString();
-	}, [state])
-
 	useEffect(() => {
 		const result = dataChart.filter(item => {
 			return item.type == "ROM";
@@ -159,7 +233,7 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 		return (
 			<>
 				<Path path={path} style="stroke" strokeWidth={strokeWidth} color={color} />
-				<Scatter points={points} radius={3} color="white">
+				<Scatter points={points} radius={2} color="white">
 					<Paint
 						color={color}
 						style="stroke"
@@ -171,7 +245,7 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 	}
 
 	return (
-		// <GestureDetector gesture={gesture}>
+		// <GestureDetector gesture={pan}>
 		<View className="bg-white rounded-2xl shadow-sm p-2 mb-2" style={{ height: 400 }}>
 			<View className="flex-row items-center">
 				<View className="items-center justify-center mr-3">
@@ -179,13 +253,12 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 				</View>
 				<Text className="text-xl">Range of Motion Progress</Text>
 			</View>
-
 			<CartesianChart
 				data={data}
 				xKey="xIndex"
 				yKeys={['extension', 'flexion', 'l_lateral', 'l_rotation', 'r_lateral', 'r_rotation']}
 				padding={{ left: 10, top: 10 }}
-				domainPadding={{ right: 3, left: 30, bottom: 3, top: 3 }}
+				//domainPadding={{ right: 3, left: 30, bottom: 3, top: 3 }}
 				chartPressState={state}
 				axisOptions={{
 					font,
@@ -206,8 +279,41 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 						return date
 					}
 				}}
+				// transformConfig={{
+				// 	pan: {
+				// 		enabled: true,
+				// 		dimensions: ["x"],
+				// 	},
+				// }}
+				renderOutside={({ chartBounds }) => {
+					return (
+						<>
+							{isActive && (
+								<>
+									<ActiveValueIndicator
+										xPosition={state.x.position}
+										yPosition={state.y}
+										bottom={chartBounds.bottom}
+										top={chartBounds.top}
+										font={font}
+										activeValueDate={valToolTipDate}
+										activeValueExtension={valToolTipExtension}
+										activeValueFlexion={valToolTipFlexion}
+										activeValueLRotation={valToolTipLRotation}
+										activeValueRRotation={valToolTipRRotation}
+										activeValueLLateral={valToolTipLLateral}
+										activeValueRlateral={valToolTipRlateral}
+										topOffset={0}
+										chartBounds={chartBounds}
+									/>
+								</>
+							)}
+
+						</>
+					);
+				}}
 			>
-				{({ points, chartBounds }) => (
+				{({ points }) => (
 					<>
 						<NaturalLine points={points.extension} color={colors.extension} strokeWidth={1.5} />
 						<NaturalLine points={points.flexion} color={colors.flexion} strokeWidth={1.5} />
@@ -215,24 +321,6 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 						<NaturalLine points={points.l_rotation} color={colors.l_rotation} strokeWidth={1.5} />
 						<NaturalLine points={points.r_lateral} color={colors.r_lateral} strokeWidth={1.5} />
 						<NaturalLine points={points.r_rotation} color={colors.r_rotation} strokeWidth={1.5} />
-						{isActive && (
-							<>
-								<ToolTip
-									x={state.x.position}
-									y={state.y}
-									font={font}
-									chartBounds={chartBounds}
-									//valToolTipX={valToolTipX}
-									valToolTipDate={valToolTipDate}
-									valToolTipExtension={valToolTipExtension}
-									valToolTipFlexion={valToolTipFlexion}
-									valToolTipLRotation={valToolTipLRotation}
-									valToolTipRRotation={valToolTipRRotation}
-									valToolTipLLateral={valToolTipLLateral}
-									valToolTipRlateral={valToolTipRlateral}
-								/>
-							</>
-						)}
 					</>
 				)}
 			</CartesianChart>
