@@ -107,6 +107,10 @@ const AssessmentSelection = () => {
 		navigation.replace("RangeOfMotion", { title: title })
 	}
 
+	const onPressGotoJPS = () => {
+		navigation.replace("JointPositionSense")
+	}
+
 	return (
 		<ScrollView className="flex-1 bg-gray-50 p-4">
 			<View className="w-full">
@@ -204,7 +208,7 @@ const AssessmentSelection = () => {
 					{/* Start button */}
 					<View className="mt-5">
 						<TouchableOpacity
-							onPress={onPressGotoAssessment}
+							onPress={onPressGotoJPS}
 							className="rounded-lg overflow-hidden"
 							activeOpacity={0.9}>
 							<LinearGradient

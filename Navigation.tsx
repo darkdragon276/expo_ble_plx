@@ -7,6 +7,7 @@ import AssessmentSelection from './creens/AssessmentSelection';
 import RangeOfMotion from './creens/RangeOfMotion';
 import RangeOfMotionSummary from './creens/RangeOfMotionSummary';
 import AssessmentHistory from './creens/AssessmentHistory';
+import JointPositionSense from './creens/JointPositionSense';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -36,6 +37,11 @@ const Navigatior = () => {
 				options={{
 					title: '',
 				}} >
+			</Stack.Screen>
+			<Stack.Screen
+				name="JointPositionSense"
+				component={JointPositionSense}
+			>
 			</Stack.Screen>
 			<Stack.Screen
 				name="RangeOfMotion"
