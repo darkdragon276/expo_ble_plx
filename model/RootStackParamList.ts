@@ -7,4 +7,5 @@ export type RootStackParamList = {
 	BLEScanner: undefined;
 	RangeOfMotionSummary: { key: string };
 	AssessmentHistory: undefined;
+	JointPositionSense: undefined;
 };
