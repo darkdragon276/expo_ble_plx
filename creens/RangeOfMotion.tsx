@@ -308,7 +308,7 @@ const RangeOfMotion = () => {
                             >
                                 <LuSquare size={20} color="white"></LuSquare>
                                 <Text className="text-white font-semibold ml-2 p-3">Stop Recording</Text>
-                                <AssessmentDuration record={record} ref={refDuration}></AssessmentDuration>
+                                <AssessmentDuration record={record} ref={refDuration} mode={"ROM"}></AssessmentDuration>
                             </LinearGradient>
                         </TouchableOpacity>
                 }
