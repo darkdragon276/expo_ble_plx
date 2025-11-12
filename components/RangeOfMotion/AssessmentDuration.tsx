@@ -4,9 +4,10 @@ import { ChildROMRef } from '../../model/ChildRefGetValue';
 
 type AssessmentCardProps = {
 	record: boolean;
+	mode: string
 };
 
-const AssessmentDuration = forwardRef<ChildROMRef, AssessmentCardProps>(({ record }, ref) => {
+const AssessmentDuration = forwardRef<ChildROMRef, AssessmentCardProps>(({ record, mode }, ref) => {
 	const secondsRef = useRef(1);
 	const [timer, setTimer] = useState<string>("0:01")
 	const [seconds, setSeconds] = useState<number>(1)
@@ -56,7 +57,13 @@ const AssessmentDuration = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 
 	return (
 		<View>
-			<Text className="text-white font-semibold">({timer})</Text>
+			{
+				mode == "ROM"
+					?
+					<Text className="text-white font-semibold">({timer})</Text>
+					:
+					<Text className="text-green-800 font-semibold">{timer}</Text>
+			}
 		</View>
 	)
 });
