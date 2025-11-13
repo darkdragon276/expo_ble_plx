@@ -20,24 +20,24 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 
 	useEffect(() => {
 
-		// const reStart = () => {
-		// 	setTimeout(() => {
-		// 		reset.current = false;
-		// 	}, 1000);
-		// }
+		const reStart = () => {
+			setTimeout(() => {
+				reset.current = false;
+			}, 1000);
+		}
 
-		// // dummy position for test
-		// const interval = setInterval(() => {
-		// 	const t = Date.now() / 1000;
-		// 	let x = 100 * Math.cos(t);
-		// 	let y = 120 * Math.sin(t * 1.5);
-		// 	if (reset.current) {
-		// 		reStart();
-		// 		x = 0;
-		// 		y = 0;
-		// 	}
-		// 	updateCursorPosition(x, y);
-		// }, 50);
+		// dummy position for test
+		const interval = setInterval(() => {
+			const t = Date.now() / 1000;
+			let x = 100 * Math.cos(t);
+			let y = 120 * Math.sin(t * 1.5);
+			if (reset.current) {
+				reStart();
+				x = 0;
+				y = 0;
+			}
+			updateCursorPosition(x, y);
+		}, 50);
 
 		if (BLEService.deviceId === null) {
 			Alert.alert('Device disconnected', `Force stop ROM session!`, [
@@ -49,19 +49,19 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 			return;
 		};
 
-		BLEService.startSequence();
-		liveData();
+		// BLEService.startSequence();
+		// liveData();
 
 		return () => {
-			//clearInterval(interval);
-			try {
-				if (BLEService.getDevice() != null) {
-					BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
-				}
-			} catch (cleanupError) {
-				////console.error("Error to cleanup BleManager:", cleanupError);
-			}
-			BLEService.stopSequence();
+			clearInterval(interval);
+			// try {
+			// 	if (BLEService.getDevice() != null) {
+			// 		BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
+			// 	}
+			// } catch (cleanupError) {
+			// 	////console.error("Error to cleanup BleManager:", cleanupError);
+			// }
+			// BLEService.stopSequence();
 		}
 	}, []);
 
@@ -71,63 +71,63 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 		}, 1000);
 	}
 
-	const liveData = async () => {
-		const onError = (error: BleError): void => {
-			if (BLEService.isDisconnectError(error) ||
-				error.errorCode === BleErrorCode.CharacteristicNotifyChangeFailed ||
-				error.errorCode === BleErrorCode.CharacteristicReadFailed) {
-				BLEService.deviceId = null;
-				Alert.alert('Device disconnected', `Force stop ROM session!`, [
-					{
-						text: 'OK',
-						onPress: () => { rejectCauseDisconect() }
-					}
-				]);
-			}
-		};
+	// const liveData = async () => {
+	// 	const onError = (error: BleError): void => {
+	// 		if (BLEService.isDisconnectError(error) ||
+	// 			error.errorCode === BleErrorCode.CharacteristicNotifyChangeFailed ||
+	// 			error.errorCode === BleErrorCode.CharacteristicReadFailed) {
+	// 			BLEService.deviceId = null;
+	// 			Alert.alert('Device disconnected', `Force stop ROM session!`, [
+	// 				{
+	// 					text: 'OK',
+	// 					onPress: () => { rejectCauseDisconect() }
+	// 				}
+	// 			]);
+	// 		}
+	// 	};
 
-		const onMonitor = (char: Characteristic) => {
-			let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
-			let x, y;
-			if (data) {
-				krossDevice.unpack(data);
+	// 	const onMonitor = (char: Characteristic) => {
+	// 		let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
+	// 		let x, y;
+	// 		if (data) {
+	// 			krossDevice.unpack(data);
 
-				x = krossDevice.angle.pitch;
-				y = krossDevice.angle.yaw
+	// 			x = krossDevice.angle.pitch;
+	// 			y = krossDevice.angle.yaw
 
-				if (reset.current) {
-					reStart();
-					x = 0;
-					y = 0;
-				}
-				updateCursorPosition(x, y);
-			}
-			//console.log("Monitor: ", char?.value);
-		}
+	// 			if (reset.current) {
+	// 				reStart();
+	// 				x = 0;
+	// 				y = 0;
+	// 			}
+	// 			updateCursorPosition(x, y);
+	// 		}
+	// 		//console.log("Monitor: ", char?.value);
+	// 	}
 
-		await BLEService.discoverAllServicesAndCharacteristicsForDevice()
-			.then(() => {
-				BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
-			})
-			.catch((error) => {
-				if (BLEService.isDisconnectError(error)) {
-					BLEService.deviceId = null;
-					Alert.alert('Device disconnected', `Force stop ROM session!`, [
-						{
-							text: 'OK',
-							onPress: () => { rejectCauseDisconect() }
-						}
-					]);
-				}
-			});
-	}
+	// 	await BLEService.discoverAllServicesAndCharacteristicsForDevice()
+	// 		.then(() => {
+	// 			BLEService.setupMonitor(BLEService.SERVICE_UUID, BLEService.DATA_OUT_UUID, onMonitor, onError, BLEService.READ_DATA_TRANSACTION_ID);
+	// 		})
+	// 		.catch((error) => {
+	// 			if (BLEService.isDisconnectError(error)) {
+	// 				BLEService.deviceId = null;
+	// 				Alert.alert('Device disconnected', `Force stop ROM session!`, [
+	// 					{
+	// 						text: 'OK',
+	// 						onPress: () => { rejectCauseDisconect() }
+	// 					}
+	// 				]);
+	// 			}
+	// 		});
+	// }
 
-	const rejectCauseDisconect = async () => {
-		await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
-		setTimeout(async () => {
-			navigation.replace("Main");
-		}, 50)
-	};
+	// const rejectCauseDisconect = async () => {
+	// 	await BLEService.cancelTransaction(BLEService.READ_DATA_TRANSACTION_ID);
+	// 	setTimeout(async () => {
+	// 		navigation.replace("Main");
+	// 	}, 50)
+	// };
 
 	// limits within a circle
 	const updateCursorPosition = (x: number, y: number) => {

@@ -4,4 +4,8 @@ type LiveHeadPositionProps = {
 	current: string;
 }
 
-export { type LiveHeadPositionProps }
+interface LiveRecorded extends LiveHeadPositionProps {
+	id: string
+}
+
+export { type LiveHeadPositionProps, type LiveRecorded }
