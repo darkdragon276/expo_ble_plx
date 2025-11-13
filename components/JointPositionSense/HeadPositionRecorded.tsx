@@ -1,15 +1,15 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
 import React, { memo, useEffect, useState } from 'react'
-import { type LiveHeadPositionProps } from '../../model/JointPosition';
+import { type LiveRecorded } from '../../model/JointPosition';
 
-interface LiveRecorded extends LiveHeadPositionProps {
-	id: string
-}
+type HeadPositionRecordedChildProps = {
+	getData: () => LiveRecorded;
+	subscribe: (callback: () => void) => void;
+};
 
 const SessionItem = memo(({ item }: { item: LiveRecorded }) => {
-
 	return (
-		<View className="bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
+		<View className="bg-white rounded-2xl border border-gray-200 shadow-sm">
 			<View className="flex-row justify-between items-center">
 				<Text className="text-md font-bold">{item.current}</Text>
 				<View className="flex-column items-center">
@@ -17,7 +17,7 @@ const SessionItem = memo(({ item }: { item: LiveRecorded }) => {
 						className="px-3 py-1 rounded-full">
 						<Text
 							className="text-xs font-semibold">
-							H: {item.horizontal}° | H: {item.vertical}°
+							H: {item.horizontal.toFixed(1)}° | V: {item.vertical.toFixed(1)}°
 						</Text>
 					</View>
 				</View>
@@ -26,23 +26,26 @@ const SessionItem = memo(({ item }: { item: LiveRecorded }) => {
 	);
 });
 
-const HeadPositionRecorded = ({ record }: { record: React.RefObject<any> }) => {
+const HeadPositionRecorded: React.FC<HeadPositionRecordedChildProps> = ({ getData, subscribe }) => {
 
 	const [data, setData] = useState<LiveRecorded[]>([]);
 
-	console.log(record.current)
 	useEffect(() => {
-		setData(prevList => [...prevList, record.current]);
-	}, [record.current]);
+		subscribe(() => {
+			const newRecord = getData();
+			if (!newRecord) return;
+			setData(prevList => [...prevList, newRecord]);
+		});
+	}, [getData, subscribe]);
 
 	return (
-		<View className="flex-1 bg-white rounded-2xl m-4 px-6 py-4">
-			{/* <FlatList
+		<View className="flex-1 bg-white rounded-2xl">
+			<FlatList
 				data={data}
-				keyExtractor={(item) => item.current}
+				keyExtractor={(item) => item.id}
 				renderItem={({ item }) => <SessionItem item={item} />}
 				scrollEnabled={false}
-			/> */}
+			/>
 		</View>
 	)
 }

@@ -3,15 +3,16 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable, TouchableOpacity } from 'react-native';
 import { RootStackParamList } from '../../model/RootStackParamList';
-import { type LiveHeadPositionProps } from '../../model/JointPosition';
+import { type LiveHeadPositionProps, type LiveRecorded } from '../../model/JointPosition';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
-import Cursor from './Cursor';
+import LiveCursor from './LiveCursor';
 import HeadPosition from './HeadPosition';
 import { LucideTarget, LucideCircleCheckBig, LucideCircle } from 'lucide-react-native';
 import { styled } from 'nativewind';
 import { LinearGradient } from 'expo-linear-gradient';
 import HeadPositionRecorded from './HeadPositionRecorded';
+import MarkerCursor from './MarkerCursor';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const LuTarget = styled(LucideTarget);
@@ -22,17 +23,27 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 	const navigation = useNavigation<NavigationProp>();
 	const refPosition = useRef<LiveHeadPositionProps>(null)
 
-	const radius = 80;
-	const center = radius + 10;
-	const refRecord = useRef<LiveHeadPositionProps>(null);
+	const refRecord = useRef<LiveRecorded | any>(null);
+	const refRecordCnt = useRef<number>(0);
+	const subscribers = useRef<(() => void)[]>([]);
 
 	useEffect(() => {
 
 	}, []);
 
 	const onPressRecord = () => {
-		refRecord.current = refPosition.current;
-		//console.log(refRecord.current)
+		refRecordCnt.current += 1;
+		refRecord.current = {
+			id: refRecordCnt.current.toString(),
+			horizontal: refPosition.current ? refPosition.current.horizontal : 0,
+			vertical: refPosition.current ? refPosition.current?.vertical : 0,
+			current: refPosition.current ? refPosition.current?.current : ""
+		};
+		subscribers.current.forEach((fn) => fn());
+	};
+
+	const subscribe = (fn: () => void) => {
+		subscribers.current.push(fn);
 	};
 
 	return (
@@ -129,7 +140,11 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 					</Svg>
 
 					<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-						<Cursor dataRef={refPosition} reset={isReset} record={record}></Cursor>
+						<LiveCursor dataRef={refPosition} reset={isReset} record={record}></LiveCursor>
+					</View>
+
+					<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+						<MarkerCursor x={15.5} y={-57.3}></MarkerCursor>
 					</View>
 
 					{/* <View className="absolute top-1/2 left-1/2 w-3 h-3 bg-blue-600 rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg border-2 border-white">
@@ -213,7 +228,7 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 				record
 					?
 					<View>
-						<HeadPositionRecorded record={refRecord} ></HeadPositionRecorded>
+						<HeadPositionRecorded getData={() => refRecord ? refRecord.current : []} subscribe={subscribe}></HeadPositionRecorded>
 					</View>
 					:
 					<View></View>
