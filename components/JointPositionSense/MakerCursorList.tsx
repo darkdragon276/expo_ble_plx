@@ -6,7 +6,7 @@ import { MakerCursorProps } from '../../model/JointPosition'
 type MakerCursorChildProps = {
 	mode: string;
 	data: MakerCursorProps[] | null;
-	getData: () => MakerCursorProps;
+	getData: () => MakerCursorProps | undefined;
 	subscribe: (callback: () => void) => void;
 };
 

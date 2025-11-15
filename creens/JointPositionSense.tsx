@@ -23,6 +23,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 const JointPositionSense = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [record, setRecord] = useState(false);
+	const [idSession, setIdSession] = useState("");
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const animatedPos = useState(new Animated.ValueXY({ x: 0, y: 0 }))[0];
 	const refDuration = useRef<ChildROMRef>(null);
@@ -71,6 +72,8 @@ const JointPositionSense = () => {
 	}
 
 	const onPressStartRecord = () => {
+		const id = new Date().toISOString();
+		setIdSession(id);
 		setRecord(true);
 	}
 
@@ -213,7 +216,7 @@ const JointPositionSense = () => {
 			</View>
 
 			{/* Live Head Position */}
-			<LiveHeadPosition isReset={reset} refDuration={refDuration} record={record} ></LiveHeadPosition>
+			<LiveHeadPosition isReset={reset} refDuration={refDuration} record={record} id_session={idSession} ></LiveHeadPosition>
 
 			<View className="h-12"></View>
 

@@ -17,7 +17,7 @@ import MarkerCursor from './MarkerCursor';
 import MakerCursorList from './MakerCursorList';
 import { ChildROMRef } from '../../model/ChildRefGetValue';
 import { useDatabase } from '../../db/useDatabase';
-import { DB_INSERT_JPS, DB_SELECT_ALL_JPS } from '../../db/dbQuery';
+import { DB_INSERT_JPS, DB_INSERT_JPS_RECORD, DB_SELECT_ALL_JPS } from '../../db/dbQuery';
 import { getCurrentDateTime } from '../../utils/getDateTime';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -38,7 +38,7 @@ const dummyMarkerCursor: MakerCursorProps[] = [
 	}
 ]
 
-const LiveHeadPosition = ({ isReset, refDuration, record }: { isReset: React.RefObject<boolean>, refDuration: React.RefObject<ChildROMRef | null>, record: boolean }) => {
+const LiveHeadPosition = ({ isReset, refDuration, record, id_session }: { isReset: React.RefObject<boolean>, refDuration: React.RefObject<ChildROMRef | null>, record: boolean, id_session?: string | undefined }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const refPosition = useRef<LiveHeadPositionProps>(null)
 
@@ -52,6 +52,10 @@ const LiveHeadPosition = ({ isReset, refDuration, record }: { isReset: React.Ref
 	useEffect(() => {
 
 	}, []);
+
+	const onPressFinish = async () => {
+		navigation.replace("JointPositionSenseSummary", { key: id_session ?? "" })
+	}
 
 	const onPressRecord = async () => {
 		refRecordCnt.current += 1;
@@ -102,10 +106,17 @@ const LiveHeadPosition = ({ isReset, refDuration, record }: { isReset: React.Ref
 			title = `ROM Session - ${nowObj.localShortDateTime}`;
 		}
 
-		await db.runAsync(DB_INSERT_JPS, [key, title, dt, type, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
+		const idSession = id_session ?? "";
 
-		const rs = await db.getAllAsync(DB_SELECT_ALL_JPS);
-		console.log(rs)
+		await db.withTransactionAsync(async () => {
+			if (refRecordCnt.current <= 1) {
+				await db.runAsync(DB_INSERT_JPS, [key, idSession, refRecordCnt.current, title, dt, type, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
+			}
+			await db.runAsync(DB_INSERT_JPS_RECORD, [idSession, refRecordCnt.current, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
+		});
+
+		//const rs = await db.getAllAsync(DB_SELECT_ALL_JPS);
+		//console.log(rs)
 	};
 
 	return (
@@ -263,7 +274,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record }: { isReset: React.Ref
 						</TouchableOpacity>
 
 						<TouchableOpacity
-							onPress={() => { }}
+							onPress={onPressFinish}
 							activeOpacity={0.9}
 							className="rounded-xl overflow-hidden border border-gray-200 shadow w-1/2">
 							<LinearGradient

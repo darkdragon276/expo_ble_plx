@@ -157,8 +157,8 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 		}).start();
 
 		dataRef.current = {
-			horizontal: x,
-			vertical: y,
+			horizontal: newX,
+			vertical: newY,
 			current: getCurrentPositionText(x, y)
 		};
 	};
