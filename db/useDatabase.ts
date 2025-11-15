@@ -14,7 +14,7 @@ export function useDatabase(dbName: string = "headx.db") {
 				setDb(database);
 
 				await database.execAsync(`
-					CREATE TABLE IF NOT EXISTS TableROM (
+					CREATE TABLE IF NOT EXISTS tb_asm_rom (
 						id INTEGER PRIMARY KEY AUTOINCREMENT,
 						key 		text,
 						title		text,
@@ -30,12 +30,27 @@ export function useDatabase(dbName: string = "headx.db") {
 					)
 				`);
 
+				await database.execAsync(`
+					CREATE TABLE IF NOT EXISTS tb_asm_jps (
+						id INTEGER PRIMARY KEY AUTOINCREMENT,
+						key 		text,
+						title		text,
+						date		text,
+						type		text,
+						horizontal	decimal(3,1),
+						vertical	decimal(3,1),
+						angular		decimal(3,1),
+						current		text,
+						duration	decimal(3,1)
+					)
+				`);
+
 				// await database.execAsync(`
-				// 	DROP TABLE IF EXISTS TableROM
+				// 	DROP TABLE IF EXISTS tb_asm_rom
 				// `);
 
 				// await database.execAsync(`
-				// 	DELETE FROM TableROM
+				// 	DELETE FROM tb_asm_rom
 				// `);
 
 			} catch (error) {

@@ -3,7 +3,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable, TouchableOpacity } from 'react-native';
 import { RootStackParamList } from '../../model/RootStackParamList';
-import { type LiveHeadPositionProps, type LiveRecorded } from '../../model/JointPosition';
+import { MakerCursorProps, type LiveHeadPositionProps, type LiveRecorded } from '../../model/JointPosition';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
 import LiveCursor from './LiveCursor';
@@ -12,38 +12,100 @@ import { LucideTarget, LucideCircleCheckBig, LucideCircle } from 'lucide-react-n
 import { styled } from 'nativewind';
 import { LinearGradient } from 'expo-linear-gradient';
 import HeadPositionRecorded from './HeadPositionRecorded';
+import PositionCoordinates from './PositionCoordinates';
 import MarkerCursor from './MarkerCursor';
+import MakerCursorList from './MakerCursorList';
+import { ChildROMRef } from '../../model/ChildRefGetValue';
+import { useDatabase } from '../../db/useDatabase';
+import { DB_INSERT_JPS, DB_SELECT_ALL_JPS } from '../../db/dbQuery';
+import { getCurrentDateTime } from '../../utils/getDateTime';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const LuTarget = styled(LucideTarget);
 const LuCircleCheckBig = styled(LucideCircleCheckBig);
 const LuCircle = styled(LucideCircle);
 
-const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolean>, record: boolean }) => {
+const dummyMarkerCursor: MakerCursorProps[] = [
+	{
+		id: "1",
+		x: 15.5,
+		y: -57.3,
+	},
+	{
+		id: "2",
+		x: -68.1,
+		y: -39.9,
+	}
+]
+
+const LiveHeadPosition = ({ isReset, refDuration, record }: { isReset: React.RefObject<boolean>, refDuration: React.RefObject<ChildROMRef | null>, record: boolean }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const refPosition = useRef<LiveHeadPositionProps>(null)
 
 	const refRecord = useRef<LiveRecorded | any>(null);
+	const refMarkerCursor = useRef<MakerCursorProps | any>(null);
 	const refRecordCnt = useRef<number>(0);
 	const subscribers = useRef<(() => void)[]>([]);
+
+	const db = useDatabase("headx.db");
 
 	useEffect(() => {
 
 	}, []);
 
-	const onPressRecord = () => {
+	const onPressRecord = async () => {
 		refRecordCnt.current += 1;
 		refRecord.current = {
 			id: refRecordCnt.current.toString(),
 			horizontal: refPosition.current ? refPosition.current.horizontal : 0,
-			vertical: refPosition.current ? refPosition.current?.vertical : 0,
-			current: refPosition.current ? refPosition.current?.current : ""
+			vertical: refPosition.current ? refPosition.current.vertical : 0,
+			current: refPosition.current ? refPosition.current.current : "",
+			time: refDuration.current ? refDuration.current.getValue() : "",
+			angular: (refPosition.current && refPosition.current) ? Math.hypot(refPosition.current.horizontal, refPosition.current.vertical).toFixed(1) : 0
 		};
+
+		refMarkerCursor.current = {
+			id: refRecordCnt.current.toString(),
+			x: refPosition.current ? refPosition.current.horizontal : 0,
+			y: refPosition.current ? refPosition.current.vertical : 0,
+			z: 0
+		};
+
+		try {
+			const key: string = Date.now().toString();
+			let NowObj = { localShortDateTime: "", strNow: "" };
+			NowObj.strNow = getCurrentDateTime().strNowISO;
+			NowObj.localShortDateTime = getCurrentDateTime().localShortDateTime;
+
+			addJPSData(key, NowObj, refRecord.current);
+
+		} catch (e) { }
+
 		subscribers.current.forEach((fn) => fn());
 	};
 
 	const subscribe = (fn: () => void) => {
 		subscribers.current.push(fn);
+	};
+
+	const addJPSData = async (key: string, nowObj: { localShortDateTime: string, strNow: string }, record: LiveRecorded) => {
+		if (!db) {
+			return;
+		}
+
+		//let { title } = route.params;
+		let title = "test JPS";
+		const dt: string = nowObj.strNow;
+		const type: string = "JPS";
+
+		if (title == "") {
+			title = `ROM Session - ${nowObj.localShortDateTime}`;
+		}
+
+		await db.runAsync(DB_INSERT_JPS, [key, title, dt, type, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
+
+		const rs = await db.getAllAsync(DB_SELECT_ALL_JPS);
+		console.log(rs)
 	};
 
 	return (
@@ -60,8 +122,14 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 
 				{/* svg */}
 				<View className="relative w-48 h-48 mx-auto my-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full border-2 border-gray-300 shadow-inner">
-					<Svg className="absolute inset-0 w-full h-full" viewBox="0 0 192 192">
-						{/* Circles */}
+
+					<PositionCoordinates>
+						<LiveCursor dataRef={refPosition} reset={isReset} record={record}></LiveCursor>
+						<MakerCursorList mode={"LIVE"} getData={() => refMarkerCursor ? refMarkerCursor.current : []} subscribe={subscribe} data={dummyMarkerCursor}></MakerCursorList>
+					</PositionCoordinates>
+
+					<>
+						{/* <Svg className="absolute inset-0 w-full h-full" viewBox="0 0 192 192">
 						<Circle
 							cx="96"
 							cy="96"
@@ -98,7 +166,6 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 							strokeWidth="1"
 							strokeDasharray="2,2"
 						/>
-						{/* Cross lines */}
 						<Line
 							x1="96"
 							y1="11"
@@ -117,7 +184,6 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 							strokeWidth="1"
 							strokeDasharray="4,2"
 						/>
-						{/* Diagonals */}
 						<Line
 							x1="29"
 							y1="29"
@@ -147,9 +213,6 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 						<MarkerCursor x={15.5} y={-57.3}></MarkerCursor>
 					</View>
 
-					{/* <View className="absolute top-1/2 left-1/2 w-3 h-3 bg-blue-600 rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg border-2 border-white">
-				</View> */}
-
 					<View className="absolute -top-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
 						<Text>Flexion</Text>
 					</View>
@@ -164,7 +227,8 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 
 					<View className="absolute top-1/2 -right-7 transform -translate-y-1/2 text-xs font-medium text-gray-600 rotate-90">
 						<Text>Right</Text>
-					</View>
+					</View> */}
+					</>
 				</View>
 
 				<View className="flex-row space-x-3 mt-3">
@@ -182,44 +246,36 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 			{
 				record
 					?
-					<View>
-						<View className="flex-row space-x-2 mb-4">
-							<TouchableOpacity
-								onPress={onPressRecord}
-								activeOpacity={0.9}
-								className="rounded-xl overflow-hidden border border-gray-200 shadow w-1/2">
-								<LinearGradient
-									colors={["#1447e6", "#007595"]}
-									start={[0, 0]}
-									end={[1, 0]}
-									className="flex-row items-center justify-center py-4 px-8"
-								>
-									<LuCircle size={20} color="white"></LuCircle>
-									<Text className="text-white font-semibold p-3">Record Position</Text>
-								</LinearGradient>
-							</TouchableOpacity>
+					<View className="flex-row space-x-2">
+						<TouchableOpacity
+							onPress={onPressRecord}
+							activeOpacity={0.9}
+							className="rounded-xl overflow-hidden border border-gray-200 shadow w-1/2">
+							<LinearGradient
+								colors={["#1447e6", "#007595"]}
+								start={[0, 0]}
+								end={[1, 0]}
+								className="flex-row items-center justify-center py-4 px-8"
+							>
+								<LuCircle size={20} color="white"></LuCircle>
+								<Text className="text-white font-semibold p-3">Record Position</Text>
+							</LinearGradient>
+						</TouchableOpacity>
 
-							<TouchableOpacity
-								onPress={() => { }}
-								activeOpacity={0.9}
-								className="rounded-xl overflow-hidden border border-gray-200 shadow w-1/2">
-								<LinearGradient
-									colors={["#f8fafc", "#f1f5f9"]}
-									start={[0, 0]}
-									end={[1, 0]}
-									className="flex-row items-center justify-center py-4 px-8"
-								>
-									<LuCircleCheckBig size={20} className="text-gray-500"></LuCircleCheckBig>
-									<Text className="text-gray-500 font-semibold p-3">Finish</Text>
-								</LinearGradient>
-							</TouchableOpacity>
-						</View>
-
-						<View className="items-center">
-							<Text className="text-muted-foreground text-xs mb-6 text-center">
-								Record at least one position to finish assessment
-							</Text>
-						</View>
+						<TouchableOpacity
+							onPress={() => { }}
+							activeOpacity={0.9}
+							className="rounded-xl overflow-hidden border border-gray-200 shadow w-1/2">
+							<LinearGradient
+								colors={["#f8fafc", "#f1f5f9"]}
+								start={[0, 0]}
+								end={[1, 0]}
+								className="flex-row items-center justify-center py-4 px-8"
+							>
+								<LuCircleCheckBig size={20} className="text-gray-500"></LuCircleCheckBig>
+								<Text className="text-gray-500 font-semibold p-3">Finish</Text>
+							</LinearGradient>
+						</TouchableOpacity>
 					</View>
 					:
 					<View></View>
@@ -233,7 +289,6 @@ const LiveHeadPosition = ({ isReset, record }: { isReset: React.RefObject<boolea
 					:
 					<View></View>
 			}
-
 
 		</View>
 	);

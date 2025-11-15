@@ -5,7 +5,16 @@ type LiveHeadPositionProps = {
 }
 
 interface LiveRecorded extends LiveHeadPositionProps {
-	id: string
+	id: string;
+	time?: string;
+	angular: number;
 }
 
-export { type LiveHeadPositionProps, type LiveRecorded }
+type MakerCursorProps = {
+	id: string;
+	x: number;
+	y: number;
+	z?: string;
+}
+
+export { type LiveHeadPositionProps, type LiveRecorded, type MakerCursorProps }
