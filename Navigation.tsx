@@ -8,6 +8,7 @@ import RangeOfMotion from './creens/RangeOfMotion';
 import RangeOfMotionSummary from './creens/RangeOfMotionSummary';
 import AssessmentHistory from './creens/AssessmentHistory';
 import JointPositionSense from './creens/JointPositionSense';
+import JointPositionSenseSummary from './creens/JointPositionSenseSummary';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -41,6 +42,11 @@ const Navigatior = () => {
 			<Stack.Screen
 				name="JointPositionSense"
 				component={JointPositionSense}
+			>
+			</Stack.Screen>
+			<Stack.Screen
+				name="JointPositionSenseSummary"
+				component={JointPositionSenseSummary}
 			>
 			</Stack.Screen>
 			<Stack.Screen

@@ -8,4 +8,5 @@ export type RootStackParamList = {
 	RangeOfMotionSummary: { key: string };
 	AssessmentHistory: undefined;
 	JointPositionSense: undefined;
+	JointPositionSenseSummary: { key: string };
 };

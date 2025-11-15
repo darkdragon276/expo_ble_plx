@@ -10,7 +10,7 @@ export function useDatabase(dbName: string = "headx.db") {
 				const database = await SQLite.openDatabaseAsync(dbName, {
 					useNewConnection: true
 				});
-				
+
 				setDb(database);
 
 				await database.execAsync(`
@@ -34,11 +34,29 @@ export function useDatabase(dbName: string = "headx.db") {
 					CREATE TABLE IF NOT EXISTS tb_asm_jps (
 						id INTEGER PRIMARY KEY AUTOINCREMENT,
 						key 		text,
+						id_record 	int,
+						id_session 	text,
 						title		text,
 						date		text,
 						type		text,
 						horizontal	decimal(3,1),
 						vertical	decimal(3,1),
+						l_lateral	decimal(3,1),
+						r_lateral	decimal(3,1),
+						angular		decimal(3,1),
+						current		text,
+						duration	decimal(3,1)
+					)
+				`);
+
+				await database.execAsync(`
+					CREATE TABLE IF NOT EXISTS tb_asm_jps_record (
+						id_session 	text,
+						id_record 	int,
+						horizontal	decimal(3,1),
+						vertical	decimal(3,1),
+						l_lateral	decimal(3,1),
+						r_lateral	decimal(3,1),
 						angular		decimal(3,1),
 						current		text,
 						duration	decimal(3,1)
@@ -46,7 +64,7 @@ export function useDatabase(dbName: string = "headx.db") {
 				`);
 
 				// await database.execAsync(`
-				// 	DROP TABLE IF EXISTS tb_asm_rom
+				// 	DROP TABLE IF EXISTS tb_asm_jps
 				// `);
 
 				// await database.execAsync(`
