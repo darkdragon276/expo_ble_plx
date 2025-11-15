@@ -3,7 +3,7 @@ import React from 'react'
 
 const CURSOR_RADIUS = 10;
 
-const MarkerCursor = ({ x, y }: { x: number, y: number }) => {
+const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z?: number | null }) => {
 	return (
 		<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 			<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
@@ -21,7 +21,7 @@ const MarkerCursor = ({ x, y }: { x: number, y: number }) => {
 				<View className="absolute h-6 w-0.5 bg-purple-600 opacity-75" />
 				<View className="absolute -top-4">
 					<View className="bg-purple-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
-						<Text>1</Text>
+						<Text>{id}</Text>
 					</View>
 				</View>
 			</View>

@@ -9,17 +9,36 @@ type HeadPositionRecordedChildProps = {
 
 const SessionItem = memo(({ item }: { item: LiveRecorded }) => {
 	return (
-		<View className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-			<View className="flex-row justify-between items-center">
-				<Text className="text-md font-bold">{item.current}</Text>
-				<View className="flex-column items-center">
-					<View
-						className="px-3 py-1 rounded-full">
-						<Text
-							className="text-xs font-semibold">
-							H: {item.horizontal.toFixed(1)}° | V: {item.vertical.toFixed(1)}°
-						</Text>
+		<View className="flex-row justify-between items-center my-1">
+			<View className="flex-row space-x-2 w-3/7">
+				<View className="w-7 h-5 justify-between items-center rounded-xl bg-purple-50 border-purple-200">
+					<Text className="text-md text-purple-700 font-semibold">#{item.id}</Text>
+				</View>
+				<Text className="text-md font-semibold">{item.current}</Text>
+			</View>
+
+			<View className="flex-column w-4/7">
+				<View className="flex-row items-center justify-items-center">
+					<View className="w-1/9 p-1">
+						<Text className="text-md font-semibold">H:</Text>
 					</View>
+					<View className="w-3/9 p-1">
+						<Text className="text-md font-semibold">{item.horizontal.toFixed(1)}°</Text>
+					</View>
+					<View className="w-1/9 p-1">
+						<Text className="text-md font-semibold">|</Text>
+					</View>
+					<View className="w-1/9 p-1">
+						<Text className="text-md font-semibold">V:</Text>
+					</View>
+					<View className="w-3/9 p-1">
+						<Text className="text-md font-semibold">{item.vertical.toFixed(1)}°</Text>
+					</View>
+				</View>
+				<View className="items-end">
+					<Text className="text-md font-semibold">
+						{item.angular}
+					</Text>
 				</View>
 			</View>
 		</View>
@@ -31,21 +50,46 @@ const HeadPositionRecorded: React.FC<HeadPositionRecordedChildProps> = ({ getDat
 	const [data, setData] = useState<LiveRecorded[]>([]);
 
 	useEffect(() => {
+
 		subscribe(() => {
 			const newRecord = getData();
-			if (!newRecord) return;
+
+			if (!newRecord)
+				return;
+
 			setData(prevList => [...prevList, newRecord]);
 		});
+
 	}, [getData, subscribe]);
 
+
 	return (
-		<View className="flex-1 bg-white rounded-2xl">
-			<FlatList
-				data={data}
-				keyExtractor={(item) => item.id}
-				renderItem={({ item }) => <SessionItem item={item} />}
-				scrollEnabled={false}
-			/>
+		<View>
+			<View className="items-center">
+				<Text className="text-muted-foreground text-xs text-center mb-3">
+					Record at least one position to finish assessment
+				</Text>
+			</View>
+			{
+				data.length == 0
+					?
+					<></>
+					:
+					<View className="flex-1 bg-white rounded-2xl px-6 py-2">
+						<View>
+							<Text className="text-muted-foreground text-md font-bold mb-3">
+								Recorded Positions ({data.length})
+							</Text>
+						</View>
+
+						<FlatList
+							data={data}
+							keyExtractor={(item) => item.id}
+							renderItem={({ item }) => <SessionItem item={item} />}
+							scrollEnabled={false}
+						/>
+					</View>
+			}
 		</View>
 	)
 }

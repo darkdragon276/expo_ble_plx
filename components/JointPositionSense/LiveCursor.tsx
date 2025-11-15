@@ -8,7 +8,6 @@ import { useNavigation } from '@react-navigation/native';
 import { BleError, BleErrorCode, Characteristic } from 'react-native-ble-plx';
 import { KrossDevice } from '../../ble/KrossDevice';
 import { normalizeAngle } from '../../utils/helper';
-import { X } from 'lucide-react-native';
 
 const CIRCLE_RADIUS = 85;
 const CURSOR_RADIUS = 10;

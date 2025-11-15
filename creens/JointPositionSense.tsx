@@ -11,8 +11,6 @@ import LiveHeadPosition from '../components/JointPositionSense/LiveHeadPosition'
 import { ChildROMRef } from '../model/ChildRefGetValue';
 import AssessmentDuration from '../components/RangeOfMotion/AssessmentDuration';
 
-const CIRCLE_RADIUS = 150;
-const CURSOR_RADIUS = 10;
 
 const LuTarget = styled(LucideTarget);
 const LuPlay = styled(LucidePlay);
@@ -215,7 +213,7 @@ const JointPositionSense = () => {
 			</View>
 
 			{/* Live Head Position */}
-			<LiveHeadPosition isReset={reset} record={record}></LiveHeadPosition>
+			<LiveHeadPosition isReset={reset} refDuration={refDuration} record={record} ></LiveHeadPosition>
 
 			<View className="h-12"></View>
 

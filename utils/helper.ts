@@ -17,4 +17,15 @@ const loadImg = async (localSrc: any) => {
     return `data:image/png;base64,${base64}`;
 }
 
-export { normalizeAngle, loadImg }
+// convert seconds to mm:ss
+const numberToMmss = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+
+    const mm = minutes.toString().padStart(2, "0");
+    const ss = secs.toString().padStart(2, "0");
+
+    return `${mm}:${ss}`;
+}
+
+export { normalizeAngle, loadImg, numberToMmss }
