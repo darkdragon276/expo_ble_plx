@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "HeadX",
-    "slug": "HeadX",
-    "version": "1.0.7",
+    "name": "HeadX Dou",
+    "slug": "HeadX  Dou",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/HeadX-adaptive-icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.HeadX.app",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "buildNumber": "1",
       "infoPlist": {
         "CFBundleDisplayName": "HeadX",
