@@ -1,6 +1,12 @@
 import { NativeEventEmitter, NativeModules } from 'react-native';
 
-const bleEventEmitter = new NativeEventEmitter(NativeModules.BLEModule || {});
+const safeModule = {
+	addListener: () => { },
+	removeListeners: () => { },
+	...NativeModules,
+};
+
+const bleEventEmitter = new NativeEventEmitter(safeModule);
 
 type BleEmitterProps = {
 	roll: number;
