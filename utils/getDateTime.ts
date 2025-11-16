@@ -20,10 +20,6 @@ export const getCurrentDateTime = (): any => {
 
 	const localShortDateTime = Intl.DateTimeFormat("en-US", options).format(now).toString().replace(" at", ",");
 	const strNow = now.toString();
-
-	//for test
-	let yesterday = new Date();
-	yesterday.setDate(yesterday.getDate() - 8);
 	const strNowISO = now.toISOString();
 
 	return {
