@@ -208,22 +208,22 @@ const AssessmentHistory = () => {
 			<AssessmentHistoryTags dataChart={data}></AssessmentHistoryTags>
 
 			{/* ROM Chart Section */}
-			{
+			{/* {
 				(formData.metric.prop == "rom" || formData.metric.prop == "all")
 					?
 					<AssessmentHistorROMChart dataChart={data}></AssessmentHistorROMChart>
 					:
 					<></>
-			}
+			} */}
 
 			{/* JPSChart Section */}
-			{
+			{/* {
 				(formData.metric.prop == "jps" || formData.metric.prop == "all")
 					?
 					<AssessmentHistoryJPSChart></AssessmentHistoryJPSChart>
 					:
 					<></>
-			}
+			} */}
 
 			{/* Session Recent Section */}
 			<AssessmentHistorySessionRecent dataRecent={data}></AssessmentHistorySessionRecent>
