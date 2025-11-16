@@ -2,7 +2,7 @@ import React, { memo, useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import { LucideHistory, LucideTrendingUp, LucideTrash2 } from "lucide-react-native";
 import { useDatabase } from "../../db/useDatabase";
-import { DB_SELECT_RECENT_ROM, DB_DELETE_BY_KEY_ROM } from "../../db/dbQuery";
+import { DB_SELECT_RECENT, DB_DELETE_BY_KEY_ROM, DB_DELETE_BY_KEY_JPS, DB_DELETE_BY_KEY_JPS_RECORD } from "../../db/dbQuery";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../model/RootStackParamList";
@@ -24,12 +24,12 @@ type Session = {
 	type: "JPS" | "ROM";
 };
 
-const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHistory: any, delROM: any }) => {
+const SessionItem = memo(({ item, gotoSummary, delAsm }: { item: Session, gotoSummary: any, delAsm: any }) => {
 	const { date_MM_dd_yyyy_hh_mm_ss_ampm } = useConvertDateTime(new Date(item.date));
 
 	return (
 		<TouchableOpacity
-			onPress={(key) => gotoHistory(key)}
+			onPress={(item) => gotoSummary(item)}
 		>
 			<View className="bg-white rounded-2xl border border-gray-200 p-3 mb-3 shadow-sm">
 				<View className="flex-row justify-between items-center">
@@ -51,7 +51,7 @@ const SessionItem = memo(({ item, gotoHistory, delROM }: { item: Session, gotoHi
 					</Text>
 					<TouchableOpacity
 						className="px-3"
-						onPress={(key) => delROM(key)}
+						onPress={(key) => delAsm(key)}
 					>
 						<LucTrash size={20} color={"gray"} />
 					</TouchableOpacity>
@@ -73,7 +73,7 @@ export default function MainRecentSession() {
 				return;
 			}
 
-			const rs = await db.getAllAsync<Session>(DB_SELECT_RECENT_ROM);
+			const rs = await db.getAllAsync<Session>(DB_SELECT_RECENT);
 			if (rs) {
 				setData(rs);
 				setInit(true);
@@ -89,18 +89,30 @@ export default function MainRecentSession() {
 
 	}, [db])
 
-	const gotoHistory = (key: string) => {
-		navigation.replace("RangeOfMotionSummary", { key: key });
+	const gotoSummary = (item: Session) => {
+		if (item.type == "JPS") {
+			navigation.replace("JointPositionSenseSummary", { key: item.key });
+		} else if (item.type === "ROM") {
+			navigation.replace("RangeOfMotionSummary", { key: item.key });
+		}
 	};
 
-	const delROM = async (key: string) => {
+	const delAsm = async (item: Session) => {
+		if (item.type == "JPS") {
+			delJPS(item);
+		} else if (item.type === "ROM") {
+			delROM(item);
+		}
+	}
+
+	const delROM = async (item: Session) => {
 		if (!db) {
 			return;
 		}
 
 		const del = async (db: SQLiteDatabase) => {
-			await db.runAsync(DB_DELETE_BY_KEY_ROM, [key])
-			setData(prev => prev.filter(item => item.key !== key));
+			await db.runAsync(DB_DELETE_BY_KEY_ROM, [item.key])
+			setData(prev => prev.filter(items => items.key !== item.key));
 		}
 
 		Alert.alert("", "Are you sure?", [
@@ -114,8 +126,33 @@ export default function MainRecentSession() {
 		]);
 	};
 
+	const delJPS = async (item: Session) => {
+		if (!db) {
+			return;
+		}
+
+		const del = async (db: SQLiteDatabase) => {
+			await db.withTransactionAsync(async () => {
+				await db.runAsync(DB_DELETE_BY_KEY_JPS, [item.key])
+				await db.runAsync(DB_DELETE_BY_KEY_JPS_RECORD, [item.key])
+			});
+
+			setData(prev => prev.filter(items => items.key !== item.key));
+		}
+
+		Alert.alert("", "Are you sure?", [
+			{
+				text: "Yes",
+				onPress: () => { del(db!) }
+			},
+			{
+				text: "No",
+			}
+		]);
+	}
+
 	const gotoAssessmentHistory = () => {
-		navigation.navigate("AssessmentHistory");
+		navigation.replace("AssessmentHistory");
 	};
 
 	return (
@@ -140,7 +177,7 @@ export default function MainRecentSession() {
 			<FlatList
 				data={data}
 				keyExtractor={(item) => item.id}
-				renderItem={({ item }) => <SessionItem item={item} delROM={() => delROM(item.key)} gotoHistory={() => { gotoHistory(item.key) }} />}
+				renderItem={({ item }) => <SessionItem item={item} delAsm={() => delAsm(item)} gotoSummary={() => { gotoSummary(item) }} />}
 				showsVerticalScrollIndicator={false}
 				removeClippedSubviews={true}
 			/>

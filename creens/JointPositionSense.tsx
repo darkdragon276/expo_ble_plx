@@ -10,7 +10,8 @@ import { LucidePlay, LucideSquare, RotateCcw, LucideTarget, LucideTimer } from '
 import LiveHeadPosition from '../components/JointPositionSense/LiveHeadPosition';
 import { ChildROMRef } from '../model/ChildRefGetValue';
 import AssessmentDuration from '../components/RangeOfMotion/AssessmentDuration';
-
+import { getCurrentDateTime } from '../utils/getDateTime';
+import { type JPSCommonInfo } from '../model/JointPosition';
 
 const LuTarget = styled(LucideTarget);
 const LuPlay = styled(LucidePlay);
@@ -23,12 +24,15 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 const JointPositionSense = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [record, setRecord] = useState(false);
-	const [idSession, setIdSession] = useState("");
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const animatedPos = useState(new Animated.ValueXY({ x: 0, y: 0 }))[0];
 	const refDuration = useRef<ChildROMRef>(null);
 
 	const reset = useRef(false);
+	const [idSession, setIdSession] = useState("");
+	const [jpsInfo, setJpsInfo] = useState<JPSCommonInfo | null>(null);
+
+	let NowObj = { localShortDateTime: "", strNow: "" };
 
 	useLayoutEffect(() => {
 		navigation.setOptions({
@@ -72,8 +76,20 @@ const JointPositionSense = () => {
 	}
 
 	const onPressStartRecord = () => {
-		const id = new Date().toISOString();
-		setIdSession(id);
+		const key: string = Date.now().toString();
+		const idSession = key;
+		NowObj.strNow = getCurrentDateTime().strNowISO;
+		NowObj.localShortDateTime = getCurrentDateTime().localShortDateTime;
+
+		setJpsInfo({
+			key: key,
+			idSession: idSession,
+			nowObj: {
+				localShortDateTime: NowObj.localShortDateTime,
+				strNow: NowObj.strNow
+			}
+		})
+		//setIdSession(id);
 		setRecord(true);
 	}
 
@@ -216,7 +232,7 @@ const JointPositionSense = () => {
 			</View>
 
 			{/* Live Head Position */}
-			<LiveHeadPosition isReset={reset} refDuration={refDuration} record={record} id_session={idSession} ></LiveHeadPosition>
+			<LiveHeadPosition isReset={reset} refDuration={refDuration} record={record} baseInfo={jpsInfo} ></LiveHeadPosition>
 
 			<View className="h-12"></View>
 
