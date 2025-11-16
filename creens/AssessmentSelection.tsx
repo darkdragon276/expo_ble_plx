@@ -12,7 +12,7 @@ import {
 
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { RotateCcw, LucideTarget, PenLine, CircleCheckBig, Clock } from 'lucide-react-native'
+import { RotateCcw, LucideTarget, PenLine, CircleCheckBig } from 'lucide-react-native'
 import { styled } from 'nativewind';
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../model/RootStackParamList";
@@ -23,7 +23,6 @@ import { BLEService } from "../ble/BLEService";
 const LuRotateCcw = styled(RotateCcw);
 const LuPenLine = styled(PenLine);
 const LuCircleCheckBig = styled(CircleCheckBig);
-const LuClock = styled(Clock);
 const LuTarget = styled(LucideTarget);
 
 type Feature = {
@@ -249,7 +248,25 @@ const AssessmentSelection = () => {
 					</View>
 				</View>
 
-				{/* Additional spacing or other cards could go here */}
+				<View className="bg-white p-4 rounded-xl shadow mt-4">
+					<View className="flex-row items-center mb-3">
+						<View className="w-10 h-10 rounded-xl bg-blue-200 items-center justify-center mr-4">
+							<LuCircleCheckBig size={20} className="text-blue-500"></LuCircleCheckBig>
+						</View>
+						<Text className="mb-3 text-xl">Before You Begin</Text>
+					</View>
+
+					<View className="rounded-xl p-1 ml-10 ">
+						<View className="flex-1 space-y-1">
+							<Text className="text-xs text-muted-foreground space-y-1">• Ensure HeadX device is properly positioned</Text>
+							<Text className="text-xs text-muted-foreground space-y-1">• Patient seated comfortably with good posture</Text>
+							<Text className="text-xs text-muted-foreground space-y-1">• Device calibrated (Settings if needed)</Text>
+							<Text className="text-xs text-muted-foreground space-y-1">• Results automatically saved</Text>
+						</View>
+					</View>
+				</View>
+
+				<View className="h-12"></View>
 			</View>
 		</ScrollView >
 	);
