@@ -77,7 +77,7 @@ class BLEServiceInstance {
 	}
 
 	setDeviceById = (id: DeviceId) => {
-		console.log("Set device by id: " + id);
+		//console.log("Set device by id: " + id);
 		if (this.deviceId !== id) {
 			if (this.deviceId !== null) {
 				this.manager.cancelDeviceConnection(this.deviceId);
@@ -112,7 +112,7 @@ class BLEServiceInstance {
 					return;
 				}
 				if (device) {
-					console.log("scan")
+					//console.log("scan")
 					if (!this.listDevices.some(d => d.id === device.id)) {
 						this.listDevices.push(device);
 					}
@@ -123,7 +123,7 @@ class BLEServiceInstance {
 	}
 
 	isDisconnectError = (error: BleError) => {
-		console.log("isDisconnectError check: " + error.errorCode);
+		//console.log("isDisconnectError check: " + error.errorCode);
 		return error.errorCode === BleErrorCode.DeviceDisconnected ||
 			error.errorCode === BleErrorCode.DeviceConnectionFailed ||
 			error.errorCode === BleErrorCode.DeviceNotFound ||
@@ -137,7 +137,7 @@ class BLEServiceInstance {
 
 		if (this.deviceId === null) return;
 
-		console.log("Update for devices");
+		//console.log("Update for devices");
 		if (this.secCounter % 20 === 0) {
 			await this.manager.stopDeviceScan().catch((error) => {
 				// this.onError(error);
@@ -320,6 +320,7 @@ class BLEServiceInstance {
 	discoverAllServicesAndCharacteristicsForDevice = async () =>
 		new Promise<Device>((resolve, reject) => {
 			if (!this.device) {
+				//console.log("discoverAllServicesAndCharacteristicsForDevice !this.device")
 				this.showErrorToast(deviceNotConnectedErrorText)
 				reject(new Error(deviceNotConnectedErrorText))
 				return
@@ -327,12 +328,14 @@ class BLEServiceInstance {
 			this.manager
 				.discoverAllServicesAndCharacteristicsForDevice(this.device.id)
 				.then(device => {
+					//console.log("discoverAllServicesAndCharacteristicsForDevice then")
 					resolve(device)
 					this.device = device
 				})
 				.catch(error => {
 					this.onError(error)
 					reject(error)
+					//console.log("discoverAllServicesAndCharacteristicsForDevice error")
 				})
 		})
 
@@ -385,7 +388,9 @@ class BLEServiceInstance {
 		transactionId?: TransactionId,
 		hideErrorDisplay?: boolean
 	) => {
+		//console.log("setupMonitor")
 		if (!this.device) {
+			//console.log("!this.device")
 			this.showErrorToast(deviceNotConnectedErrorText)
 			throw new Error(deviceNotConnectedErrorText)
 		}
@@ -395,6 +400,7 @@ class BLEServiceInstance {
 			characteristicUUID,
 			(error, characteristic) => {
 				if (error) {
+					//console.log("characteristic error")
 					onError(error)
 					if (error.errorCode === 2 && this.isCharacteristicMonitorDisconnectExpected) {
 						this.isCharacteristicMonitorDisconnectExpected = false
@@ -405,7 +411,10 @@ class BLEServiceInstance {
 					}
 					return
 				}
+				//console.log(`error: ${error}`)
+				//console.log(`characteristic: ${characteristic}`)
 				if (characteristic) {
+					//console.log("characteristic")
 					onCharacteristicReceived(characteristic)
 				}
 			},
