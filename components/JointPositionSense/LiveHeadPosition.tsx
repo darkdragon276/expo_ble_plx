@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, Pressable, TouchableOpacity } from 'react-native';
@@ -19,26 +19,16 @@ import { ChildROMRef } from '../../model/ChildRefGetValue';
 import { useDatabase } from '../../db/useDatabase';
 import { DB_INSERT_JPS, DB_INSERT_JPS_RECORD, DB_SELECT_ALL_JPS } from '../../db/dbQuery';
 import { getCurrentDateTime } from '../../utils/getDateTime';
+import { type JPSCommonInfo } from '../../model/JointPosition';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
+type RProp = RouteProp<RootStackParamList, "JointPositionSense">;
+
 const LuTarget = styled(LucideTarget);
 const LuCircleCheckBig = styled(LucideCircleCheckBig);
 const LuCircle = styled(LucideCircle);
 
-const dummyMarkerCursor: MakerCursorProps[] = [
-	{
-		id: "1",
-		x: 15.5,
-		y: -57.3,
-	},
-	{
-		id: "2",
-		x: -68.1,
-		y: -39.9,
-	}
-]
-
-const LiveHeadPosition = ({ isReset, refDuration, record, id_session }: { isReset: React.RefObject<boolean>, refDuration: React.RefObject<ChildROMRef | null>, record: boolean, id_session?: string | undefined }) => {
+const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset: React.RefObject<boolean>, refDuration: React.RefObject<ChildROMRef | null>, record: boolean, baseInfo?: JPSCommonInfo | null }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const refPosition = useRef<LiveHeadPositionProps>(null)
 
@@ -48,13 +38,12 @@ const LiveHeadPosition = ({ isReset, refDuration, record, id_session }: { isRese
 	const subscribers = useRef<(() => void)[]>([]);
 
 	const db = useDatabase("headx.db");
+	const route = useRoute<RProp>();
 
-	useEffect(() => {
-
-	}, []);
+	useEffect(() => { }, []);
 
 	const onPressFinish = async () => {
-		navigation.replace("JointPositionSenseSummary", { key: id_session ?? "" })
+		navigation.replace("JointPositionSenseSummary", { key: baseInfo?.key ?? "" })
 	}
 
 	const onPressRecord = async () => {
@@ -76,12 +65,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, id_session }: { isRese
 		};
 
 		try {
-			const key: string = Date.now().toString();
-			let NowObj = { localShortDateTime: "", strNow: "" };
-			NowObj.strNow = getCurrentDateTime().strNowISO;
-			NowObj.localShortDateTime = getCurrentDateTime().localShortDateTime;
-
-			addJPSData(key, NowObj, refRecord.current);
+			addJPSData(refRecord.current);
 
 		} catch (e) { }
 
@@ -92,25 +76,23 @@ const LiveHeadPosition = ({ isReset, refDuration, record, id_session }: { isRese
 		subscribers.current.push(fn);
 	};
 
-	const addJPSData = async (key: string, nowObj: { localShortDateTime: string, strNow: string }, record: LiveRecorded) => {
+	const addJPSData = async (record: LiveRecorded) => {
 		if (!db) {
 			return;
 		}
 
-		//let { title } = route.params;
-		let title = "test JPS";
-		const dt: string = nowObj.strNow;
-		const type: string = "JPS";
-
+		let { title } = route.params;
 		if (title == "") {
-			title = `ROM Session - ${nowObj.localShortDateTime}`;
+			title = `JPS Session - ${baseInfo?.nowObj.localShortDateTime ?? ""}`;
 		}
 
-		const idSession = id_session ?? "";
+		const key = baseInfo?.key ?? "";
+		const dt: string = baseInfo?.nowObj.strNow ?? ""
+		const idSession = baseInfo?.idSession ?? ""
 
 		await db.withTransactionAsync(async () => {
 			if (refRecordCnt.current <= 1) {
-				await db.runAsync(DB_INSERT_JPS, [key, idSession, refRecordCnt.current, title, dt, type, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
+				await db.runAsync(DB_INSERT_JPS, [key, idSession, title, dt, "JPS"]);
 			}
 			await db.runAsync(DB_INSERT_JPS_RECORD, [idSession, refRecordCnt.current, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
 		});
@@ -136,110 +118,9 @@ const LiveHeadPosition = ({ isReset, refDuration, record, id_session }: { isRese
 
 					<PositionCoordinates>
 						<LiveCursor dataRef={refPosition} reset={isReset} record={record}></LiveCursor>
-						<MakerCursorList mode={"LIVE"} getData={() => refMarkerCursor ? refMarkerCursor.current : []} subscribe={subscribe} data={dummyMarkerCursor}></MakerCursorList>
+						<MakerCursorList mode={"LIVE"} getData={() => refMarkerCursor ? refMarkerCursor.current : []} subscribe={subscribe} data={[]}></MakerCursorList>
 					</PositionCoordinates>
 
-					<>
-						{/* <Svg className="absolute inset-0 w-full h-full" viewBox="0 0 192 192">
-						<Circle
-							cx="96"
-							cy="96"
-							r="25"
-							fill="none"
-							stroke="#e5e7eb"
-							strokeWidth="1"
-							strokeDasharray="2,2"
-						/>
-						<Circle
-							cx="96"
-							cy="96"
-							r="45"
-							fill="none"
-							stroke="#d1d5db"
-							strokeWidth="1"
-							strokeDasharray="2,2"
-						/>
-						<Circle
-							cx="96"
-							cy="96"
-							r="65"
-							fill="none"
-							stroke="#9ca3af"
-							strokeWidth="1"
-							strokeDasharray="2,2"
-						/>
-						<Circle
-							cx="96"
-							cy="96"
-							r="85"
-							fill="none"
-							stroke="#6b7280"
-							strokeWidth="1"
-							strokeDasharray="2,2"
-						/>
-						<Line
-							x1="96"
-							y1="11"
-							x2="96"
-							y2="181"
-							stroke="#9ca3af"
-							strokeWidth="1"
-							strokeDasharray="4,2"
-						/>
-						<Line
-							x1="11"
-							y1="96"
-							x2="181"
-							y2="96"
-							stroke="#9ca3af"
-							strokeWidth="1"
-							strokeDasharray="4,2"
-						/>
-						<Line
-							x1="29"
-							y1="29"
-							x2="163"
-							y2="163"
-							stroke="#d1d5db"
-							strokeWidth="1"
-							strokeDasharray="2,4"
-						/>
-						<Line
-							x1="163"
-							y1="29"
-							x2="29"
-							y2="163"
-							stroke="#d1d5db"
-							strokeWidth="1"
-							strokeDasharray="2,4"
-						/>
-						<Circle cx="96" cy="96" r="4" stroke="white" strokeWidth="1" fill="#155dfc" />
-					</Svg>
-
-					<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-						<LiveCursor dataRef={refPosition} reset={isReset} record={record}></LiveCursor>
-					</View>
-
-					<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-						<MarkerCursor x={15.5} y={-57.3}></MarkerCursor>
-					</View>
-
-					<View className="absolute -top-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
-						<Text>Flexion</Text>
-					</View>
-
-					<View className="absolute -bottom-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
-						<Text>Extension</Text>
-					</View>
-
-					<View className="absolute top-1/2 -left-6 transform -translate-y-1/2 text-xs font-medium text-gray-600 -rotate-90">
-						<Text>Left</Text>
-					</View>
-
-					<View className="absolute top-1/2 -right-7 transform -translate-y-1/2 text-xs font-medium text-gray-600 rotate-90">
-						<Text>Right</Text>
-					</View> */}
-					</>
 				</View>
 
 				<View className="flex-row space-x-3 mt-3">

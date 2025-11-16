@@ -34,18 +34,10 @@ export function useDatabase(dbName: string = "headx.db") {
 					CREATE TABLE IF NOT EXISTS tb_asm_jps (
 						id INTEGER PRIMARY KEY AUTOINCREMENT,
 						key 		text,
-						id_record 	int,
 						id_session 	text,
 						title		text,
 						date		text,
-						type		text,
-						horizontal	decimal(3,1),
-						vertical	decimal(3,1),
-						l_lateral	decimal(3,1),
-						r_lateral	decimal(3,1),
-						angular		decimal(3,1),
-						current		text,
-						duration	decimal(3,1)
+						type		text
 					)
 				`);
 
@@ -65,6 +57,10 @@ export function useDatabase(dbName: string = "headx.db") {
 
 				// await database.execAsync(`
 				// 	DROP TABLE IF EXISTS tb_asm_jps
+				// `);
+
+				// await database.execAsync(`
+				// 	DROP TABLE IF EXISTS tb_asm_jps_record
 				// `);
 
 				// await database.execAsync(`

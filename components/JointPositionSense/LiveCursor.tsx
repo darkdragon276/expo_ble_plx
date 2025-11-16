@@ -14,9 +14,17 @@ const CURSOR_RADIUS = 10;
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
+const degreesArray: number[] = [0, 30, 45, 60, 90, 120, 135, 150, 180, 360];
+
 const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveHeadPositionProps | null>, reset: React.RefObject<boolean>, record: boolean }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const animatedPos = useState(new Animated.ValueXY({ x: 0, y: 0 }))[0];
+	const animatedRotate = useRef(new Animated.Value(0)).current;
+	const rotateAnim = useRef(new Animated.Value(0)).current;
+	const rotate = rotateAnim.interpolate({
+		inputRange: [0, Math.PI * 2],
+		outputRange: ["0rad", `${2 * Math.PI}rad`],
+	});
 	const krossDevice = new KrossDevice();
 	const OffsetX = useRef<number | null>(null);
 	const OffsetY = useRef<number | null>(null);
@@ -91,12 +99,13 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 
 		const onMonitor = (char: Characteristic) => {
 			let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
-			let x, y;
+			let x, y, z;
 			if (data) {
 				krossDevice.unpack(data);
 
 				x = krossDevice.angle.yaw;
-				y = krossDevice.angle.pitch
+				y = krossDevice.angle.pitch;
+				z = krossDevice.angle.roll;
 
 				if (reset.current) {
 					OffsetX.current = 0;
@@ -106,7 +115,8 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 
 				x = getHorizontalOffset(x);
 				y = getVerticalOffset(y);
-				updateCursorPosition(x, y);
+				z = getRote(z);
+				updateCursorPosition(x, y, z);
 			}
 			//console.log("Monitor: ", char?.value);
 		}
@@ -136,7 +146,7 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 	};
 
 	// limits within a circle
-	const updateCursorPosition = (x: number, y: number) => {
+	const updateCursorPosition = (x: number, y: number, z: number) => {
 		const distance = Math.sqrt(x * x + y * y);
 
 		let newX = x;
@@ -149,16 +159,37 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 			newY = y * ratio;
 		}
 
+
+
 		// update position
+		//Animated.parallel([
 		Animated.spring(animatedPos, {
 			toValue: { x: newX, y: newY },
 			useNativeDriver: false,
 			speed: 8,
 		}).start();
+		// , Animated.timing(animatedRotate, {
+		// 	toValue: z,
+		// 	duration: 500,
+		// 	useNativeDriver: true,
+		// })
+		// ]).start(() => {
+		// 	animatedRotate.setValue(0); // reset để xoay tiếp lần sau
+		// });
+
+		let newZ = degToRadRounded(normalizeAngle360(z));
+
+		//console.log(`roll: ${z} --- convert: ${newZ}`)
+
+		Animated.timing(rotateAnim, {
+			toValue: 0,              // sẽ map thành 360 độ
+			duration: 100,
+			useNativeDriver: false, // rotate hỗ trợ native driver
+		}).start();
 
 		dataRef.current = {
 			horizontal: newX,
-			vertical: newY,
+			vertical: newY * (-1),
 			current: getCurrentPositionText(x, y)
 		};
 	};
@@ -183,7 +214,6 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 
 	const getHorizontalOffset = (x: number): number => {
 		if (OffsetX.current === null || OffsetX.current === 0) {
-			// assign ONCE the first time listener is called
 			OffsetX.current = Math.round(x);
 		}
 
@@ -193,13 +223,29 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 
 	const getVerticalOffset = (y: number): number => {
 		if (OffsetY.current === null || OffsetY.current === 0) {
-			// assign ONCE the first time listener is called
 			OffsetY.current = Math.round(y);
 		}
 
 		let alpha = normalizeAngle(Math.round(y * 10) / 10 - OffsetY.current);
 		return (Math.round(alpha * 10) / 10);
 	};
+
+	const getRote = (z: number): number => {
+		return (Math.round(z * 10) / 10);
+	}
+
+	const degToRadRounded = (degrees: number, roundTo: number = 30): number => {
+		const roundedDeg = Math.round(degrees / roundTo) * roundTo;
+		return roundedDeg * (Math.PI / 180);
+	}
+
+	const normalizeAngle360 = (angle: number): number => {
+		let normalized = angle % 360;  // modulo để xử lý vòng quanh
+		if (normalized < 0) {
+			normalized += 360;  // đưa về 0..360
+		}
+		return normalized;
+	}
 
 	return (
 		<View>
@@ -210,6 +256,7 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 						transform: [
 							{ translateX: animatedPos.x },
 							{ translateY: animatedPos.y },
+							{ rotate },
 						],
 					},
 				]}

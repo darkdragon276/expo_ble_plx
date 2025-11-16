@@ -108,7 +108,8 @@ const AssessmentSelection = () => {
 	}
 
 	const onPressGotoJPS = () => {
-		navigation.replace("JointPositionSense")
+		const title = titleRef.current?.getValue() || "";
+		navigation.replace("JointPositionSense", { title: title })
 	}
 
 	return (

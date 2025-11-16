@@ -9,7 +9,7 @@ import { LucideCheck, LucideTarget, LucideX, PenLine, RotateCcw } from 'lucide-r
 import type { DataHistory } from "../../model/AssessmentHistory";
 import useConvertDateTime from '../../utils/convertDateTime';
 import { useDatabase } from '../../db/useDatabase';
-import { DB_UPDATE_BY_KEY_ROM } from '../../db/dbQuery';
+import { DB_UPDATE_BY_KEY_JPS, DB_UPDATE_BY_KEY_ROM } from '../../db/dbQuery';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const LuRotateCcw = styled(RotateCcw);
@@ -18,7 +18,7 @@ const LuCheck = styled(LucideCheck);
 const LuUnCheck = styled(LucideX);
 const LuTarget = styled(LucideTarget);
 
-const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) => {
+const TitleSummary = ({ title, dataKey, type }: { title: string, dataKey: string, type: string }) => {
 	const [text, setText] = useState(title)
 	const [oldtext, setOldText] = useState(title)
 	const [edit, setEditText] = useState(false)
@@ -40,7 +40,13 @@ const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) =>
 				return;
 			}
 
-			await db.runAsync(DB_UPDATE_BY_KEY_ROM, [text, dataKey]);
+			if (type == "ROM") {
+				await db.runAsync(DB_UPDATE_BY_KEY_ROM, [text, dataKey]);
+
+			} else if (type == "JPS") {
+				await db.runAsync(DB_UPDATE_BY_KEY_JPS, [text, dataKey]);
+			}
+
 			setText(text);
 			setOldText(text);
 		} catch (error) {
@@ -126,7 +132,7 @@ const AssessmentHistorySessionItems = memo(({ item, gotoHistory }: { item: DataH
 			</View>
 
 			{/* Title */}
-			<TitleSummary title={item.title} dataKey={item.key}></TitleSummary>
+			<TitleSummary title={item.title} dataKey={item.key} type={item.type}></TitleSummary>
 			<Text className="text-gray-500 text-sm mb-3">
 				{date_MM_dd_yyyy_at_hh_mm_ampm}
 			</Text>
@@ -156,14 +162,7 @@ const AssessmentHistorySessionItems = memo(({ item, gotoHistory }: { item: DataH
 						</View>
 					</View>
 					:
-					<View className="space-y-2 mb-2">
-						<View className="flex-row justify-between">
-							<Text className="text-gray-500">Mean Error:</Text>
-							<Text className="text-gray-700 font-semibold">{item.flexion}°</Text>
-							<Text className="text-gray-500">Variability:</Text>
-							<Text className="text-gray-700 font-semibold">{item.extension}°</Text>
-						</View>
-					</View>
+					<View></View>
 			}
 
 			{/* Divider */}
@@ -177,7 +176,7 @@ const AssessmentHistorySessionItems = memo(({ item, gotoHistory }: { item: DataH
 
 			{/* Button */}
 			<TouchableOpacity className="border border-blue-100 bg-blue-50 py-2 rounded-xl"
-				onPress={(key) => gotoHistory(key)}
+				onPress={(item) => gotoHistory(item)}
 			>
 				<Text className="text-blue-600 text-center font-semibold">
 					View Full Report
@@ -190,8 +189,13 @@ const AssessmentHistorySessionItems = memo(({ item, gotoHistory }: { item: DataH
 const AssessmentHistorySessionRecent = ({ dataRecent }: { dataRecent: DataHistory[] }) => {
 	const navigation = useNavigation<NavigationProp>();
 
-	const gotoHistory = (key: string) => {
-		navigation.replace("RangeOfMotionSummary", { key: key });
+	const gotoHistory = (item: DataHistory) => {
+		if (item.type == "ROM") {
+			navigation.replace("RangeOfMotionSummary", { key: item.key });
+
+		} else if (item.type == "JPS") {
+			navigation.replace("JointPositionSenseSummary", { key: item.key });
+		}
 	};
 
 	return (
@@ -210,7 +214,7 @@ const AssessmentHistorySessionRecent = ({ dataRecent }: { dataRecent: DataHistor
 			<FlatList
 				data={dataRecent}
 				keyExtractor={(item) => item.id}
-				renderItem={({ item }) => <AssessmentHistorySessionItems item={item} gotoHistory={() => { gotoHistory(item.key) }} />}
+				renderItem={({ item }) => <AssessmentHistorySessionItems item={item} gotoHistory={() => { gotoHistory(item) }} />}
 				showsVerticalScrollIndicator={false}
 				removeClippedSubviews={true}
 				scrollEnabled={false}

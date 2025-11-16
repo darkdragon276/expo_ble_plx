@@ -12,7 +12,7 @@ const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z?: n
 					{
 						transform: [
 							{ translateX: x },
-							{ translateY: y },
+							{ translateY: y * (-1) },
 						],
 					},
 				]}
