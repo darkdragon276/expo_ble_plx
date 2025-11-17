@@ -92,12 +92,14 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 				{children}
 			</View>
 
-			{/* <View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-				<MarkerCursor x={15.5} y={-57.3}></MarkerCursor>
+			{/* <View className="absolute w-3 h-3 top-1/2 left-1/2 bg-blue-600 rounded-full shadow-lg border-2 border-white"
+				style={{
+					width: 10,
+					height: 10,
+					transform: [{ translateX: -5 }, { translateY: -5 }],
+				}}
+			>
 			</View> */}
-
-			{/* <View className="absolute top-1/2 left-1/2 w-3 h-3 bg-blue-600 rounded-full transform -translate-x-1/2 -translate-y-1/2 shadow-lg border-2 border-white">
-				</View> */}
 
 			<View className="absolute -top-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
 				<Text>Flexion</Text>

@@ -8,9 +8,10 @@ import { useNavigation } from '@react-navigation/native';
 import { BleError, BleErrorCode, Characteristic } from 'react-native-ble-plx';
 import { KrossDevice } from '../../ble/KrossDevice';
 import { normalizeAngle } from '../../utils/helper';
+import { CURSOR_ADJUST_OFFSET, CIRCLE_MAX_RADIUS } from '../../dummy/Constants';
 
-const CIRCLE_RADIUS = 85;
-const CURSOR_RADIUS = 10;
+const CIRCLE_RADIUS = CIRCLE_MAX_RADIUS;
+const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -47,14 +48,14 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 		// 		x = 0;
 		// 		y = 0;
 		// 	}
-		// 	updateCursorPosition(x, y);
+		// 	updateCursorPosition(x, y, 0);
 		// }, 50);
 
 		if (BLEService.deviceId === null) {
 			Alert.alert('Device disconnected', `Force stop JPS session!`, [
 				{
 					text: 'OK',
-					//onPress: () => navigation.replace("Main"),
+					onPress: () => navigation.replace("Main"),
 				}
 			]);
 			return;
@@ -159,12 +160,11 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 			newY = y * ratio;
 		}
 
-
-
 		// update position
+		// *Important => minus CURSOR_ADJUST_OFFSET is used to adjust the deviation from the center of Svg
 		//Animated.parallel([
 		Animated.spring(animatedPos, {
-			toValue: { x: newX, y: newY },
+			toValue: { x: newX - CURSOR_ADJUST_OFFSET, y: newY - CURSOR_ADJUST_OFFSET },
 			useNativeDriver: false,
 			speed: 8,
 		}).start();
@@ -248,23 +248,21 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 	}
 
 	return (
-		<View>
-			<Animated.View
-				style={[
-					styles.cursor,
-					{
-						transform: [
-							{ translateX: animatedPos.x },
-							{ translateY: animatedPos.y },
-							{ rotate },
-						],
-					},
-				]}
-			>
-				<View style={!record ? styles.plusVertical : styles.plusRecordVertical} />
-				<View style={!record ? styles.plusHorizontal : styles.plusRecordHorizontal} />
-			</Animated.View>
-		</View>
+		<Animated.View
+			style={[
+				styles.cursor,
+				{
+					transform: [
+						{ translateX: animatedPos.x },
+						{ translateY: animatedPos.y },
+						{ rotate },
+					],
+				},
+			]}
+		>
+			<View style={!record ? styles.plusVertical : styles.plusRecordVertical} />
+			<View style={!record ? styles.plusHorizontal : styles.plusRecordHorizontal} />
+		</Animated.View>
 	)
 }
 

@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { CURSOR_ADJUST_OFFSET } from '../../dummy/Constants';
 
-const CURSOR_RADIUS = 10;
+const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
 
 const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z?: number | null }) => {
 	return (
@@ -11,8 +12,8 @@ const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z?: n
 					styles.cursor,
 					{
 						transform: [
-							{ translateX: x },
-							{ translateY: y * (-1) },
+							{ translateX: x - CURSOR_ADJUST_OFFSET },
+							{ translateY: y * (-1) - CURSOR_ADJUST_OFFSET },
 						],
 					},
 				]}
