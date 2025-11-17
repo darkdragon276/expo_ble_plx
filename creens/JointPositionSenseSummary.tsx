@@ -15,6 +15,10 @@ import useConvertDateTime from '../utils/convertDateTime';
 import TitleSummary from '../components/@ComponentCommon/TitleSummary';
 import JPSRecordedList from '../components/@ComponentCommon/JPSRecordedList';
 import { JPSRecordDataProp } from '../model/JointPosition';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
+import { Asset } from "expo-asset";
+import * as FileSystem from 'expo-file-system/legacy';
 
 const LuTarget = styled(LucideTarget);
 const LuFileText = styled(FileText);
@@ -23,6 +27,9 @@ const LuCircleAlert = styled(LucideCircleAlert);
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 type RProp = RouteProp<RootStackParamList, "JointPositionSenseSummary">;
+
+let cursorPDF: any = []
+let recordPDF: any = []
 
 const JointPositionSenseSummary = () => {
 	const navigation = useNavigation<NavigationProp>();
@@ -56,7 +63,7 @@ const JointPositionSenseSummary = () => {
 				<View className="flex-row items-center justify-center mb-1 mr-4">
 					<TouchableOpacity
 						activeOpacity={0.1}
-						onPress={() => { }}
+						onPress={printPDF}
 						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
 					>
 						<LuFileText size={18} color="black" />
@@ -97,9 +104,12 @@ const JointPositionSenseSummary = () => {
 							, z: item.angular.toString()
 						};
 					});
+
+					cursorPDF = result;
+					recordPDF = rs;
+
 					const { date_MM_dd_yyyy_at_hh_mm_ampm } = useConvertDateTime(new Date(rs[0].date));
 					setDateConvert(date_MM_dd_yyyy_at_hh_mm_ampm)
-
 					setData(rs);
 					setCursor(result);
 				}
@@ -126,6 +136,99 @@ const JointPositionSenseSummary = () => {
 			return Promise.resolve(false);
 		}
 	}
+
+	const printPDF = async () => {
+
+		// load ROM html template
+		const template = Asset.fromModule(require('../assets/PDFTemplate/JPSTemplate.html'));
+		await template.downloadAsync();
+
+		const htmlTemplate = await FileSystem.readAsStringAsync(template.localUri || "");
+
+		let cursors: any[] = [];
+		let _cursor =
+			`	
+				<div class="absolute" style="transform: translate({{x}}px, {{y}}px);">
+					<div class="absolute w-5 h-0.5 bg-purple-600 opacity-75 -translate-x-1/2 -translate-y-1/2">
+					</div>
+					<div class="absolute h-5 w-0.5 bg-purple-600 opacity-75 -translate-x-1/2 -translate-y-1/2">
+					</div>
+					<div class="absolute -top-6 left-1/2 -translate-x-1/2">
+						<div class="bg-purple-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">{{id_record}}
+						</div>
+					</div>
+				</div>
+		`;
+
+		cursorPDF?.forEach((cur: any) => {
+			let temp = _cursor;
+			temp = temp.replace("{{x}}", (cur.x).toString())
+				.replace("{{y}}", (cur.y * (-1)).toString())
+				.replace("{{id_record}}", cur.id.toString())
+
+			cursors.push(temp);
+		})
+
+		//console.log(cursors.join(""))
+		//return;
+		let records: any[] = [];
+		let _record =
+			`	
+				<div class="flex items-center justify-between bg-white shadow p-1 rounded-xl">
+					<div class="flex items-center space-x-3">
+						<div class="bg-purple-600 text-white px-3 py-1 rounded-md font-semibold">#{{id}}</div>
+						<div class="text-gray-700 font-medium">{{current}}</div>
+					</div>
+					<div class="text-right text-sm">
+						<div class="text-gray-800 font-semibold">Horizontal: {{horizontal}}°</div>
+						<div class="text-gray-800 font-semibold">Vertical: {{vertical}}°</div>
+						<div class="text-gray-800 font-semibold">Angular: {{angular}}°</div>
+					</div>
+				</div>
+		`;
+
+		recordPDF?.forEach((record: any) => {
+			let temp = _record;
+			//console.log(cur.x)
+			temp = temp.replace("{{id}}", record.id_record.toString())
+				.replace("{{current}}", record.current)
+				.replace("{{angular}}", record.angular.toString())
+				.replace("{{horizontal}}", record.horizontal.toString())
+				.replace("{{vertical}}", record.vertical.toString())
+
+			records.push(temp);
+		})
+
+		//console.log(cursors.join(''))
+		//console.log(recordPDF[0].title)
+		//return;
+
+		const { date_MM_dd_yyyy_at_hh_mm_ampm } = useConvertDateTime(new Date(recordPDF[0].date));
+
+		// loaded data to html template
+		const html = htmlTemplate
+			.replace('{{title}}', recordPDF[0].title)
+			.replace('{{datetime}}', `JPS Assessment - ${date_MM_dd_yyyy_at_hh_mm_ampm}`)
+			.replace("{{maker-cuscor}}", cursors.join(''))
+			.replace("{{records}}", records.join(''))
+			.replace("{{total_record}}", records.length.toString())
+
+		// create PDF from .html
+		const { uri } = await Print.printToFileAsync({ html });
+
+		// rename file
+		const newPath = `${FileSystem.documentDirectory}${recordPDF[0].title}.pdf`;
+
+		await FileSystem.moveAsync({
+			from: uri,
+			to: newPath,
+		});
+
+		// open or share file PDF
+		if (await Sharing.isAvailableAsync()) {
+			await Sharing.shareAsync(newPath);
+		}
+	};
 
 	return (
 		<ScrollView className="flex-1 p-4 space-y-4">
