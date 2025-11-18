@@ -101,11 +101,11 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 			>
 			</View> */}
 
-			<View className="absolute -top-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
+			<View className="absolute -bottom-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
 				<Text>Flexion</Text>
 			</View>
 
-			<View className="absolute -bottom-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
+			<View className="absolute -top-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
 				<Text>Extension</Text>
 			</View>
 

@@ -12,6 +12,9 @@ import { CURSOR_ADJUST_OFFSET, CIRCLE_MAX_RADIUS } from '../../dummy/Constants';
 
 const CIRCLE_RADIUS = CIRCLE_MAX_RADIUS;
 const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
+//const R_UI   = 20;  // bán kính hiển thị
+let SCALE_X = 1;
+let SCALE_Y = 1;
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -160,11 +163,15 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 			newY = y * ratio;
 		}
 
+		//const { x, y } = calculatePointPosition()
+
+		SCALE_X = 20 / newX;
+		SCALE_Y = 20 / newY;
+
 		// update position
-		// *Important => minus CURSOR_ADJUST_OFFSET is used to adjust the deviation from the center of Svg
 		//Animated.parallel([
 		Animated.spring(animatedPos, {
-			toValue: { x: newX - CURSOR_ADJUST_OFFSET, y: newY - CURSOR_ADJUST_OFFSET },
+			toValue: { x: newX, y: newY * (-1) },
 			useNativeDriver: false,
 			speed: 8,
 		}).start();
@@ -189,7 +196,7 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 
 		dataRef.current = {
 			horizontal: newX,
-			vertical: newY * (-1),
+			vertical: newY,
 			current: getCurrentPositionText(x, y)
 		};
 	};
@@ -271,8 +278,8 @@ export default LiveCursor
 const styles = StyleSheet.create({
 	cursor: {
 		position: 'absolute',
-		width: CURSOR_RADIUS * 2,
-		height: CURSOR_RADIUS * 2,
+		width: 0.2,
+		height: 0.2,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
