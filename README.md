@@ -24,6 +24,7 @@ npx expo run:ios
 To compile and build the apk for Android, run:
 
 ```bash
+npx expo prebuild --platform android
 cd ./android
 ./gradlew assembleRelease
 adb install -r .\app\build\outputs\apk\release\app-release.apk
@@ -35,7 +36,7 @@ To compile and build the apk for Android, run:
 
 ```bash
 rm -rf ./ios
-npx expo prebuild
+npx expo prebuild --platform ios 
 cd ./ios
 pod install
 ```
