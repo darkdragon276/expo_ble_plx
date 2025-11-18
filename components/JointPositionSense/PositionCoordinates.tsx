@@ -1,11 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import Svg, { Circle, Line } from 'react-native-svg'
-import MarkerCursor from './MarkerCursor'
 
 const PositionCoordinates = ({ children }: { children: any }) => {
-
-	//console.log(`PositionCoordinates render`)
 
 	return (
 		<>
@@ -91,15 +88,6 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 			<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
 				{children}
 			</View>
-
-			{/* <View className="absolute w-3 h-3 top-1/2 left-1/2 bg-blue-600 rounded-full shadow-lg border-2 border-white"
-				style={{
-					width: 10,
-					height: 10,
-					transform: [{ translateX: -5 }, { translateY: -5 }],
-				}}
-			>
-			</View> */}
 
 			<View className="absolute -bottom-5 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
 				<Text>Flexion</Text>

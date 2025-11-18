@@ -1,11 +1,9 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, Pressable, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { RootStackParamList } from '../../model/RootStackParamList';
 import { MakerCursorProps, type LiveHeadPositionProps, type LiveRecorded } from '../../model/JointPosition';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Svg, { Circle, Line, Text as SvgText } from 'react-native-svg';
 import LiveCursor from './LiveCursor';
 import HeadPosition from './HeadPosition';
 import { LucideTarget, LucideCircleCheckBig, LucideCircle } from 'lucide-react-native';
@@ -13,12 +11,10 @@ import { styled } from 'nativewind';
 import { LinearGradient } from 'expo-linear-gradient';
 import HeadPositionRecorded from './HeadPositionRecorded';
 import PositionCoordinates from './PositionCoordinates';
-import MarkerCursor from './MarkerCursor';
 import MakerCursorList from './MakerCursorList';
 import { ChildROMRef } from '../../model/ChildRefGetValue';
 import { useDatabase } from '../../db/useDatabase';
-import { DB_INSERT_JPS, DB_INSERT_JPS_RECORD, DB_SELECT_ALL_JPS } from '../../db/dbQuery';
-import { getCurrentDateTime } from '../../utils/getDateTime';
+import { DB_INSERT_JPS, DB_INSERT_JPS_RECORD } from '../../db/dbQuery';
 import { type JPSCommonInfo } from '../../model/JointPosition';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -96,9 +92,6 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 			}
 			await db.runAsync(DB_INSERT_JPS_RECORD, [idSession, refRecordCnt.current, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
 		});
-
-		//const rs = await db.getAllAsync(DB_SELECT_ALL_JPS);
-		//console.log(rs)
 	};
 
 	return (

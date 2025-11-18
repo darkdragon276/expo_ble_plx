@@ -14,10 +14,7 @@ const MakerCursorList: React.FC<MakerCursorChildProps> = ({ mode, data, getData,
 
 	const [items, setItems] = useState<MakerCursorProps[]>([]);
 
-	//console.log(items)
-
 	useEffect(() => {
-		//console.log(mode)
 		if (mode == "LIVE") {
 			subscribe(() => {
 				const newMaker = getData();
@@ -28,11 +25,8 @@ const MakerCursorList: React.FC<MakerCursorChildProps> = ({ mode, data, getData,
 			});
 
 		} else {
-			//console.log(mode)
 			setItems(data ?? []);
 		}
-
-		//console.log(items)
 
 	}, [mode, data, getData, subscribe]);
 
