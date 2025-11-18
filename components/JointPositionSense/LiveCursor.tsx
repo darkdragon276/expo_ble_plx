@@ -12,9 +12,6 @@ import { CURSOR_ADJUST_OFFSET, CIRCLE_MAX_RADIUS } from '../../dummy/Constants';
 
 const CIRCLE_RADIUS = CIRCLE_MAX_RADIUS;
 const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
-//const R_UI   = 20;  // bán kính hiển thị
-let SCALE_X = 1;
-let SCALE_Y = 1;
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
@@ -156,6 +153,9 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 		let newX = x;
 		let newY = y;
 
+		// let Circle_X = x;
+		// let Circle_Y = y;
+
 		// if out of circle then scale again
 		if (distance > CIRCLE_RADIUS - CURSOR_RADIUS) {
 			const ratio = (CIRCLE_RADIUS - CURSOR_RADIUS) / distance;
@@ -163,10 +163,14 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 			newY = y * ratio;
 		}
 
-		//const { x, y } = calculatePointPosition()
+		// const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
+		// if (distance2 > 20) {
+		// 	const ratio = (20) / distance2;
+		// 	Circle_X = Circle_X * ratio;
+		// 	Circle_Y = Circle_Y * ratio;
+		// }
 
-		SCALE_X = 20 / newX;
-		SCALE_Y = 20 / newY;
+		//const { x, y } = calculatePointPosition()
 
 		// update position
 		//Animated.parallel([
@@ -189,9 +193,9 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 		//console.log(`roll: ${z} --- convert: ${newZ}`)
 
 		Animated.timing(rotateAnim, {
-			toValue: 0,              // sẽ map thành 360 độ
+			toValue: 0,
 			duration: 100,
-			useNativeDriver: false, // rotate hỗ trợ native driver
+			useNativeDriver: false,
 		}).start();
 
 		dataRef.current = {
@@ -247,9 +251,9 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 	}
 
 	const normalizeAngle360 = (angle: number): number => {
-		let normalized = angle % 360;  // modulo để xử lý vòng quanh
+		let normalized = angle % 360;
 		if (normalized < 0) {
-			normalized += 360;  // đưa về 0..360
+			normalized += 360;
 		}
 		return normalized;
 	}
