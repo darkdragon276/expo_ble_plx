@@ -43,15 +43,17 @@ export function useDatabase(dbName: string = "headx.db") {
 
 				await database.execAsync(`
 					CREATE TABLE IF NOT EXISTS tb_asm_jps_record (
-						id_session 	text,
-						id_record 	int,
-						horizontal	decimal(3,1),
-						vertical	decimal(3,1),
-						l_lateral	decimal(3,1),
-						r_lateral	decimal(3,1),
-						angular		decimal(3,1),
-						current		text,
-						duration	decimal(3,1)
+						id_session 		text,
+						id_record 		int,
+						horizontal		decimal(3,1),
+						horizontalScale	decimal(3,1),
+						vertical		decimal(3,1),
+						verticalScale	decimal(3,1),
+						l_lateral		decimal(3,1),
+						r_lateral		decimal(3,1),
+						angular			decimal(3,1),
+						current			text,
+						duration		decimal(3,1)
 					)
 				`);
 

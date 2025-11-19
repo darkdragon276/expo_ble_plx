@@ -51,7 +51,7 @@ const DB_UPDATE_BY_KEY_ROM = "UPDATE tb_asm_rom SET title = ? WHERE key = ?";
 
 const DB_INSERT_JPS = "INSERT INTO tb_asm_jps (key, id_session, title, date, type) VALUES (?, ?, ?, ?, ?)";
 
-const DB_INSERT_JPS_RECORD = "INSERT INTO tb_asm_jps_record (id_session, id_record, horizontal, vertical, angular, current, duration) VALUES (?, ?, ?, ?, ?, ?, ?)";
+const DB_INSERT_JPS_RECORD = "INSERT INTO tb_asm_jps_record (id_session, id_record, horizontal, horizontalScale, vertical, verticalScale, angular, current, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 const DB_SELECT_ALL_JPS = "SELECT id, key, id_session, title, date, type FROM tb_asm_jps";
 
@@ -68,7 +68,9 @@ const DB_SELECT_BY_ID_JPS =
         , jps.date
         , record.id_record
         , record.horizontal
+        , record.horizontalScale
         , record.vertical
+        , record.verticalScale
         , record.angular
         , record.current
         , record.duration 

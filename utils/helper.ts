@@ -1,5 +1,6 @@
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system/legacy';
+import { CIRCLE_LIMIT, SCALE_PERCENT } from "../dummy/Constants";
 
 const normalizeAngle = (alpha: number): number => {
     alpha = ((alpha + 180) % 360 + 360) % 360;
@@ -28,4 +29,18 @@ const numberToMmss = (seconds: number): string => {
     return `${mm}:${ss}`;
 }
 
-export { normalizeAngle, loadImg, numberToMmss }
+// scale JPS circle
+const coordinatesScaleConvert = (coordinates: number, sign: number = 1): number => {
+    let convert = 0;
+
+    convert = coordinates * sign;
+    coordinates = Math.abs(coordinates);
+
+    if (coordinates < CIRCLE_LIMIT) {
+        convert = convert * SCALE_PERCENT;
+    }
+
+    return Math.round(convert * 10) / 10;
+}
+
+export { normalizeAngle, loadImg, numberToMmss, coordinatesScaleConvert }

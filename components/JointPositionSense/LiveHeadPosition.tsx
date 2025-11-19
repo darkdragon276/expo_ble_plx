@@ -16,6 +16,7 @@ import { ChildROMRef } from '../../model/ChildRefGetValue';
 import { useDatabase } from '../../db/useDatabase';
 import { DB_INSERT_JPS, DB_INSERT_JPS_RECORD } from '../../db/dbQuery';
 import { type JPSCommonInfo } from '../../model/JointPosition';
+import { CIRCLE_LIMIT } from '../../dummy/Constants';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 type RProp = RouteProp<RootStackParamList, "JointPositionSense">;
@@ -30,6 +31,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 
 	const refRecord = useRef<LiveRecorded | any>(null);
 	const refMarkerCursor = useRef<MakerCursorProps | any>(null);
+	const dataRefScale = useRef<MakerCursorProps | any>(null);
 	const refRecordCnt = useRef<number>(0);
 	const subscribers = useRef<(() => void)[]>([]);
 
@@ -53,15 +55,42 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 			angular: (refPosition.current && refPosition.current) ? Math.hypot(refPosition.current.horizontal, refPosition.current.vertical).toFixed(1) : 0
 		};
 
+		// refMarkerCursor.current = {
+		// 	id: refRecordCnt.current.toString(),
+		// 	x: refPosition.current ? refPosition.current.horizontal : 0,
+		// 	y: refPosition.current ? refPosition.current.vertical : 0,
+		// 	z: 0
+		// };
+
 		refMarkerCursor.current = {
 			id: refRecordCnt.current.toString(),
-			x: refPosition.current ? refPosition.current.horizontal : 0,
-			y: refPosition.current ? refPosition.current.vertical : 0,
+			x: dataRefScale.current ? dataRefScale.current.horizontal : 0,
+			y: dataRefScale.current ? dataRefScale.current.vertical : 0,
+			// x: (() => {
+			// 	let xScale = 0;
+			// 	if (refPosition.current && Math.abs(refPosition.current.horizontal) > CIRCLE_LIMIT) {
+			// 		xScale = dataRefScale.current ? dataRefScale.current.horizontal : 0;
+			// 	} else {
+			// 		xScale = refPosition.current ? refPosition.current.horizontal : 0;
+			// 	}
+
+			// 	return xScale;
+			// })(),
+			// y: (() => {
+			// 	let yScale = 0;
+			// 	if (refPosition.current && Math.abs(refPosition.current.vertical) > CIRCLE_LIMIT) {
+			// 		yScale = dataRefScale.current ? dataRefScale.current.vertical : 0;
+			// 	} else {
+			// 		yScale = refPosition.current ? refPosition.current.vertical : 0;
+			// 	}
+
+			// 	return yScale;
+			// })(),
 			z: 0
 		};
 
 		try {
-			addJPSData(refRecord.current);
+			addJPSData(refRecord.current, refMarkerCursor.current);
 
 		} catch (e) { }
 
@@ -72,7 +101,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 		subscribers.current.push(fn);
 	};
 
-	const addJPSData = async (record: LiveRecorded) => {
+	const addJPSData = async (record: LiveRecorded, cursorScale: MakerCursorProps) => {
 		if (!db) {
 			return;
 		}
@@ -90,7 +119,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 			if (refRecordCnt.current <= 1) {
 				await db.runAsync(DB_INSERT_JPS, [key, idSession, title, dt, "JPS"]);
 			}
-			await db.runAsync(DB_INSERT_JPS_RECORD, [idSession, refRecordCnt.current, record.horizontal, record.vertical, record.angular, record.current, record.time ? record.time : 0]);
+			await db.runAsync(DB_INSERT_JPS_RECORD, [idSession, refRecordCnt.current, record.horizontal, cursorScale.x, record.vertical, cursorScale.y, record.angular, record.current, record.time ? record.time : 0]);
 		});
 	};
 
@@ -108,12 +137,10 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 
 				{/* svg */}
 				<View className="relative w-48 h-48 mx-auto my-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full border-2 border-gray-300 shadow-inner">
-
 					<PositionCoordinates>
-						<LiveCursor dataRef={refPosition} reset={isReset} record={record}></LiveCursor>
+						<LiveCursor dataRef={refPosition} reset={isReset} record={record} dataRefScale={dataRefScale}></LiveCursor>
 						<MakerCursorList mode={"LIVE"} getData={() => refMarkerCursor ? refMarkerCursor.current : []} subscribe={subscribe} data={[]}></MakerCursorList>
 					</PositionCoordinates>
-
 				</View>
 
 				<View className="flex-row space-x-3 mt-3">

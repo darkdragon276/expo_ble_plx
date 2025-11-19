@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { BleError, BleErrorCode, Characteristic } from 'react-native-ble-plx';
 import { KrossDevice } from '../../ble/KrossDevice';
 import { normalizeAngle } from '../../utils/helper';
-import { CURSOR_ADJUST_OFFSET, CIRCLE_MAX_RADIUS } from '../../dummy/Constants';
+import { CURSOR_ADJUST_OFFSET, CIRCLE_MAX_RADIUS, CIRCLE_LIMIT, SCALE_PERCENT } from '../../dummy/Constants';
 
 const CIRCLE_RADIUS = CIRCLE_MAX_RADIUS;
 const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
@@ -17,7 +17,7 @@ type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const degreesArray: number[] = [0, 30, 45, 60, 90, 120, 135, 150, 180, 360];
 
-const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveHeadPositionProps | null>, reset: React.RefObject<boolean>, record: boolean }) => {
+const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.RefObject<LiveHeadPositionProps | null>, reset: React.RefObject<boolean>, record: boolean, dataRefScale: React.RefObject<LiveHeadPositionProps | null> }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const animatedPos = useState(new Animated.ValueXY({ x: 0, y: 0 }))[0];
 	const animatedRotate = useRef(new Animated.Value(0)).current;
@@ -153,8 +153,8 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 		let newX = x;
 		let newY = y;
 
-		// let Circle_X = x;
-		// let Circle_Y = y;
+		let Circle_X = x;
+		let Circle_Y = y;
 
 		// if out of circle then scale again
 		if (distance > CIRCLE_RADIUS - CURSOR_RADIUS) {
@@ -163,22 +163,37 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 			newY = y * ratio;
 		}
 
-		// const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
-		// if (distance2 > 20) {
-		// 	const ratio = (20) / distance2;
-		// 	Circle_X = Circle_X * ratio;
-		// 	Circle_Y = Circle_Y * ratio;
-		// }
+		//const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
+		const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
+		if (distance2 > CIRCLE_LIMIT) {
+			const ratio = 20 / distance2;
+			Circle_X = x * ratio;
+			Circle_Y = y * ratio;
 
-		//const { x, y } = calculatePointPosition()
+			if (Math.abs(newX) < CIRCLE_LIMIT) {
+				//Circle_X = newX
+			}
+
+			if (Math.abs(newY) < CIRCLE_LIMIT) {
+				//Circle_Y = newY
+			}
+		}
+
+		//console.log(`Circle_X: ${Math.round(Circle_X * 10) / 10} + newX: ${newX}, Circle_Y: ${Math.round(Circle_Y * 10) / 10 * (-1)} + newY: ${newY}`)
 
 		// update position
 		//Animated.parallel([
 		Animated.spring(animatedPos, {
-			toValue: { x: newX, y: newY * (-1) },
+			toValue: { x: Circle_X, y: Circle_Y * (-1) },
 			useNativeDriver: false,
-			speed: 8,
+			stiffness: 90,
+			damping: 20,
+			mass: 1,
+			overshootClamping: true,
+			restSpeedThreshold: 0.1,
+			restDisplacementThreshold: 0.1,
 		}).start();
+
 		// , Animated.timing(animatedRotate, {
 		// 	toValue: z,
 		// 	duration: 500,
@@ -190,8 +205,6 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 
 		let newZ = degToRadRounded(normalizeAngle360(z));
 
-		//console.log(`roll: ${z} --- convert: ${newZ}`)
-
 		Animated.timing(rotateAnim, {
 			toValue: 0,
 			duration: 100,
@@ -201,6 +214,12 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 		dataRef.current = {
 			horizontal: newX,
 			vertical: newY,
+			current: getCurrentPositionText(x, y)
+		};
+
+		dataRefScale.current = {
+			horizontal: Circle_X,
+			vertical: Circle_Y,
 			current: getCurrentPositionText(x, y)
 		};
 	};
@@ -264,8 +283,8 @@ const LiveCursor = ({ dataRef, reset, record }: { dataRef: React.RefObject<LiveH
 				styles.cursor,
 				{
 					transform: [
-						{ translateX: animatedPos.x },
-						{ translateY: animatedPos.y },
+						{ translateX: Animated.multiply(animatedPos.x, SCALE_PERCENT) },
+						{ translateY: Animated.multiply(animatedPos.y, SCALE_PERCENT) },
 						{ rotate },
 					],
 				},

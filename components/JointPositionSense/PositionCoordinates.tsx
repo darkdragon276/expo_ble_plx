@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import Svg, { Circle, Line } from 'react-native-svg'
+import Svg, { Circle } from 'react-native-svg'
 
 const PositionCoordinates = ({ children }: { children: any }) => {
 
@@ -11,78 +11,45 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 				<Circle
 					cx="96"
 					cy="96"
-					r="25"
-					fill="none"
-					stroke="#e5e7eb"
+					r="96"
+					fill="#e53935"
+					stroke="black"
 					strokeWidth="1"
-					strokeDasharray="2,2"
 				/>
 				<Circle
 					cx="96"
 					cy="96"
-					r="45"
-					fill="none"
-					stroke="#d1d5db"
+					r="72"
+					fill="#fff176"
+					stroke="black"
 					strokeWidth="1"
-					strokeDasharray="2,2"
 				/>
 				<Circle
 					cx="96"
 					cy="96"
-					r="65"
-					fill="none"
-					stroke="#9ca3af"
+					r="48"
+					fill="#66bb6a"
+					stroke="black"
 					strokeWidth="1"
-					strokeDasharray="2,2"
 				/>
 				<Circle
 					cx="96"
 					cy="96"
-					r="85"
-					fill="none"
-					stroke="#6b7280"
+					r="32"
+					fill="#66bb6a"
+					stroke="black"
 					strokeWidth="1"
-					strokeDasharray="2,2"
 				/>
-				{/* Cross lines */}
-				<Line
-					x1="96"
-					y1="11"
-					x2="96"
-					y2="181"
-					stroke="#9ca3af"
+
+				<Circle
+					cx="96"
+					cy="96"
+					r="16"
+					fill="#66bb6a"
+					stroke="black"
 					strokeWidth="1"
-					strokeDasharray="4,2"
 				/>
-				<Line
-					x1="11"
-					y1="96"
-					x2="181"
-					y2="96"
-					stroke="#9ca3af"
-					strokeWidth="1"
-					strokeDasharray="4,2"
-				/>
-				{/* Diagonals */}
-				<Line
-					x1="29"
-					y1="29"
-					x2="163"
-					y2="163"
-					stroke="#d1d5db"
-					strokeWidth="1"
-					strokeDasharray="2,4"
-				/>
-				<Line
-					x1="163"
-					y1="29"
-					x2="29"
-					y2="163"
-					stroke="#d1d5db"
-					strokeWidth="1"
-					strokeDasharray="2,4"
-				/>
-				<Circle cx="96" cy="96" r="4" stroke="white" strokeWidth="1" fill="#155dfc" />
+				<Circle cx="96" cy="96" r="4" strokeWidth="1" fill="black" />
 			</Svg>
 
 			<View className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { View, Text, Pressable, TouchableOpacity, ScrollView, FlatList } from 'react-native';
 import { RootStackParamList } from '../model/RootStackParamList';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { styled } from 'nativewind';
@@ -10,7 +10,7 @@ import { useDatabase } from '../db/useDatabase';
 import PositionCoordinates from '../components/JointPositionSense/PositionCoordinates';
 import MakerCursorList from '../components/JointPositionSense/MakerCursorList';
 import { MakerCursorProps } from '../model/JointPosition';
-import { DB_SELECT_ALL_JPS, DB_SELECT_ALL_JPS_RECORD, DB_SELECT_BY_ID_JPS, DB_UPDATE_BY_KEY_JPS } from '../db/dbQuery';
+import { DB_SELECT_BY_ID_JPS, DB_UPDATE_BY_KEY_JPS } from '../db/dbQuery';
 import useConvertDateTime from '../utils/convertDateTime';
 import TitleSummary from '../components/@ComponentCommon/TitleSummary';
 import JPSRecordedList from '../components/@ComponentCommon/JPSRecordedList';
@@ -19,6 +19,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system/legacy';
+import { coordinatesScaleConvert } from '../utils/helper';
 
 const LuTarget = styled(LucideTarget);
 const LuFileText = styled(FileText);
@@ -83,31 +84,24 @@ const JointPositionSenseSummary = () => {
 				}
 
 				const { key } = route.params;
-				//console.log(key)
 				const rs = await db.getAllAsync<JPSRecordDataProp>(DB_SELECT_BY_ID_JPS, key);
-
-				//console.log(rs)
-
-				//const rs1 = await db.getAllAsync(DB_SELECT_ALL_JPS);
-				//console.log(rs1)
-
-				//const rs2 = await db.getAllAsync(DB_SELECT_ALL_JPS_RECORD);
-				//console.log(rs2)
 
 				if (rs && rs.length > 0) {
 
 					const result = rs.map((item: JPSRecordDataProp, index: number) => {
 						return {
 							id: item.id_record.toString()
-							, x: item.horizontal
-							, y: item.vertical
+							, xRaw: coordinatesScaleConvert(item.horizontalScale)
+							, yRaw: coordinatesScaleConvert(item.verticalScale, -1)
+							, x: item.horizontalScale
+							, y: item.verticalScale
 							, z: item.angular.toString()
 						};
 					});
 
 					cursorPDF = result;
 					recordPDF = rs;
-
+					//console.log(cursorPDF);
 					const { date_MM_dd_yyyy_at_hh_mm_ampm } = useConvertDateTime(new Date(rs[0].date));
 					setDateConvert(date_MM_dd_yyyy_at_hh_mm_ampm)
 					setData(rs);
@@ -162,8 +156,8 @@ const JointPositionSenseSummary = () => {
 
 		cursorPDF?.forEach((cur: any) => {
 			let temp = _cursor;
-			temp = temp.replace("{{x}}", (cur.x).toString())
-				.replace("{{y}}", (cur.y * (-1)).toString())
+			temp = temp.replace("{{x}}", (cur.xRaw).toString())
+				.replace("{{y}}", (cur.yRaw).toString())
 				.replace("{{id_record}}", cur.id.toString())
 
 			cursors.push(temp);
@@ -189,7 +183,6 @@ const JointPositionSenseSummary = () => {
 
 		recordPDF?.forEach((record: any) => {
 			let temp = _record;
-			//console.log(cur.x)
 			temp = temp.replace("{{id}}", record.id_record.toString())
 				.replace("{{current}}", record.current)
 				.replace("{{angular}}", record.angular.toString())
@@ -199,6 +192,7 @@ const JointPositionSenseSummary = () => {
 			records.push(temp);
 		})
 
+		//console.log(`-------------------------------------------------`)
 		//console.log(cursors.join(''))
 		//console.log(recordPDF[0].title)
 		//return;
