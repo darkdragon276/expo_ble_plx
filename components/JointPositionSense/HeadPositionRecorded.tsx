@@ -14,7 +14,7 @@ const SessionItem = memo(({ item }: { item: LiveRecorded }) => {
 				<View className="w-7 h-5 justify-between items-center rounded-xl bg-purple-50 border-purple-200">
 					<Text className="text-md text-purple-700 font-semibold">#{item.id}</Text>
 				</View>
-				<Text className="text-md font-semibold">{item.current}</Text>
+				<Text className="text-md font-semibold">{item.pst_txt}</Text>
 			</View>
 
 			<View className="flex-column w-4/7">

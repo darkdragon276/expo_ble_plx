@@ -36,7 +36,7 @@ const MakerCursorList: React.FC<MakerCursorChildProps> = ({ mode, data, getData,
 				items && items.length > 0
 					?
 					items.map((item, index) => (
-						<MarkerCursor key={index} id={item.id} x={item.x} y={item.y}></MarkerCursor>
+						<MarkerCursor key={index} id={item.id} x={item.x} y={item.y} z={item.z}></MarkerCursor>
 					))
 					:
 					<View></View>

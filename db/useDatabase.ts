@@ -49,10 +49,9 @@ export function useDatabase(dbName: string = "headx.db") {
 						horizontalScale	decimal(3,1),
 						vertical		decimal(3,1),
 						verticalScale	decimal(3,1),
-						l_lateral		decimal(3,1),
-						r_lateral		decimal(3,1),
+						rotate			decimal(3,1),
 						angular			decimal(3,1),
-						current			text,
+						pst_txt			text,
 						duration		decimal(3,1)
 					)
 				`);

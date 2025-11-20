@@ -16,7 +16,6 @@ import { ChildROMRef } from '../../model/ChildRefGetValue';
 import { useDatabase } from '../../db/useDatabase';
 import { DB_INSERT_JPS, DB_INSERT_JPS_RECORD } from '../../db/dbQuery';
 import { type JPSCommonInfo } from '../../model/JointPosition';
-import { CIRCLE_LIMIT } from '../../dummy/Constants';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 type RProp = RouteProp<RootStackParamList, "JointPositionSense">;
@@ -31,7 +30,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 
 	const refRecord = useRef<LiveRecorded | any>(null);
 	const refMarkerCursor = useRef<MakerCursorProps | any>(null);
-	const dataRefScale = useRef<MakerCursorProps | any>(null);
+	const dataRefScale = useRef<any>(null);
 	const refRecordCnt = useRef<number>(0);
 	const subscribers = useRef<(() => void)[]>([]);
 
@@ -50,43 +49,16 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 			id: refRecordCnt.current.toString(),
 			horizontal: refPosition.current ? refPosition.current.horizontal : 0,
 			vertical: refPosition.current ? refPosition.current.vertical : 0,
-			current: refPosition.current ? refPosition.current.current : "",
+			pst_txt: refPosition.current ? refPosition.current.pst_txt : "",
 			time: refDuration.current ? refDuration.current.getValue() : "",
 			angular: (refPosition.current && refPosition.current) ? Math.hypot(refPosition.current.horizontal, refPosition.current.vertical).toFixed(1) : 0
 		};
-
-		// refMarkerCursor.current = {
-		// 	id: refRecordCnt.current.toString(),
-		// 	x: refPosition.current ? refPosition.current.horizontal : 0,
-		// 	y: refPosition.current ? refPosition.current.vertical : 0,
-		// 	z: 0
-		// };
 
 		refMarkerCursor.current = {
 			id: refRecordCnt.current.toString(),
 			x: dataRefScale.current ? dataRefScale.current.horizontal : 0,
 			y: dataRefScale.current ? dataRefScale.current.vertical : 0,
-			// x: (() => {
-			// 	let xScale = 0;
-			// 	if (refPosition.current && Math.abs(refPosition.current.horizontal) > CIRCLE_LIMIT) {
-			// 		xScale = dataRefScale.current ? dataRefScale.current.horizontal : 0;
-			// 	} else {
-			// 		xScale = refPosition.current ? refPosition.current.horizontal : 0;
-			// 	}
-
-			// 	return xScale;
-			// })(),
-			// y: (() => {
-			// 	let yScale = 0;
-			// 	if (refPosition.current && Math.abs(refPosition.current.vertical) > CIRCLE_LIMIT) {
-			// 		yScale = dataRefScale.current ? dataRefScale.current.vertical : 0;
-			// 	} else {
-			// 		yScale = refPosition.current ? refPosition.current.vertical : 0;
-			// 	}
-
-			// 	return yScale;
-			// })(),
-			z: 0
+			z: dataRefScale.current ? dataRefScale.current.rotate : 0,
 		};
 
 		try {
@@ -119,7 +91,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 			if (refRecordCnt.current <= 1) {
 				await db.runAsync(DB_INSERT_JPS, [key, idSession, title, dt, "JPS"]);
 			}
-			await db.runAsync(DB_INSERT_JPS_RECORD, [idSession, refRecordCnt.current, record.horizontal, cursorScale.x, record.vertical, cursorScale.y, record.angular, record.current, record.time ? record.time : 0]);
+			await db.runAsync(DB_INSERT_JPS_RECORD, [idSession, refRecordCnt.current, record.horizontal, cursorScale.x, record.vertical, cursorScale.y, cursorScale.z, record.angular, record.pst_txt, record.time ? record.time : 0]);
 		});
 	};
 

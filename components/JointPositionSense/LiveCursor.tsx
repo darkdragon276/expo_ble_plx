@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Animated, Alert } from 'react-native';
+import { View, StyleSheet, Animated, Alert, Easing } from 'react-native';
 import { type LiveHeadPositionProps } from '../../model/JointPosition';
 import { BLEService } from '../../ble/BLEService';
 import { RootStackParamList } from '../../model/RootStackParamList';
@@ -8,27 +8,25 @@ import { useNavigation } from '@react-navigation/native';
 import { BleError, BleErrorCode, Characteristic } from 'react-native-ble-plx';
 import { KrossDevice } from '../../ble/KrossDevice';
 import { normalizeAngle } from '../../utils/helper';
-import { CURSOR_ADJUST_OFFSET, CIRCLE_MAX_RADIUS, CIRCLE_LIMIT, SCALE_PERCENT } from '../../dummy/Constants';
+import { CIRCLE_LIMIT, SCALE_PERCENT } from '../../dummy/Constants';
 
-const CIRCLE_RADIUS = CIRCLE_MAX_RADIUS;
-const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
+// const CIRCLE_RADIUS = CIRCLE_MAX_RADIUS;
+// const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-
-const degreesArray: number[] = [0, 30, 45, 60, 90, 120, 135, 150, 180, 360];
 
 const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.RefObject<LiveHeadPositionProps | null>, reset: React.RefObject<boolean>, record: boolean, dataRefScale: React.RefObject<LiveHeadPositionProps | null> }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const animatedPos = useState(new Animated.ValueXY({ x: 0, y: 0 }))[0];
-	const animatedRotate = useRef(new Animated.Value(0)).current;
 	const rotateAnim = useRef(new Animated.Value(0)).current;
 	const rotate = rotateAnim.interpolate({
-		inputRange: [0, Math.PI * 2],
-		outputRange: ["0rad", `${2 * Math.PI}rad`],
+		inputRange: [-90, 90],
+		outputRange: ['-90deg', '90deg'],
 	});
 	const krossDevice = new KrossDevice();
 	const OffsetX = useRef<number | null>(null);
 	const OffsetY = useRef<number | null>(null);
+	const OffsetZ = useRef<number | null>(null);
 
 	useEffect(() => {
 
@@ -111,15 +109,15 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 				if (reset.current) {
 					OffsetX.current = 0;
 					OffsetY.current = 0;
+					OffsetZ.current = 0;
 					reStart();
 				}
 
 				x = getHorizontalOffset(x);
 				y = getVerticalOffset(y);
-				z = getRote(z);
+				z = getRoteOffset(z);
 				updateCursorPosition(x, y, z);
 			}
-			//console.log("Monitor: ", char?.value);
 		}
 
 		await BLEService.discoverAllServicesAndCharacteristicsForDevice()
@@ -148,7 +146,7 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 
 	// limits within a circle
 	const updateCursorPosition = (x: number, y: number, z: number) => {
-		const distance = Math.sqrt(x * x + y * y);
+		//const distance = Math.sqrt(x * x + y * y);
 
 		let newX = x;
 		let newY = y;
@@ -163,26 +161,14 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 		// 	newY = y * ratio;
 		// }
 
-		//const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
 		const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
 		if (distance2 > CIRCLE_LIMIT) {
 			const ratio = 20 / distance2;
 			Circle_X = x * ratio;
 			Circle_Y = y * ratio;
 
-			//if (Math.abs(newX) < CIRCLE_LIMIT) {
-			//Circle_X = newX
-			//}
-
-			//if (Math.abs(newY) < CIRCLE_LIMIT) {
-			//Circle_Y = newY
-			//}
 		}
 
-		//console.log(`Circle_X: ${Math.round(Circle_X * 10) / 10} + newX: ${newX}, Circle_Y: ${Math.round(Circle_Y * 10) / 10 * (-1)} + newY: ${newY}`)
-
-		// update position
-		//Animated.parallel([
 		Animated.spring(animatedPos, {
 			toValue: { x: Circle_X, y: Circle_Y * (-1) },
 			useNativeDriver: false,
@@ -194,52 +180,46 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 			restDisplacementThreshold: 0.1,
 		}).start();
 
-		// , Animated.timing(animatedRotate, {
-		// 	toValue: z,
-		// 	duration: 500,
-		// 	useNativeDriver: true,
-		// })
-		// ]).start(() => {
-		// 	animatedRotate.setValue(0); // reset để xoay tiếp lần sau
-		// });
-
-		let newZ = degToRadRounded(normalizeAngle360(z));
-
-		Animated.timing(rotateAnim, {
-			toValue: 0,
-			duration: 100,
-			useNativeDriver: false,
-		}).start();
+		rotateAnim.stopAnimation(() => {
+			Animated.timing(rotateAnim, {
+				toValue: z,
+				duration: 120,
+				easing: Easing.linear,
+				useNativeDriver: false,
+			}).start();
+		})
 
 		dataRef.current = {
 			horizontal: newX,
 			vertical: newY,
-			current: getCurrentPositionText(x, y)
+			rotate: z,
+			pst_txt: getCurrentPositionText(x, y)
 		};
 
 		dataRefScale.current = {
 			horizontal: Circle_X,
 			vertical: Circle_Y,
-			current: getCurrentPositionText(x, y)
+			rotate: z,
+			pst_txt: getCurrentPositionText(x, y)
 		};
 	};
 
 	const getCurrentPositionText = (x: number, y: number) => {
-		let current = "";
+		let pst = "";
 
 		if (x <= 0) {
-			current = "Left ";
+			pst = "Left ";
 		} else if (x >= 0) {
-			current = "Right ";
+			pst = "Right ";
 		}
 
 		if (y <= 0) {
-			current += "Flexion ";
+			pst += "Flexion ";
 		} else if (y >= 0) {
-			current += "Extension ";
+			pst += "Extension ";
 		}
 
-		return current;
+		return pst;
 	};
 
 	const getHorizontalOffset = (x: number): number => {
@@ -260,21 +240,13 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 		return (Math.round(alpha * 10) / 10);
 	};
 
-	const getRote = (z: number): number => {
-		return (Math.round(z * 10) / 10);
-	}
-
-	const degToRadRounded = (degrees: number, roundTo: number = 30): number => {
-		const roundedDeg = Math.round(degrees / roundTo) * roundTo;
-		return roundedDeg * (Math.PI / 180);
-	}
-
-	const normalizeAngle360 = (angle: number): number => {
-		let normalized = angle % 360;
-		if (normalized < 0) {
-			normalized += 360;
+	const getRoteOffset = (z: number): number => {
+		if (OffsetZ.current === null || OffsetZ.current === 0) {
+			OffsetZ.current = Math.round(z);
 		}
-		return normalized;
+
+		let alpha = normalizeAngle(Math.round(z * 10) / 10 - OffsetZ.current);
+		return (Math.round((alpha) * 10) / 10);
 	}
 
 	return (

@@ -4,7 +4,7 @@ import { type LiveHeadPositionProps } from '../../model/JointPosition';
 
 const HeadPosition = ({ dataRef }: { dataRef: React.RefObject<LiveHeadPositionProps | null> }) => {
 
-	const [position, setPosition] = useState<LiveHeadPositionProps>({ horizontal: 0, vertical: 0, current: "" });
+	const [position, setPosition] = useState<LiveHeadPositionProps>({ horizontal: 0, vertical: 0, rotate: 0, pst_txt: "" });
 
 	useEffect(() => {
 		const interval = setInterval(() => {
@@ -34,7 +34,7 @@ const HeadPosition = ({ dataRef }: { dataRef: React.RefObject<LiveHeadPositionPr
 				</View>
 			</View>
 
-			<Text className="text-gray-700">Current: {position.current}</Text>
+			<Text className="text-gray-700">Current: {position.pst_txt}</Text>
 		</>
 	)
 }

@@ -2,10 +2,11 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { coordinatesScaleConvert } from '../../utils/helper';
 
-const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z?: number | null }) => {
+const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z: number | null }) => {
 
 	const horizontal = coordinatesScaleConvert(x);
 	const vertical = coordinatesScaleConvert(y, -1);
+	const rotate = `${z}deg`;
 
 	return (
 		<View className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -15,6 +16,7 @@ const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z?: n
 					transform: [
 						{ translateX: horizontal },
 						{ translateY: vertical },
+						{ rotate: rotate }
 					],
 				},
 			]}

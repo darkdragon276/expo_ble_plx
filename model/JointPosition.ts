@@ -1,7 +1,8 @@
 type LiveHeadPositionProps = {
 	horizontal: number;
 	vertical: number;
-	current: string;
+	rotate: number;
+	pst_txt: string;
 }
 
 interface LiveRecorded extends LiveHeadPositionProps {
@@ -14,7 +15,7 @@ type MakerCursorProps = {
 	id: string;
 	x: number;
 	y: number;
-	z?: string;
+	z: number;
 }
 
 type JPSCommonInfo = {
@@ -27,7 +28,6 @@ type JPSCommonInfo = {
 }
 
 type JPSRecordDataProp = {
-	//id, key, id_session, title, date, horizontal, vertical, angular, current, duration
 	id: number,
 	key: string,
 	id_session: string,
@@ -38,8 +38,9 @@ type JPSRecordDataProp = {
 	horizontalScale: number,
 	vertical: number,
 	verticalScale: number,
+	rotate: number;
 	angular: number,
-	current: string,
+	pst_txt: string,
 	duration: number,
 }
 

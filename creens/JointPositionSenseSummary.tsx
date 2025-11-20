@@ -95,13 +95,13 @@ const JointPositionSenseSummary = () => {
 							, yRaw: coordinatesScaleConvert(item.verticalScale, -1)
 							, x: item.horizontalScale
 							, y: item.verticalScale
-							, z: item.angular.toString()
+							, z: item.rotate
 						};
 					});
 
 					cursorPDF = result;
 					recordPDF = rs;
-					//console.log(cursorPDF);
+					//console.log(recordPDF);
 					const { date_MM_dd_yyyy_at_hh_mm_ampm } = useConvertDateTime(new Date(rs[0].date));
 					setDateConvert(date_MM_dd_yyyy_at_hh_mm_ampm)
 					setData(rs);
@@ -142,7 +142,7 @@ const JointPositionSenseSummary = () => {
 		let cursors: any[] = [];
 		let _cursor =
 			`	
-				<div class="absolute" style="transform: translate({{x}}px, {{y}}px);">
+				<div class="absolute" style="transform: translate({{x}}px, {{y}}px) rotate({{z}}deg);">
 					<div class="absolute w-5 h-0.5 bg-purple-600 opacity-75 -translate-x-1/2 -translate-y-1/2">
 					</div>
 					<div class="absolute h-5 w-0.5 bg-purple-600 opacity-75 -translate-x-1/2 -translate-y-1/2">
@@ -158,6 +158,7 @@ const JointPositionSenseSummary = () => {
 			let temp = _cursor;
 			temp = temp.replace("{{x}}", (cur.xRaw).toString())
 				.replace("{{y}}", (cur.yRaw).toString())
+				.replace("{{z}}", (cur.z).toString())
 				.replace("{{id_record}}", cur.id.toString())
 
 			cursors.push(temp);
@@ -171,7 +172,7 @@ const JointPositionSenseSummary = () => {
 				<div class="flex items-center justify-between bg-white shadow p-1 rounded-xl">
 					<div class="flex items-center space-x-3">
 						<div class="bg-purple-600 text-white px-3 py-1 rounded-md font-semibold">#{{id}}</div>
-						<div class="text-gray-700 font-medium">{{current}}</div>
+						<div class="text-gray-700 font-medium">{{pst_txt}}</div>
 					</div>
 					<div class="text-right text-sm">
 						<div class="text-gray-800 font-semibold">Horizontal: {{horizontal}}°</div>
@@ -184,7 +185,7 @@ const JointPositionSenseSummary = () => {
 		recordPDF?.forEach((record: any) => {
 			let temp = _record;
 			temp = temp.replace("{{id}}", record.id_record.toString())
-				.replace("{{current}}", record.current)
+				.replace("{{pst_txt}}", record.pst_txt)
 				.replace("{{angular}}", record.angular.toString())
 				.replace("{{horizontal}}", record.horizontal.toString())
 				.replace("{{vertical}}", record.vertical.toString())
