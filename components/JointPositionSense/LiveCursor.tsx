@@ -157,11 +157,11 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 		let Circle_Y = y;
 
 		// if out of circle then scale again
-		if (distance > CIRCLE_RADIUS - CURSOR_RADIUS) {
-			const ratio = (CIRCLE_RADIUS - CURSOR_RADIUS) / distance;
-			newX = x * ratio;
-			newY = y * ratio;
-		}
+		// if (distance > CIRCLE_RADIUS - CURSOR_RADIUS) {
+		// 	const ratio = (CIRCLE_RADIUS - CURSOR_RADIUS) / distance;
+		// 	newX = x * ratio;
+		// 	newY = y * ratio;
+		// }
 
 		//const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
 		const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
@@ -170,13 +170,13 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 			Circle_X = x * ratio;
 			Circle_Y = y * ratio;
 
-			if (Math.abs(newX) < CIRCLE_LIMIT) {
-				//Circle_X = newX
-			}
+			//if (Math.abs(newX) < CIRCLE_LIMIT) {
+			//Circle_X = newX
+			//}
 
-			if (Math.abs(newY) < CIRCLE_LIMIT) {
-				//Circle_Y = newY
-			}
+			//if (Math.abs(newY) < CIRCLE_LIMIT) {
+			//Circle_Y = newY
+			//}
 		}
 
 		//console.log(`Circle_X: ${Math.round(Circle_X * 10) / 10} + newX: ${newX}, Circle_Y: ${Math.round(Circle_Y * 10) / 10 * (-1)} + newY: ${newY}`)
