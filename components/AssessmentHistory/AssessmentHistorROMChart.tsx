@@ -20,77 +20,6 @@ const colors = {
 	r_lateral: "#06b6d4",
 };
 
-const ToolTip = ({ x
-	, y
-	, font
-	, chartBounds
-	//, valToolTipX
-	, valToolTipDate
-	, valToolTipExtension
-	, valToolTipFlexion
-	, valToolTipLRotation
-	, valToolTipRRotation
-	, valToolTipLLateral
-	, valToolTipRlateral }:
-	{
-		x: SharedValue<number>; y: any, font: any, chartBounds: ChartBounds//</number>, valToolTipX: any
-		, valToolTipDate: any
-		, valToolTipExtension: any
-		, valToolTipFlexion: any
-		, valToolTipLRotation: any
-		, valToolTipRRotation: any
-		, valToolTipLLateral: any
-		, valToolTipRlateral: any
-	}) => {
-
-	return (
-		<>
-			<Circle cx={x} cy={y.extension.position} r={3} color={colors.extension} />
-			<Circle cx={x} cy={y.flexion.position} r={3} color={colors.flexion} />
-			<Circle cx={x} cy={y.l_lateral.position} r={3} color={colors.l_lateral} />
-			<Circle cx={x} cy={y.l_rotation.position} r={3} color={colors.l_rotation} />
-			<Circle cx={x} cy={y.r_rotation.position} r={3} color={colors.r_rotation} />
-			<Circle cx={x} cy={y.r_lateral.position} r={3} color={colors.r_lateral} />
-
-			<Group
-				transform={[
-					{
-						translateX: x.value
-					},
-					{
-						translateY: chartBounds.top + 10,
-					},
-				]}
-			>
-				<RoundedRect
-					x={40}
-					y={0}
-					r={10}
-					width={(chartBounds.right - chartBounds.left) / 2}
-					height={((chartBounds.bottom - chartBounds.top) / 2) + 10}
-				>
-					<Paint color="white" style="fill" />
-					<Paint color="gray" style="stroke" strokeWidth={1} />
-				</RoundedRect>
-				<SKText x={45} y={20} font={font} text={valToolTipDate} color="black" />
-				<SKText x={45} y={40} font={font} text={valToolTipExtension} color={colors.extension} />
-				<SKText x={45} y={60} font={font} text={valToolTipFlexion} color={colors.flexion} />
-				<SKText x={45} y={80} font={font} text={valToolTipLRotation} color={colors.l_rotation} />
-				<SKText x={45} y={100} font={font} text={valToolTipRRotation} color={colors.r_rotation} />
-				<SKText x={45} y={120} font={font} text={valToolTipLLateral} color={colors.l_lateral} />
-				<SKText x={45} y={140} font={font} text={valToolTipRlateral} color={colors.r_lateral} />
-			</Group>
-
-			{/* <SkiaLine
-				p1={{ x: xGusturePan.value, y: chartBounds.bottom }}
-				p2={{ x: xGusturePan.value, y: chartBounds.top }}
-			>
-				<Paint color="gray" style="stroke" strokeWidth={1} />
-			</SkiaLine> */}
-		</>
-	)
-}
-
 const ActiveValueIndicator = ({
 	xPosition,
 	yPosition,
@@ -258,13 +187,13 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 				xKey="xIndex"
 				yKeys={['extension', 'flexion', 'l_lateral', 'l_rotation', 'r_lateral', 'r_rotation']}
 				padding={{ left: 10, top: 10 }}
-				//domainPadding={{ right: 3, left: 30, bottom: 3, top: 3 }}
+				domainPadding={{ right: 3, left: 30, bottom: 3, top: 3 }}
 				chartPressState={state}
 				axisOptions={{
 					font,
 					labelColor: '#333',
 					tickCount: {
-						x: 4,
+						x: 3,
 						y: 6
 					},
 					tickValues: {

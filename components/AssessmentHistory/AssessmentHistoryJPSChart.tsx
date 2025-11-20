@@ -16,50 +16,52 @@ type DataPoint = {
 	variability: number;
 }
 
-const ToolTip = ({ x
-	, y
-	, font
-	, chartBounds
-	//, valToolTipX
-	, valToolTipDate
-	, valToolTipMeanError
-	, valToolTipVariability }:
-	{
-		x: SharedValue<number>; y: any, font: any, chartBounds: ChartBounds//</number>, valToolTipX: any
-		, valToolTipDate: any
-		, valToolTipMeanError: any
-		, valToolTipVariability: any
-	}) => {
-	//console.log(valToolTipExtension)
+const ActiveValueIndicator = ({
+	xPosition,
+	yPosition,
+	top,
+	bottom,
+	activeValueDate,
+	valToolTipMeanError,
+	valToolTipVariability,
+	topOffset = 0,
+	font,
+	chartBounds
+}: {
+	xPosition: SharedValue<number>;
+	yPosition: any;
+	activeValueDate: SharedValue<string>;
+	valToolTipMeanError: SharedValue<string>;
+	valToolTipVariability: SharedValue<string>;
+	bottom: number;
+	top: number;
+	topOffset?: number;
+	font: any;
+	chartBounds: ChartBounds;
+}) => {
+	const start = useDerivedValue(() => vec(xPosition.value, bottom));
+	const end = useDerivedValue(() =>
+		vec(xPosition.value, top)
+	);
+
+	const activeValueX = useDerivedValue(
+		() => {
+			if (chartBounds.right - xPosition.value <= 80) {
+				return xPosition.value - 80;
+			}
+			return xPosition.value - 10;
+		}
+	);
+
 	return (
 		<>
-			<Group
-				transform={[
-					{
-						translateX: x.value,
-					},
-					{
-						translateY: chartBounds.top + 10,
-					},
-				]}
-			>
-				<RoundedRect
-					x={40}
-					y={0}
-					r={10}
-					width={(chartBounds.right - chartBounds.left) / 2}
-					height={((chartBounds.bottom - chartBounds.top) / 2) + 10}
-				>
-					<Paint color="white" style="fill" />
-					<Paint color="gray" style="stroke" strokeWidth={1} />
-				</RoundedRect>
-				<SKText x={45} y={20} font={font} text={valToolTipDate} color="white" />
-				<SKText x={45} y={40} font={font} text={valToolTipMeanError} color="#3b82f6" />
-				<SKText x={45} y={60} font={font} text={valToolTipVariability} color="#10b981" />
-			</Group>
+			{ /* value tooltip */}
+			<SKText x={activeValueX} y={20 + topOffset} font={font} text={activeValueDate} color="black" />
+			<SKText x={activeValueX} y={30 + topOffset} font={font} text={valToolTipMeanError} color="#3b82f6" />
+			<SKText x={activeValueX} y={40 + topOffset} font={font} text={valToolTipVariability} color="#10b981" />
 		</>
-	)
-}
+	);
+};
 
 const AssessmentHistoryJPSChart = () => {
 
@@ -141,19 +143,18 @@ const AssessmentHistoryJPSChart = () => {
 							<BarGroup.Bar points={points.variability} color="#10b981" />
 						</BarGroup>
 						{isActive && (
-							<>
-								<ToolTip
-									x={state.x.position}
-									y={state.y}
-									font={font}
-									chartBounds={chartBounds}
-									//valToolTipX={valToolTipX}
-									valToolTipDate={valToolTipDate}
-									valToolTipMeanError={valToolTipMeanError}
-									valToolTipVariability={valToolTipVariability}
-
-								/>
-							</>
+							<ActiveValueIndicator
+								xPosition={state.x.position}
+								yPosition={state.y}
+								bottom={chartBounds.bottom}
+								top={chartBounds.top}
+								font={font}
+								activeValueDate={valToolTipDate}
+								valToolTipMeanError={valToolTipMeanError}
+								valToolTipVariability={valToolTipVariability}
+								topOffset={0}
+								chartBounds={chartBounds}
+							/>
 						)}
 					</>
 				)}
