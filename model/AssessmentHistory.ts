@@ -1,3 +1,5 @@
+import { Combobox } from "../dummy/masterData"
+
 type DataHistory = {
 	xIndex: number,
 	id: string,
@@ -18,4 +20,27 @@ type DataHistory = {
 	type: string,
 }
 
-export { type DataHistory }
+type JPSDataHistory = {
+	xIndex: number,
+	id: string,
+	key: string,
+	dt: Date,
+	date: string,
+	date_n: number,
+	date_str: string,
+	time_str: string,
+	title: string,
+	horizontal: number,
+	vertical: number,
+	rotate: number,
+	angular: number,
+	pst_txt: number,
+	duration: number,
+}
+
+type ComboboxFilter = {
+	metric: Combobox,
+	time: Combobox,
+}
+
+export { type DataHistory, type JPSDataHistory, type ComboboxFilter }

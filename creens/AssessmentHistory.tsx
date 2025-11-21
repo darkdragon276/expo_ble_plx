@@ -13,14 +13,10 @@ import AssessmentHistorROMChart from "../components/AssessmentHistory/Assessment
 import AssessmentHistoryJPSChart from "../components/AssessmentHistory/AssessmentHistoryJPSChart";
 import { useDatabase } from '../db/useDatabase';
 import { DB_SELECT_ALL_ROM } from '../db/dbQuery';
-import type { DataHistory } from "../model/AssessmentHistory";
+import type { DataHistory, ComboboxFilter } from "../model/AssessmentHistory";
 import { type Combobox, TimeOptions as timeOptions, MetricOptions as metricOptions } from '../dummy/masterData'
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
-type ComboboxFilter = {
-	metric: Combobox,
-	time: Combobox,
-}
 const LuDownload = styled(LucideDownload);
 
 const AssessmentHistory = () => {
@@ -29,8 +25,8 @@ const AssessmentHistory = () => {
 	const db = useDatabase("headx.db");
 
 	const [formData, setFormData] = useState<ComboboxFilter>({
-		metric: timeOptions[0],
-		time: metricOptions[0],
+		metric: metricOptions[0],
+		time: timeOptions[0],
 	});
 
 	const handleSelect = (key: keyof typeof formData, value: string) => {
@@ -220,7 +216,7 @@ const AssessmentHistory = () => {
 			{
 				(formData.metric.prop == "jps" || formData.metric.prop == "all")
 					?
-					<AssessmentHistoryJPSChart></AssessmentHistoryJPSChart>
+					<AssessmentHistoryJPSChart timeFilter={formData.time.prop} ></AssessmentHistoryJPSChart>
 					:
 					<></>
 			}

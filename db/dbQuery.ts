@@ -107,6 +107,29 @@ const DB_SELECT_ALL_ROM =
     ORDER BY date DESC
 `;
 
+const DB_SELECT_JPS_RECORD_CHART =
+    `SELECT 
+       record.id_record AS id
+        , jps.key
+        , jps.id_session
+        , jps.title
+        , jps.date
+        , record.id_record
+        , record.horizontal
+        , record.horizontalScale
+        , record.vertical
+        , record.verticalScale
+        , record.rotate
+        , record.angular
+        , record.pst_txt
+        , record.duration 
+    FROM tb_asm_jps AS jps
+
+    INNER JOIN tb_asm_jps_record AS record
+    ON jps.id_session = record.id_session
+
+    `;
+
 export {
     DB_INSERT_ROM
     , DB_SELECT_ALL_ROM
@@ -123,4 +146,5 @@ export {
     , DB_SELECT_ALL_JPS
     , DB_SELECT_BY_ID_JPS
     , DB_SELECT_ALL_JPS_RECORD
+    , DB_SELECT_JPS_RECORD_CHART
 }
