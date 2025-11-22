@@ -117,20 +117,20 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 
 				<View className="flex-row space-x-3 mt-3">
 					<View className="flex-row items-center">
-						<View className="w-3 h-3 bg-black rounded-full" />
+						<View className="w-3 h-3 bg-black rounded-full mr-1" />
 						<Text className="text-gray-600 text-sm">Neutral</Text>
 					</View>
 					{
 						!record
 							?
 							<View className="flex-row items-center">
-								<View className="w-3 h-3 bg-blue-700 rounded-full" />
+								<View className="w-3 h-3 bg-blue-700 rounded-full mr-1" />
 								<Text className="text-gray-600 text-sm">Live Position</Text>
 							</View>
 							:
 							<View className="flex-row space-x-5">
 								<View className="flex-row items-center">
-									<View className="w-3 h-3 bg-red-700 rounded-full" />
+									<View className="w-3 h-3 bg-red-700 rounded-full mr-1" />
 									<Text className="text-gray-600 text-sm">Live Position</Text>
 								</View>
 								<View className="flex-row items-center">
@@ -145,7 +145,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 			{
 				record
 					?
-					<View className="flex-row space-x-2">
+					<View className="flex-row space-x-2 h-20">
 						<TouchableOpacity
 							onPress={onPressRecord}
 							activeOpacity={0.9}
@@ -154,7 +154,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 								colors={["#1447e6", "#007595"]}
 								start={[0, 0]}
 								end={[1, 0]}
-								className="flex-row items-center justify-center py-4 px-8"
+								className="flex-row items-center justify-center h-full"
 							>
 								<LuCircle size={20} color="white"></LuCircle>
 								<Text className="text-white font-semibold p-3">Record Position</Text>
@@ -169,7 +169,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 								colors={["#f8fafc", "#f1f5f9"]}
 								start={[0, 0]}
 								end={[1, 0]}
-								className="flex-row items-center justify-center py-4 px-8"
+								className="flex-row items-center justify-center h-full"
 							>
 								<LuCircleCheckBig size={20} className="text-gray-500"></LuCircleCheckBig>
 								<Text className="text-gray-500 font-semibold p-3">Finish</Text>
