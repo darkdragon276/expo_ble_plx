@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../model/RootStackParamList';
@@ -240,11 +240,32 @@ const AssessmentHistory = () => {
 			const nameCsv = `assessment_history_${today}.csv`
 			const fileUri = FileSystem.documentDirectory + nameCsv;
 
-			await FileSystem.writeAsStringAsync(fileUri, csvRow, {
-				encoding: FileSystem.EncodingType.UTF8,
-			});
+			if (Platform.OS === 'ios') {
+				await FileSystem.writeAsStringAsync(fileUri, csvRow, {
+					encoding: FileSystem.EncodingType.UTF8,
+				});
 
-			await Sharing.shareAsync(fileUri);
+				await Sharing.shareAsync(fileUri);
+
+			} else if (Platform.OS === 'android') {
+
+				const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+				if (!perm.granted) {
+					Alert.alert("Permission Denied", "You need to grant permission to access files.");
+					return;
+				}
+
+				const dirUri = perm.directoryUri;
+				const fileUriAndroid = await FileSystem.StorageAccessFramework.createFileAsync(
+					dirUri,
+					nameCsv,
+					"text/csv"
+				);
+
+				await FileSystem.writeAsStringAsync(fileUriAndroid, csvRow, {
+					encoding: FileSystem.EncodingType.UTF8,
+				});
+			}
 
 		} catch (error) {
 			//console.log(error);
