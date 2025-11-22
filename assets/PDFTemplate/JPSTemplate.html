@@ -1739,6 +1739,36 @@
 		.-top-6 {
 			top: calc(.25 * -6rem);
 		}
+
+		.c1 {
+			position: absolute;
+			font-size: 8px;
+			transform: translate(100px, 90px);
+		}
+
+		.c2 {
+			position: absolute;
+			font-size: 8px;
+			transform: translate(120px, 90px);
+		}
+
+		.c3 {
+			position: absolute;
+			font-size: 8px;
+			transform: translate(135px, 90px);
+		}
+
+		.c4 {
+			position: absolute;
+			font-size: 8px;
+			transform: translate(152px, 90px);
+		}
+
+		.c5 {
+			position: absolute;
+			font-size: 8px;
+			transform: translate(180px, 90px);
+		}
 	</style>
 </head>
 
@@ -1783,6 +1813,26 @@
 				class="absolute top-1/2 -right-7 transform -translate-y-1/2 text-xs font-medium text-gray-600 rotate-90">
 				Right
 			</div>
+
+			<View class="c1">
+				<Text>1°</Text>
+			</View>
+
+			<View class="c2">
+				<Text>2°</Text>
+			</View>
+
+			<View class="c3">
+				<Text>3°</Text>
+			</View>
+
+			<View class="c4">
+				<Text>4.5°</Text>
+			</View>
+
+			<View class="c5">
+				<Text>6°</Text>
+			</View>
 		</div>
 
 		<div class="grid grid-cols-2 gap-2 text-xs mt-4">
@@ -1803,55 +1853,6 @@
 		<div class="w-full max-w-xl mx-auto mt-6">
 			<div class="space-y-3">
 				{{records}}
-
-				<!-- <div class="flex items-center justify-between bg-white shadow p-1 rounded-xl">
-					<div class="flex items-center space-x-3">
-						<div class="bg-purple-600 text-white px-3 py-1 rounded-md font-semibold">#1</div>
-						<div class="text-gray-700 font-medium">Good</div>
-					</div>
-					<div class="text-right text-sm">
-						<div class="text-gray-800 font-semibold">Angular: 2.50°</div>
-						<div class="text-green-600 font-semibold">Distance: 39.3mm</div>
-						<div class="text-gray-500 text-xs">Left Extension</div>
-					</div>
-				</div>
-
-				<div class="flex items-center justify-between bg-white shadow p-1 rounded-xl">
-					<div class="flex items-center space-x-3">
-						<div class="bg-purple-600 text-white px-3 py-1 rounded-md font-semibold">#2</div>
-						<div class="text-gray-700 font-medium">Good</div>
-					</div>
-					<div class="text-right text-sm">
-						<div class="text-gray-800 font-semibold">Angular: 3.20°</div>
-						<div class="text-green-600 font-semibold">Distance: 50.3mm</div>
-						<div class="text-gray-500 text-xs">Right Flexion</div>
-					</div>
-				</div>
-
-				<div class="flex items-center justify-between bg-white shadow p-1 rounded-xl">
-					<div class="flex items-center space-x-3">
-						<div class="bg-purple-600 text-white px-3 py-1 rounded-md font-semibold">#3</div>
-						<div class="text-gray-700 font-medium">Good</div>
-					</div>
-					<div class="text-right text-sm">
-						<div class="text-gray-800 font-semibold">Angular: 2.80°</div>
-						<div class="text-green-600 font-semibold">Distance: 44.0mm</div>
-						<div class="text-gray-500 text-xs">Left Flexion</div>
-					</div>
-				</div>
-
-				<div class="flex items-center justify-between bg-white shadow p-1 rounded-xl">
-					<div class="flex items-center space-x-3">
-						<div class="bg-purple-600 text-white px-3 py-1 rounded-md font-semibold">#4</div>
-						<div class="text-gray-700 font-medium">Good</div>
-					</div>
-					<div class="text-right text-sm">
-						<div class="text-gray-800 font-semibold">Angular: 3.10°</div>
-						<div class="text-green-600 font-semibold">Distance: 48.7mm</div>
-						<div class="text-gray-500 text-xs">Right Flexion</div>
-					</div>
-				</div> -->
-
 			</div>
 		</div>
 	</div>

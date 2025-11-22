@@ -117,13 +117,28 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 
 				<View className="flex-row space-x-3 mt-3">
 					<View className="flex-row items-center">
-						<View className="w-3 h-3 bg-blue-400 rounded-full mr-1" />
+						<View className="w-3 h-3 bg-black rounded-full" />
 						<Text className="text-gray-600 text-sm">Neutral</Text>
 					</View>
-					<View className="flex-row items-center">
-						<View className="w-3 h-3 bg-blue-700 rounded-full mr-1" />
-						<Text className="text-gray-600 text-sm">Live Position</Text>
-					</View>
+					{
+						!record
+							?
+							<View className="flex-row items-center">
+								<View className="w-3 h-3 bg-blue-700 rounded-full" />
+								<Text className="text-gray-600 text-sm">Live Position</Text>
+							</View>
+							:
+							<View className="flex-row space-x-5">
+								<View className="flex-row items-center">
+									<View className="w-3 h-3 bg-red-700 rounded-full" />
+									<Text className="text-gray-600 text-sm">Live Position</Text>
+								</View>
+								<View className="flex-row items-center">
+									<View className="w-3 h-1 bg-purple-700 mr-1" />
+									<Text className="text-gray-600 text-sm">Recorded</Text>
+								</View>
+							</View>
+					}
 				</View>
 			</View>
 
