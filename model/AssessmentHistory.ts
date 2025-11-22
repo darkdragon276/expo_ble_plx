@@ -38,9 +38,26 @@ type JPSDataHistory = {
 	duration: number,
 }
 
+type DataAssessmentCSV = {
+	date: string,
+	title: string,
+	type: string,
+	flexion: number,
+	extension: number,
+	l_rotation: number,
+	r_rotation: number,
+	l_lateral: number,
+	r_lateral: number,
+	horizontal: number,
+	vertical: number,
+	rotate: number,
+	angular: number,
+}
+
+
 type ComboboxFilter = {
 	metric: Combobox,
 	time: Combobox,
 }
 
-export { type DataHistory, type JPSDataHistory, type ComboboxFilter }
+export { type DataHistory, type JPSDataHistory, type ComboboxFilter, type DataAssessmentCSV }

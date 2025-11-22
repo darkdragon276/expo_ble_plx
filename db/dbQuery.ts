@@ -130,6 +130,61 @@ const DB_SELECT_JPS_RECORD_CHART =
 
     `;
 
+const DB_SELECT_ALL_ASM_CSV =
+    `SELECT 
+        date
+        , title
+        , type
+        , flexion
+        , extension
+        , l_rotation
+        , r_rotation
+        , l_lateral
+        , r_lateral
+        , '' AS horizontal
+        , '' AS vertical
+        , '' AS rotate
+        , '' AS angular
+        
+    FROM tb_asm_rom
+
+    UNION ALL
+
+    SELECT
+        date
+        , title
+        , type
+        , '' AS flexion
+        , '' AS extension
+        , '' AS l_rotation
+        , '' AS r_rotation
+        , '' AS l_lateral
+        , '' AS r_lateral
+        , horizontal
+        , vertical
+        , rotate
+        , angular
+       
+    FROM
+    (
+        SELECT
+            jps.title
+            , jps.date
+            , record.horizontal
+            , record.vertical
+            , record.rotate
+            , record.angular
+            , 'JPS' AS type
+
+        FROM tb_asm_jps jps
+
+        INNER JOIN tb_asm_jps_record AS record
+        ON jps.id_session = record.id_session
+    )
+    
+    ORDER BY date ASC
+`;
+
 export {
     DB_INSERT_ROM
     , DB_SELECT_ALL_ROM
@@ -147,4 +202,5 @@ export {
     , DB_SELECT_BY_ID_JPS
     , DB_SELECT_ALL_JPS_RECORD
     , DB_SELECT_JPS_RECORD_CHART
+    , DB_SELECT_ALL_ASM_CSV
 }

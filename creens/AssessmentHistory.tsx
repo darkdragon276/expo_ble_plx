@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../model/RootStackParamList';
@@ -12,9 +12,13 @@ import AssessmentHistoryTags from "../components/AssessmentHistory/AssessmentHis
 import AssessmentHistorROMChart from "../components/AssessmentHistory/AssessmentHistorROMChart";
 import AssessmentHistoryJPSChart from "../components/AssessmentHistory/AssessmentHistoryJPSChart";
 import { useDatabase } from '../db/useDatabase';
-import { DB_SELECT_ALL_ROM } from '../db/dbQuery';
-import type { DataHistory, ComboboxFilter } from "../model/AssessmentHistory";
-import { type Combobox, TimeOptions as timeOptions, MetricOptions as metricOptions } from '../dummy/masterData'
+import { DB_SELECT_ALL_ASM_CSV, DB_SELECT_ALL_ROM } from '../db/dbQuery';
+import type { DataHistory, ComboboxFilter, DataAssessmentCSV } from "../model/AssessmentHistory";
+import { TimeOptions as timeOptions, MetricOptions as metricOptions } from '../dummy/masterData'
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as SQLite from 'expo-sqlite';
+import { CSV_HEADER } from '../dummy/Constants';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 const LuDownload = styled(LucideDownload);
@@ -55,13 +59,14 @@ const AssessmentHistory = () => {
 			),
 			headerRight: () => (
 				<View className="flex-row items-center justify-center mb-1 mr-4">
-					<Pressable
-						onPress={() => { }}
+					<TouchableOpacity
+						activeOpacity={0.1}
+						onPress={exportCSV}
 						className="flex-row items-center bg-gray-100 px-3 py-1 rounded-lg"
 					>
 						<LuDownload size={18} color="black" />
 						<Text className="ml-1 text-sm font-medium">Export</Text>
-					</Pressable >
+					</TouchableOpacity >
 				</View>
 			)
 		});
@@ -179,6 +184,72 @@ const AssessmentHistory = () => {
 
 		return result;
 	};
+
+	const exportCSV = async () => {
+		const convertData = (result: DataAssessmentCSV[]) => {
+			result = result.map((item) => {
+				const dt = new Date(item.date);
+				const pad = (n: number) => n.toString().padStart(2, "0");
+				const asString = `${pad(dt.getMonth() + 1)}/${pad(dt.getDate())}/${dt.getFullYear()}`;
+
+				return {
+					date: asString
+					, title: item.title.replace(",", "")
+					, type: item.type
+					, flexion: item.flexion
+					, extension: item.extension
+					, l_rotation: item.l_rotation
+					, r_rotation: item.r_rotation
+					, l_lateral: item.l_lateral
+					, r_lateral: item.r_lateral
+					, horizontal: item.horizontal
+					, vertical: item.vertical
+					, rotate: item.rotate
+					, angular: item.angular
+				};
+			});
+
+			return result;
+		}
+
+		try {
+			const db = await SQLite.openDatabaseAsync('headx.db');
+			if (!db) {
+				return;
+			}
+
+			let result = await db.getAllAsync<DataAssessmentCSV>(DB_SELECT_ALL_ASM_CSV);
+			if (!result || (result && result.length == 0)) {
+				return;
+			}
+
+			result = convertData(result)
+
+			let csv: any[] = [CSV_HEADER.join(",")];
+
+			result.forEach(item => {
+				const values = [item].map((value: any) => {
+					return Object.values(value)
+				});
+				csv.push(values.join(","));
+			});
+
+			let csvRow = csv.join("\n");
+
+			const today = new Date().toISOString().split("T")[0];
+			const nameCsv = `assessment_history_${today}.csv`
+			const fileUri = FileSystem.documentDirectory + nameCsv;
+
+			await FileSystem.writeAsStringAsync(fileUri, csvRow, {
+				encoding: FileSystem.EncodingType.UTF8,
+			});
+
+			await Sharing.shareAsync(fileUri);
+
+		} catch (error) {
+			//console.log(error);
+		}
+	}
 
 	return (
 		<ScrollView className="flex-1 bg-gray-50 py-2 px-4">

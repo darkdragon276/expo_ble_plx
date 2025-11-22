@@ -18,7 +18,8 @@ export const getCurrentDateTime = (): any => {
 		hour12: true,     // AM/PM format
 	};
 
-	const localShortDateTime = Intl.DateTimeFormat("en-US", options).format(now).toString().replace(" at", ",");
+	//u202F => Narrow No-Break Space (U+202F) -> .csv export will have special characters
+	const localShortDateTime = Intl.DateTimeFormat("en-US", options).format(now).toString().replace(" at", ",").replace(/\u202F/g, " ");
 	const strNow = now.toString();
 	const strNowISO = now.toISOString();
 
