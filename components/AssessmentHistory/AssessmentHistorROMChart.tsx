@@ -1,14 +1,12 @@
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import { CartesianActionsHandle, CartesianChart, ChartBounds, Line, PointsArray, Scatter, useChartPressState, useChartTransformState, useLinePath } from 'victory-native';
-import { useFont, Circle, Path, Canvas, Text as SKText, Paint, Line as SkiaLine, vec, Group, RoundedRect } from '@shopify/react-native-skia';
-import { SharedValue, useDerivedValue, useSharedValue, withDecay } from 'react-native-reanimated';
+import { StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { CartesianChart, ChartBounds, PointsArray, Scatter, useChartPressState, useLinePath } from 'victory-native';
+import { useFont, Circle, Path, Text as SKText, Paint, Line as SkiaLine, vec } from '@shopify/react-native-skia';
+import { SharedValue, useDerivedValue } from 'react-native-reanimated';
 import { styled } from 'nativewind';
-import { RotateCcw, X } from 'lucide-react-native';
+import { RotateCcw } from 'lucide-react-native';
 import type { DataHistory } from "../../model/AssessmentHistory";
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
-// const LuDownload = styled(LucideDownload);
 const LuRotateCcw = styled(RotateCcw);
 
 const colors = {
@@ -93,28 +91,6 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 	const [data, setData] = useState<DataHistory[]>([])
 	const font = useFont(require("../../assets/fonts/calibrii.ttf"), 12);
 	const { state, isActive } = useChartPressState({ x: 0, y: { extension: 0, flexion: 0, l_lateral: 0, l_rotation: 0, r_lateral: 0, r_rotation: 0 } });
-	// const ref = useRef<CartesianActionsHandle<typeof state>>(null)
-	//const xGusturePan = useSharedValue(0);
-
-	// const tapGesture = Gesture.Tap().onStart((e) => {
-	// 	state.isActive.value = true;
-	// 	ref.current?.handleTouch(state, e.x, e.y);
-	// });
-
-	// const composed = Gesture.Race(tapGesture);
-	// console.log(composed);
-
-	// const pan =
-	// 	Gesture.Pan()
-	//.onStart((e) => {
-	//console.log(e.x)
-	//xGusturePan.value += e.x;
-	//})
-	//.onTouchesMove((e) => {
-	//xGusturePan.value = e.x;
-	//console.log()
-	//console.log(e.state.toFixed(1))
-	//});
 
 	const valToolTipDate = useDerivedValue((): string => {
 		let date = "";
@@ -151,9 +127,17 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 	}, [state])
 
 	useEffect(() => {
-		const result = dataChart.filter(item => {
+		let result = dataChart.filter(item => {
 			return item.type == "ROM";
 		})
+
+		result = result.map((item, index) => {
+			return {
+				...item
+				, xIndex: index
+			};
+		});
+
 		setData(result);
 	}, [dataChart])
 
@@ -187,7 +171,7 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 				xKey="xIndex"
 				yKeys={['extension', 'flexion', 'l_lateral', 'l_rotation', 'r_lateral', 'r_rotation']}
 				padding={{ left: 10, top: 10 }}
-				domainPadding={{ right: 3, left: 30, bottom: 3, top: 3 }}
+				domainPadding={{ right: 3, left: 30, bottom: 0, top: 3 }}
 				chartPressState={state}
 				axisOptions={{
 					font,
@@ -197,8 +181,10 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 						y: 6
 					},
 					tickValues: {
-						x: data.map((d) => d.xIndex),
-						y: [0, 60, 100, 140, 180],
+						x: data.map((d) => {
+							return d.xIndex
+						}),
+						y: [0, 40, 80, 120, 160],
 					},
 					formatXLabel: (index) => {
 						let date = "";
@@ -211,7 +197,8 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 				// transformConfig={{
 				// 	pan: {
 				// 		enabled: true,
-				// 		dimensions: ["x"],
+				// 		dimensions: ["y"],
+				// 		activateAfterLongPress: 200,
 				// 	},
 				// }}
 				renderOutside={({ chartBounds }) => {
