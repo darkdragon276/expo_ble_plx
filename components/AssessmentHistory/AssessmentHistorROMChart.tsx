@@ -171,7 +171,7 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 				xKey="xIndex"
 				yKeys={['extension', 'flexion', 'l_lateral', 'l_rotation', 'r_lateral', 'r_rotation']}
 				padding={{ left: 10, top: 10 }}
-				domainPadding={{ right: 3, left: 30, bottom: 0, top: 3 }}
+				domainPadding={{ right: 3, left: 30, bottom: 10, top: 3 }}
 				chartPressState={state}
 				axisOptions={{
 					font,
@@ -184,7 +184,7 @@ const AssessmentHistorROMChart = ({ dataChart }: { dataChart: DataHistory[] }) =
 						x: data.map((d) => {
 							return d.xIndex
 						}),
-						y: [0, 40, 80, 120, 160],
+						y: [0, 60, 100, 140, 180],
 					},
 					formatXLabel: (index) => {
 						let date = "";
