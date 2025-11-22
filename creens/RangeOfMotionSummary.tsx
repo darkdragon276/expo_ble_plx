@@ -8,6 +8,7 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	TextInput,
+	Alert,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -246,21 +247,41 @@ const RangeOfMotionSummary = () => {
 			.replace('{{base64_leftLateral}}', leftLateralSrcImage)
 			.replace('{{base64_rightLateral}}', rightLateralSrcImage)
 
-		// create PDF from .html
-		const { uri } = await Print.printToFileAsync({ html });
+		// create PDF from .html -> covert to base64
+		const { base64 } = await Print.printToFileAsync({ html, base64: true });
 
 		// rename file
-		const newPath = `${FileSystem.documentDirectory}${data?.title}.pdf`;
+		//const newPath = `${FileSystem.documentDirectory}${data?.title}.pdf`;
 
-		await FileSystem.moveAsync({
-			from: uri,
-			to: newPath,
+		// await FileSystem.moveAsync({
+		// 	from: uri,
+		// 	to: newPath,
+		// });
+
+		//const pdfUri = FileSystem.cacheDirectory + 'file.pdf';
+		const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+		if (!perm.granted) {
+			Alert.alert("Permission Denied", "You need to grant permission to access files.");
+			return;
+		}
+
+		const dirUri = perm.directoryUri;
+
+		const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+			dirUri,
+			`${data?.title}.pdf`,
+			"application/pdf"
+		);
+		
+		await FileSystem.writeAsStringAsync(fileUri, base64 ?? "", {
+			encoding: FileSystem.EncodingType.Base64,
 		});
 
 		// open or share file PDF
-		if (await Sharing.isAvailableAsync()) {
-			await Sharing.shareAsync(newPath);
-		}
+		// if (await Sharing.isAvailableAsync()) {
+		// 	await Sharing.shareAsync(newPath);
+		// }
 	};
 
 	return (

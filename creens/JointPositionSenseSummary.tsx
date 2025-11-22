@@ -1,7 +1,7 @@
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { View, Text, Pressable, TouchableOpacity, ScrollView, FlatList } from 'react-native';
+import { View, Text, Pressable, TouchableOpacity, ScrollView, FlatList, Alert } from 'react-native';
 import { RootStackParamList } from '../model/RootStackParamList';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { styled } from 'nativewind';
@@ -209,20 +209,39 @@ const JointPositionSenseSummary = () => {
 			.replace("{{total_record}}", records.length.toString())
 
 		// create PDF from .html
-		const { uri } = await Print.printToFileAsync({ html });
+		const { base64 } = await Print.printToFileAsync({ html, base64: true });
 
-		// rename file
-		const newPath = `${FileSystem.documentDirectory}${recordPDF[0].title}.pdf`;
+		const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
 
-		await FileSystem.moveAsync({
-			from: uri,
-			to: newPath,
+		if (!perm.granted) {
+			Alert.alert("Permission Denied", "You need to grant permission to access files.");
+			return;
+		}
+
+		const dirUri = perm.directoryUri;
+
+		const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+			dirUri,
+			`${recordPDF[0].title}.pdf`,
+			"application/pdf"
+		);
+
+		await FileSystem.writeAsStringAsync(fileUri, base64 ?? "", {
+			encoding: FileSystem.EncodingType.Base64,
 		});
 
-		// open or share file PDF
-		if (await Sharing.isAvailableAsync()) {
-			await Sharing.shareAsync(newPath);
-		}
+		// rename file
+		// const newPath = `${FileSystem.documentDirectory}${recordPDF[0].title}.pdf`;
+
+		// await FileSystem.moveAsync({
+		// 	from: uri,
+		// 	to: newPath,
+		// });
+
+		// // open or share file PDF
+		// if (await Sharing.isAvailableAsync()) {
+		// 	await Sharing.shareAsync(newPath);
+		// }
 	};
 
 	return (
