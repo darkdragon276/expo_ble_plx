@@ -238,14 +238,17 @@ const AssessmentHistory = () => {
 
 			const today = new Date().toISOString().split("T")[0];
 			const nameCsv = `assessment_history_${today}.csv`
-			const fileUri = FileSystem.documentDirectory + nameCsv;
 
 			if (Platform.OS === 'ios') {
+				const fileUri = FileSystem.documentDirectory + nameCsv;
+
 				await FileSystem.writeAsStringAsync(fileUri, csvRow, {
 					encoding: FileSystem.EncodingType.UTF8,
 				});
 
 				await Sharing.shareAsync(fileUri);
+
+				await FileSystem.deleteAsync(fileUri, { idempotent: true });
 
 			} else if (Platform.OS === 'android') {
 

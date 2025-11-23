@@ -28,6 +28,8 @@ const loadImg = async (localSrc: any): Promise<string> => {
             encoding: FileSystem.EncodingType.Base64,
         });
 
+        await FileSystem.deleteAsync(src.localUri, { idempotent: true });
+
         return new Promise<string>((resolve) => { resolve(`data:image/png;base64,${base64}`) });
     }
     catch (error: any) {

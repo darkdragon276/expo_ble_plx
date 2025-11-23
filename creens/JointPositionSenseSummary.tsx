@@ -224,6 +224,8 @@ const JointPositionSenseSummary = () => {
 				await Sharing.shareAsync(newPath);
 			}
 
+			await FileSystem.deleteAsync(newPath, { idempotent: true });
+
 		} else if (Platform.OS === 'android') {
 			const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
 			if (!perm.granted) {

@@ -224,7 +224,7 @@ const RangeOfMotionSummary = () => {
 				LeftLateralSrcImage,
 				RightLateralSrcImage,
 			];
-			
+
 			const [
 				extensionSrcImage,
 				flexionSrcImage,
@@ -275,6 +275,8 @@ const RangeOfMotionSummary = () => {
 				if (await Sharing.isAvailableAsync()) {
 					await Sharing.shareAsync(newPath);
 				}
+
+				await FileSystem.deleteAsync(newPath, { idempotent: true });
 
 			} else if (Platform.OS === 'android') {
 
