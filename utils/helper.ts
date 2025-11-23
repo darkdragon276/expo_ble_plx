@@ -1,6 +1,7 @@
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system/legacy';
 import { CIRCLE_LIMIT, SCALE_PERCENT } from "../dummy/Constants";
+import { Alert } from "react-native";
 
 const normalizeAngle = (alpha: number): number => {
     alpha = ((alpha + 180) % 360 + 360) % 360;
@@ -8,14 +9,35 @@ const normalizeAngle = (alpha: number): number => {
 };
 
 // convert imge to base64
-const loadImg = async (localSrc: any) => {
-    const src = Asset.fromModule(localSrc)
-    await src.downloadAsync();
-    const base64 = await FileSystem.readAsStringAsync(src.localUri || "", {
-        encoding: "base64"
-    });
+const loadImg = async (localSrc: any): Promise<string> => {
+    try {
+        const src = Asset.fromModule(localSrc)
+        await src.downloadAsync();
 
-    return `data:image/png;base64,${base64}`;
+        // copy to document directory if not already there [necessary for Android production]
+        if (!src.localUri?.startsWith('file://')) {
+            const fileUri = FileSystem.documentDirectory + src.name;
+            await FileSystem.copyAsync({
+                from: src.localUri!,
+                to: fileUri,
+            });
+            src.localUri = fileUri;
+        }
+
+        const base64 = await FileSystem.readAsStringAsync(src.localUri!, {
+            encoding: FileSystem.EncodingType.Base64,
+        });
+
+        return new Promise<string>((resolve) => { resolve(`data:image/png;base64,${base64}`) });
+    }
+    catch (error: any) {
+        Alert.alert("Generating PDF - loadImg", error.message, [
+            {
+                text: 'OK',
+            }
+        ]);
+        return new Promise<string>((reject) => { reject("") });
+    }
 }
 
 // convert seconds to mm:ss

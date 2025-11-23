@@ -211,78 +211,96 @@ const RangeOfMotionSummary = () => {
 	};
 
 	const printPDF = async () => {
+		try {
+			// data for .html
+			const data = resultROMSummary
 
-		// data for .html
-		const data = resultROMSummary
+			// load images and convert to base64
+			const images = [
+				ExtensionSrcImage,
+				FlexionSrcImage,
+				LeftRotationSrcImage,
+				RightRotationSrcImage,
+				LeftLateralSrcImage,
+				RightLateralSrcImage,
+			];
+			
+			const [
+				extensionSrcImage,
+				flexionSrcImage,
+				leftRotationSrcImage,
+				rightRotationSrcImage,
+				leftLateralSrcImage,
+				rightLateralSrcImage
+			] = await Promise.all(images.map(img => loadImg(img)));
 
-		// convert image to base64
-		const extensionSrcImage = await loadImg(ExtensionSrcImage);
-		const flexionSrcImage = await loadImg(FlexionSrcImage);
-		const leftRotationSrcImage = await loadImg(LeftRotationSrcImage);
-		const rightRotationSrcImage = await loadImg(RightRotationSrcImage);
-		const leftLateralSrcImage = await loadImg(LeftLateralSrcImage);
-		const rightLateralSrcImage = await loadImg(RightLateralSrcImage);
+			// load ROM html template
+			const template = Asset.fromModule(require('../assets/PDFTemplate/ROMTemplate.html'));
+			await template.downloadAsync();
 
-		// load ROM html template
-		const template = Asset.fromModule(require('../assets/PDFTemplate/ROMTemplate.html'));
-		await template.downloadAsync();
+			const htmlTemplate = await FileSystem.readAsStringAsync(template.localUri || "");
 
-		const htmlTemplate = await FileSystem.readAsStringAsync(template.localUri || "");
+			// loaded data to html template
+			const html = htmlTemplate
+				.replace('{{title}}', data?.title || "")
+				.replace('{{datetime}}', `ROM Assessment - ${data.date}`)
+				//assessments
+				.replace('{{extension}}', data?.extension?.toString() || "")
+				.replace('{{flexion}}', data?.flexion?.toString() || "")
+				.replace('{{leftRotation}}', data?.l_rotation?.toString() || "")
+				.replace('{{rightRotation}}', data?.r_rotation?.toString() || "")
+				.replace('{{leftLateral}}', data?.l_lateral?.toString() || "")
+				.replace('{{rightLateral}}', data?.r_lateral?.toString() || "")
+				//src base64 for <img>
+				.replace('{{base64_extension}}', extensionSrcImage)
+				.replace('{{base64_flexion}}', flexionSrcImage)
+				.replace('{{base64_leftRotation}}', leftRotationSrcImage)
+				.replace('{{base64_rightRotation}}', rightRotationSrcImage)
+				.replace('{{base64_leftLateral}}', leftLateralSrcImage)
+				.replace('{{base64_rightLateral}}', rightLateralSrcImage)
 
-		// loaded data to html template
-		const html = htmlTemplate
-			.replace('{{title}}', data?.title || "")
-			.replace('{{datetime}}', `ROM Assessment - ${data.date}`)
-			//assessments
-			.replace('{{extension}}', data?.extension?.toString() || "")
-			.replace('{{flexion}}', data?.flexion?.toString() || "")
-			.replace('{{leftRotation}}', data?.l_rotation?.toString() || "")
-			.replace('{{rightRotation}}', data?.r_rotation?.toString() || "")
-			.replace('{{leftLateral}}', data?.l_lateral?.toString() || "")
-			.replace('{{rightLateral}}', data?.r_lateral?.toString() || "")
-			//src base64 for <img>
-			.replace('{{base64_extension}}', extensionSrcImage)
-			.replace('{{base64_flexion}}', flexionSrcImage)
-			.replace('{{base64_leftRotation}}', leftRotationSrcImage)
-			.replace('{{base64_rightRotation}}', rightRotationSrcImage)
-			.replace('{{base64_leftLateral}}', leftLateralSrcImage)
-			.replace('{{base64_rightLateral}}', rightLateralSrcImage)
+			// create PDF from .html -> covert to base64
+			const { uri, base64 } = await Print.printToFileAsync({ html, base64: true });
 
-		// create PDF from .html -> covert to base64
-		const { uri, base64 } = await Print.printToFileAsync({ html, base64: true });
+			if (Platform.OS === 'ios') {
+				// rename file
+				const newPath = `${FileSystem.documentDirectory}${data?.title}.pdf`;
 
-		if (Platform.OS === 'ios') {
-			// rename file
-			const newPath = `${FileSystem.documentDirectory}${data?.title}.pdf`;
+				await FileSystem.moveAsync({
+					from: uri,
+					to: newPath,
+				});
 
-			await FileSystem.moveAsync({
-				from: uri,
-				to: newPath,
-			});
+				// open or share file PDF
+				if (await Sharing.isAvailableAsync()) {
+					await Sharing.shareAsync(newPath);
+				}
 
-			// open or share file PDF
-			if (await Sharing.isAvailableAsync()) {
-				await Sharing.shareAsync(newPath);
+			} else if (Platform.OS === 'android') {
+
+				const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+				if (!perm.granted) {
+					Alert.alert("Permission Denied", "You need to grant permission to access files.");
+					return;
+				}
+
+				const dirUri = perm.directoryUri;
+				const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+					dirUri,
+					`${data?.title}.pdf`,
+					"application/pdf"
+				);
+
+				await FileSystem.writeAsStringAsync(fileUri, base64 ?? "", {
+					encoding: FileSystem.EncodingType.Base64,
+				});
 			}
-
-		} else if (Platform.OS === 'android') {
-
-			const perm = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-			if (!perm.granted) {
-				Alert.alert("Permission Denied", "You need to grant permission to access files.");
-				return;
-			}
-
-			const dirUri = perm.directoryUri;
-			const fileUri = await FileSystem.StorageAccessFramework.createFileAsync(
-				dirUri,
-				`${data?.title}.pdf`,
-				"application/pdf"
-			);
-
-			await FileSystem.writeAsStringAsync(fileUri, base64 ?? "", {
-				encoding: FileSystem.EncodingType.Base64,
-			});
+		} catch (error) {
+			Alert.alert("Generating PDF", (error as Error).message, [
+				{
+					text: 'OK',
+				}
+			]);
 		}
 	};
 
