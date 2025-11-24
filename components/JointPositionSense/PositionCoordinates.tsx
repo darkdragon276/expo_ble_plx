@@ -5,7 +5,7 @@ import Svg, { Circle, Line } from 'react-native-svg'
 const PositionCoordinates = ({ children }: { children: any }) => {
 
 	return (
-		<>
+		<View className="relative w-52 h-52 mx-auto my-10 rounded-full">
 			<Svg className="absolute inset-0 w-full h-full" viewBox="0 0 206 206">
 
 				{/* Circles */}
@@ -67,7 +67,7 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 					x1="103"
 					y1="5"
 					x2="103"
-					y2="195"
+					y2="202"
 					stroke="#9ca3af"
 					strokeWidth="1"
 					strokeDasharray="4,2"
@@ -76,7 +76,7 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 				<Line
 					x1="5"
 					y1="103"
-					x2="195"
+					x2="202"
 					y2="103"
 					stroke="#9ca3af"
 					strokeWidth="1"
@@ -105,7 +105,7 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 			<View className="absolute top-1/2 -right-7 transform -translate-y-1/2 text-xs font-medium text-gray-600 rotate-90">
 				<Text>Right</Text>
 			</View>
-		</>
+		</View>
 	)
 }
 

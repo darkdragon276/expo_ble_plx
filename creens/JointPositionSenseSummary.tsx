@@ -263,11 +263,9 @@ const JointPositionSenseSummary = () => {
 
 				{/* svg */}
 				<View className="bg-gray-50 mx-3">
-					<View className="relative w-52 h-52 mx-auto my-10 rounded-full shadow-inner">
-						<PositionCoordinates>
-							<MakerCursorList mode={"SUMMARY"} getData={() => undefined} subscribe={() => { }} data={cursor}></MakerCursorList>
-						</PositionCoordinates>
-					</View>
+					<PositionCoordinates>
+						<MakerCursorList mode={"SUMMARY"} getData={() => undefined} subscribe={() => { }} data={cursor}></MakerCursorList>
+					</PositionCoordinates>
 
 					<View className="flex-row justify-center space-x-3">
 						<View className="flex-row items-center">
