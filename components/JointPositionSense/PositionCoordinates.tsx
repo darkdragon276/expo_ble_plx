@@ -90,15 +90,15 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 				{children}
 			</View>
 
-			<View className="absolute -bottom-7 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-600" style={{}}>
+			<View className="absolute -bottom-4 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
 				<Text>Flexion</Text>
 			</View>
 
-			<View className="absolute -top-7 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
+			<View className="absolute -top-4 left-20 transform -translate-x-1/2 text-xs font-medium text-gray-600">
 				<Text>Extension</Text>
 			</View>
 
-			<View className="absolute top-1/2 -left-7 transform -translate-y-1/2 text-xs font-medium text-gray-600 -rotate-90">
+			<View className="absolute top-1/2 -left-6 transform -translate-y-1/2 text-xs font-medium text-gray-600 -rotate-90">
 				<Text>Left</Text>
 			</View>
 
