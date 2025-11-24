@@ -1,11 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { coordinatesScaleConvert } from '../../utils/helper';
 
 const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z: number | null }) => {
 
-	const horizontal = coordinatesScaleConvert(x);
-	const vertical = coordinatesScaleConvert(y, -1);
 	const rotate = `${z}deg`;
 
 	return (
@@ -14,8 +11,8 @@ const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z: nu
 				styles.cursor,
 				{
 					transform: [
-						{ translateX: horizontal },
-						{ translateY: vertical },
+						{ translateX: x },
+						{ translateY: y * (-1) },
 						{ rotate: rotate }
 					],
 				},

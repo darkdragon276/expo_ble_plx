@@ -108,7 +108,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 				<HeadPosition dataRef={refPosition}></HeadPosition>
 
 				{/* svg */}
-				<View className="relative w-48 h-48 mx-auto my-6 rounded-full shadow-inner">
+				<View className="relative w-52 h-52 mx-auto my-6 rounded-full shadow-inner">
 					<PositionCoordinates>
 						<LiveCursor dataRef={refPosition} reset={isReset} record={record} dataRefScale={dataRefScale}></LiveCursor>
 						<MakerCursorList mode={"LIVE"} getData={() => refMarkerCursor ? refMarkerCursor.current : []} subscribe={subscribe} data={[]}></MakerCursorList>

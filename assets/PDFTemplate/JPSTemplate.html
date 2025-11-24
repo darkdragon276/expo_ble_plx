@@ -1740,35 +1740,6 @@
 			top: calc(.25 * -6rem);
 		}
 
-		.c1 {
-			position: absolute;
-			font-size: 8px;
-			transform: translate(100px, 90px);
-		}
-
-		.c2 {
-			position: absolute;
-			font-size: 8px;
-			transform: translate(120px, 90px);
-		}
-
-		.c3 {
-			position: absolute;
-			font-size: 8px;
-			transform: translate(135px, 90px);
-		}
-
-		.c4 {
-			position: absolute;
-			font-size: 8px;
-			transform: translate(152px, 90px);
-		}
-
-		.c5 {
-			position: absolute;
-			font-size: 8px;
-			transform: translate(180px, 90px);
-		}
 	</style>
 </head>
 
@@ -1780,19 +1751,31 @@
 
 	<div class="card">
 		<div style="display:flex; align-items:center; margin-bottom:20px;">
-			<span style="font-size:22px; color:#2563eb; margin-right:8px;">&#x21BB;</span>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+				class="lucide lucide-target w-5 h-5 text-orange-500 mr-2" aria-hidden="true">
+				<circle cx="12" cy="12" r="10"></circle>
+				<circle cx="12" cy="12" r="6"></circle>
+				<circle cx="12" cy="12" r="2"></circle>
+			</svg>
 			<h2>Target Analysis</h2>
 		</div>
 		<!-- svg-container -->
-		<div class="relative w-48 h-48 mx-auto mb-6 rounded-full shadow-inner">
-			<svg class="absolute inset-0 w-full h-full" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg"
+		<div class="relative w-48 h-48 mx-auto my-6 rounded-full shadow-inner">
+			<svg class="absolute inset-0 w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"
 				role="img" aria-label="Concentric dashed circles with cross & diagonal lines">
-				<circle cx="96" cy="96" r="96" fill="#e53935" stroke="black" stroke-width="1" />
-				<circle cx="96" cy="96" r="72" fill="#fff176" stroke="black" stroke-width="1" />
-				<circle cx="96" cy="96" r="48" fill="#66bb6a" stroke="black" stroke-width="1" />
-				<circle cx="96" cy="96" r="32" fill="#66bb6a" stroke="black" stroke-width="1" />
-				<circle cx="96" cy="96" r="16" fill="#66bb6a" stroke="black" stroke-width="1" />
-				<circle cx="96" cy="96" r="4" stroke-width="1" fill="black" />
+
+				<circle cx="100" cy="100" r="102" fill="none" stroke="black" stroke-width="2" />
+				<circle cx="100" cy="100" r="60" fill="#e53935" stroke="black" stroke-width="0.5" />
+				<circle cx="100" cy="100" r="45" fill="#fff176" stroke="black" stroke-width="0.5" />
+				<circle cx="100" cy="100" r="30" fill="#66bb6a" stroke="black" stroke-width="0.5" />
+				<circle cx="100" cy="100" r="20" fill="#66bb6a" stroke="black" stroke-width="0.5" />
+				<circle cx="100" cy="100" r="10" fill="#66bb6a" stroke="black" stroke-width="0.5" />
+
+				<line x1="100" y1="5" x2="100" y2="100" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4,2" />
+				<line x1="5" y1="100" x2="200" y2="100" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4,2" />
+
+				<circle cx="100" cy="100" r="3" stroke-width="1" fill="black" />
 			</svg>
 
 			<div id="maker-cuscor" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -1814,59 +1797,38 @@
 				Right
 			</div>
 
-			<View class="c1">
-				<Text>1°</Text>
-			</View>
-
-			<View class="c2">
-				<Text>2°</Text>
-			</View>
-
-			<View class="c3">
-				<Text>3°</Text>
-			</View>
-
-			<View class="c4">
-				<Text>4.5°</Text>
-			</View>
-
-			<View class="c5">
-				<Text>6°</Text>
-			</View>
-		</div>
-
-		<div class="grid grid-cols-2 gap-2 text-xs mt-4">
-			<div class="flex items-center gap-1 justify-center">
-				<div class="w-2 h-2 bg-blue-600 rounded-full"></div><span class="text-gray-600">Neutral</span>
-			</div>
-			<div class="flex items-center gap-1 justify-center">
-				<div class="w-2 h-0.5 bg-purple-600"></div><span class="text-gray-600">Recorded</span>
+			<div class="grid grid-cols-2 gap-2 text-xs mt-4">
+				<div class="flex items-center gap-1 justify-center">
+					<div class="w-2 h-2 bg-blue-600 rounded-full"></div><span class="text-gray-600">Neutral</span>
+				</div>
+				<div class="flex items-center gap-1 justify-center">
+					<div class="w-2 h-0.5 bg-purple-600"></div><span class="text-gray-600">Recorded</span>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="w-full max-w-xl my-2">
-		<div class="text-gray-800 font-semibold">RECORDED POSITION ({{total_record}})</div>
-	</div>
+		<div class="w-full max-w-xl my-2">
+			<div class="text-gray-800 font-semibold">RECORDED POSITION ({{total_record}})</div>
+		</div>
 
-	<div class="card">
-		<div class="w-full max-w-xl mx-auto mt-6">
-			<div class="space-y-3">
-				{{records}}
+		<div class="card">
+			<div class="w-full max-w-xl mx-auto mt-6">
+				<div class="space-y-3">
+					{{records}}
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="card" style="
+		<div class="card" style="
     background: #ffffff;
     border-radius: 12px;
     padding: 16px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     margin-bottom: 20px;
   ">
-		<!-- Header -->
-		<div style="display: flex; align-items: center;">
-			<div style="
+			<!-- Header -->
+			<div style="display: flex; align-items: center;">
+				<div style="
         width: 32px;
         height: 32px;
         border-radius: 50%;
@@ -1876,40 +1838,40 @@
         margin-right: 12px;
         background-color: #f9fafb;
       ">
-				<!-- Alert icon (circle with exclamation mark) -->
-				<span style="font-size: 18px; color: gray;">&#9888;</span>
+					<!-- Alert icon (circle with exclamation mark) -->
+					<span style="font-size: 18px; color: gray;">&#9888;</span>
+				</div>
+				<span style="font-size: 18px; font-weight: 600; color: #1f2937;">Clinical Considerations</span>
 			</div>
-			<span style="font-size: 18px; font-weight: 600; color: #1f2937;">Clinical Considerations</span>
-		</div>
 
-		<!-- Inner note box -->
-		<div style="
+			<!-- Inner note box -->
+			<div style="
       margin-top: 16px;
       background-color: #eff6ff;
       border: 1px solid #dbeafe;
       border-radius: 8px;
       padding: 16px;
     ">
-			<p style="font-size: 14px; font-weight: 600; color: #1e40af; margin-bottom: 8px;">
-				Joint Position Sense Assessment Notes:
-			</p>
+				<p style="font-size: 14px; font-weight: 600; color: #1e40af; margin-bottom: 8px;">
+					Joint Position Sense Assessment Notes:
+				</p>
 
-			<div style="padding-left: 8px;">
-				<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
-					• Lower error values indicate better proprioceptive function
-				</p>
-				<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
-					• Lower variability suggests more consistent responses
-				</p>
-				<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
-					• Consider fatigue effects and learning curve in interpretation
-				</p>
-				<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
-					• Correlation with functional outcomes may vary by patient
-				</p>
+				<div style="padding-left: 8px;">
+					<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
+						• Lower error values indicate better proprioceptive function
+					</p>
+					<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
+						• Lower variability suggests more consistent responses
+					</p>
+					<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
+						• Consider fatigue effects and learning curve in interpretation
+					</p>
+					<p style="font-size: 14px; color: #1e40af; margin: 4px 0;">
+						• Correlation with functional outcomes may vary by patient
+					</p>
+				</div>
 			</div>
 		</div>
-	</div>
 </body>
 
 </html>

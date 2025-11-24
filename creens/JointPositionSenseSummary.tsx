@@ -19,7 +19,6 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Asset } from "expo-asset";
 import * as FileSystem from 'expo-file-system/legacy';
-import { coordinatesScaleConvert } from '../utils/helper';
 
 const LuTarget = styled(LucideTarget);
 const LuFileText = styled(FileText);
@@ -89,10 +88,11 @@ const JointPositionSenseSummary = () => {
 				if (rs && rs.length > 0) {
 
 					const result = rs.map((item: JPSRecordDataProp, index: number) => {
+
 						return {
 							id: item.id_record.toString()
-							, xRaw: coordinatesScaleConvert(item.horizontalScale)
-							, yRaw: coordinatesScaleConvert(item.verticalScale, -1)
+							, xRaw: item.horizontalScale
+							, yRaw: item.verticalScale * (-1)
 							, x: item.horizontalScale
 							, y: item.verticalScale
 							, z: item.rotate
@@ -164,8 +164,6 @@ const JointPositionSenseSummary = () => {
 			cursors.push(temp);
 		})
 
-		//console.log(cursors.join(""))
-		//return;
 		let records: any[] = [];
 		let _record =
 			`	
@@ -192,11 +190,6 @@ const JointPositionSenseSummary = () => {
 
 			records.push(temp);
 		})
-
-		//console.log(`-------------------------------------------------`)
-		//console.log(cursors.join(''))
-		//console.log(recordPDF[0].title)
-		//return;
 
 		const { date_MM_dd_yyyy_at_hh_mm_ampm } = useConvertDateTime(new Date(recordPDF[0].date));
 
@@ -268,7 +261,7 @@ const JointPositionSenseSummary = () => {
 
 				{/* svg */}
 				<View className="bg-gray-50 mx-3">
-					<View className="relative w-48 h-48 mx-auto my-6 bg-gray-50 from-gray-50 to-gray-100 rounded-full border-2 border-gray-300 shadow-inner">
+					<View className="relative w-52 h-52 mx-auto my-6 rounded-full shadow-inner">
 						<PositionCoordinates>
 							<MakerCursorList mode={"SUMMARY"} getData={() => undefined} subscribe={() => { }} data={cursor}></MakerCursorList>
 						</PositionCoordinates>

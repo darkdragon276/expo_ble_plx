@@ -9,6 +9,7 @@ import { BleError, BleErrorCode, Characteristic } from 'react-native-ble-plx';
 import { KrossDevice } from '../../ble/KrossDevice';
 import { normalizeAngle } from '../../utils/helper';
 import { CIRCLE_LIMIT, SCALE_PERCENT } from '../../dummy/Constants';
+import { Circle } from 'react-native-svg';
 
 // const CIRCLE_RADIUS = CIRCLE_MAX_RADIUS;
 // const CURSOR_RADIUS = CURSOR_ADJUST_OFFSET;
@@ -161,13 +162,23 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 		// 	newY = y * ratio;
 		// }
 
-		const distance2 = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
-		if (distance2 > CIRCLE_LIMIT) {
-			const ratio = 20 / distance2;
-			Circle_X = x * ratio;
-			Circle_Y = y * ratio;
-
+		const r = Math.sqrt(Circle_X * Circle_X + Circle_Y * Circle_Y);
+		
+		let r2;
+		if (r > CIRCLE_LIMIT) {
+			r2 = 100.0
+		} else if (r > 6 ) {
+			r2 = 60.0 +  ((100 - 60) / (20 - 6)) * (r - 6.0);
+		} else if (r > 0) {
+			r2 = 10.0 * r;
+		} else {
+			r2 = 0;
 		}
+
+		Circle_X = r2 == 0 ? 0 : Math.round((x / r) * r2);
+		Circle_Y = r2 == 0 ? 0 : Math.round((y / r) * r2);
+
+		//console.log(`Cursor Pos: x=${Circle_X}, y=${Circle_Y}`);
 
 		Animated.spring(animatedPos, {
 			toValue: { x: Circle_X, y: Circle_Y * (-1) },
@@ -224,7 +235,8 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 
 	const getHorizontalOffset = (x: number): number => {
 		if (OffsetX.current === null || OffsetX.current === 0) {
-			OffsetX.current = Math.round(x);
+			//OffsetX.current = Math.round(x);
+			OffsetX.current = x;
 		}
 
 		let alpha = normalizeAngle(Math.round(x * 10) / 10 - OffsetX.current);
@@ -233,7 +245,8 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 
 	const getVerticalOffset = (y: number): number => {
 		if (OffsetY.current === null || OffsetY.current === 0) {
-			OffsetY.current = Math.round(y);
+			//OffsetY.current = Math.round(y);
+			OffsetY.current = y;
 		}
 
 		let alpha = normalizeAngle(Math.round(y * 10) / 10 - OffsetY.current);
@@ -255,8 +268,8 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 				styles.cursor,
 				{
 					transform: [
-						{ translateX: Animated.multiply(animatedPos.x, SCALE_PERCENT) },
-						{ translateY: Animated.multiply(animatedPos.y, SCALE_PERCENT) },
+						{ translateX: animatedPos.x },
+						{ translateY: animatedPos.y },
 						{ rotate },
 					],
 				},

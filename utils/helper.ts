@@ -65,4 +65,27 @@ const coordinatesScaleConvert = (coordinates: number, sign: number = 1): number 
     return Math.round(convert * 10) / 10;
 }
 
-export { normalizeAngle, loadImg, numberToMmss, coordinatesScaleConvert }
+const coordinatesScaleConvert2 = (x: number, y: number) => {
+
+    const r = Math.sqrt(x * x + y * y);
+
+    let r2;
+    if (r > CIRCLE_LIMIT) {
+        r2 = 100.0
+    } else if (r > 6) {
+        r2 = 60.0 + ((100 - 60) / (20 - 6)) * (r - 6.0);
+    } else if (r > 0) {
+        r2 = 10.0 * r;
+    } else {
+        r2 = 0;
+    }
+
+    return {
+        Circle_X: r2 == 0 ? 0 : Math.round((x / r) * r2),
+        Circle_Y: r2 == 0 ? 0 : Math.round((y / r) * r2)
+    }
+}
+
+
+
+export { normalizeAngle, loadImg, numberToMmss, coordinatesScaleConvert, coordinatesScaleConvert2 }

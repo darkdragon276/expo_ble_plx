@@ -34,8 +34,8 @@ let _Y_Yaw_Pre: number = 0;
 let _Z_Sum_Angle: number = 0;
 let _Z_Yaw_Pre: number = 0;
 
-const MIN_ACCEL = 0.7;
-const MAX_ACCEL = 1.3;
+const MIN_ACCEL = 0.9;
+const MAX_ACCEL = 1.1;
 const CalibrationsProgress = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const krossDevice = new KrossDevice();
@@ -124,7 +124,8 @@ const CalibrationsProgress = () => {
 	}
 
 	const getYaw_Y = (yaw: number) => {
-		_Y_Sum_Angle += KrossDevice.normalizeAngle(yaw - _Y_Yaw_Pre);
+		let diff = KrossDevice.normalizeAngle(yaw - _Y_Yaw_Pre);
+		_Y_Sum_Angle += Math.abs(diff) < 10.0 ? diff : 0;
 
 		if (_Y_Sum_Angle >= 360 || _Y_Sum_Angle <= -360) {
 			_Y_Done = true;
@@ -133,8 +134,8 @@ const CalibrationsProgress = () => {
 	}
 
 	const getYaw_Z = (yaw: number) => {
-		_Z_Sum_Angle += KrossDevice.normalizeAngle(yaw - _Z_Yaw_Pre);
-
+		let diff = KrossDevice.normalizeAngle(yaw - _Z_Yaw_Pre);
+		_Z_Sum_Angle += Math.abs(diff) < 10.0 ? diff : 0;
 		if (_Z_Sum_Angle >= 360 || _Z_Sum_Angle <= -360) {
 			_Z_Done = true;
 		}
