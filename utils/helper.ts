@@ -15,8 +15,9 @@ const loadImg = async (localSrc: any): Promise<string> => {
         await src.downloadAsync();
 
         // copy to document directory if not already there [necessary for Android production]
+        let fileUri = "";
         if (!src.localUri?.startsWith('file://')) {
-            const fileUri = FileSystem.documentDirectory + src.name;
+            fileUri = FileSystem.documentDirectory + src.name;
             await FileSystem.copyAsync({
                 from: src.localUri!,
                 to: fileUri,
@@ -27,6 +28,11 @@ const loadImg = async (localSrc: any): Promise<string> => {
         const base64 = await FileSystem.readAsStringAsync(src.localUri!, {
             encoding: FileSystem.EncodingType.Base64,
         });
+
+        await FileSystem.deleteAsync(src.localUri, { idempotent: true });
+        if (fileUri != "") {
+            await FileSystem.deleteAsync(fileUri, { idempotent: true });
+        }
 
         return new Promise<string>((resolve) => { resolve(`data:image/png;base64,${base64}`) });
     }
