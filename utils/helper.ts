@@ -71,10 +71,10 @@ const coordinatesScaleConvert = (coordinates: number, sign: number = 1): number 
     return Math.round(convert * 10) / 10;
 }
 
-const coordinatesScaleConvert2 = (x: number, y: number) => {
+// scale JPS multi circle
+const coordinatesScaleMultiCircle = (x: number, y: number) => {
 
     const r = Math.sqrt(x * x + y * y);
-
     let r2;
     if (r > CIRCLE_LIMIT) {
         r2 = 100.0
@@ -87,11 +87,11 @@ const coordinatesScaleConvert2 = (x: number, y: number) => {
     }
 
     return {
-        Circle_X: r2 == 0 ? 0 : Math.round((x / r) * r2),
-        Circle_Y: r2 == 0 ? 0 : Math.round((y / r) * r2)
+        scaleX: r2 == 0 ? 0 : Math.round((x / r) * r2),
+        scaleY: r2 == 0 ? 0 : Math.round((y / r) * r2)
     }
 }
 
 
 
-export { normalizeAngle, loadImg, numberToMmss, coordinatesScaleConvert, coordinatesScaleConvert2 }
+export { normalizeAngle, loadImg, numberToMmss, coordinatesScaleConvert, coordinatesScaleMultiCircle }

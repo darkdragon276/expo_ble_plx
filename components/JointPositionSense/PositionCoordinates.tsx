@@ -7,7 +7,7 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 	return (
 		<>
 			<Svg className="absolute inset-0 w-full h-full" viewBox="0 0 206 206">
-			
+
 				{/* Circles */}
 				<Circle
 					cx="103"
@@ -111,33 +111,4 @@ const PositionCoordinates = ({ children }: { children: any }) => {
 
 export default PositionCoordinates
 
-const styles = StyleSheet.create({
-	// c1: {
-	// 	position: "absolute",
-	// 	fontSize: 1,
-	// 	transform: [{ translateX: 100 }, { translateY: 90 }],
-	// },
-	// c2: {
-	// 	position: "absolute",
-	// 	fontSize: 1,
-	// 	transform: [{ translateX: 115 }, { translateY: 90 }],
-	// }
-	// ,
-	// c3: {
-	// 	position: "absolute",
-	// 	fontSize: 1,
-	// 	transform: [{ translateX: 130 }, { translateY: 90 }],
-	// }
-	// ,
-	// c4: {
-	// 	position: "absolute",
-	// 	fontSize: 1,
-	// 	transform: [{ translateX: 145 }, { translateY: 90 }],
-	// }
-	// ,
-	// c5: {
-	// 	position: "absolute",
-	// 	fontSize: 1,
-	// 	transform: [{ translateX: 175 }, { translateY: 90 }],
-	// }
-})
+const styles = StyleSheet.create({})
