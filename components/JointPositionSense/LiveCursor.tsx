@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Animated, Alert, Easing } from 'react-native';
+import { View, StyleSheet, Animated, Alert, Easing, Platform } from 'react-native';
 import { type LiveHeadPositionProps } from '../../model/JointPosition';
 import { BLEService } from '../../ble/BLEService';
 import { RootStackParamList } from '../../model/RootStackParamList';
@@ -178,7 +178,7 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 				if (loopScale == 0) {
 					loopScale = 1
 					let err = "";
-					err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, coordinatesScaleMultiCircle, ${e.message}`
+					err = `OS: ${Platform.Version}, Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, coordinatesScaleMultiCircle, ${e.message}`
 
 					Alert.alert("coordinatesScaleMultiCircle", err, [
 						{
@@ -203,7 +203,7 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 				if (loopSpring == 0) {
 					loopSpring = 1
 					let err = "";
-					err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, Animated.spring, ${e.message}`
+					err = `OS: ${Platform.Version}, Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, Animated.spring, ${e.message}`
 
 					Alert.alert("Animated.spring", err, [
 						{
@@ -226,7 +226,7 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 				if (loopRotate == 0) {
 					loopRotate = 1
 					let err = "";
-					err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, rotateAnim.stopAnimation, ${e.message}`
+					err = `OS: ${Platform.Version}, Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, rotateAnim.stopAnimation, ${e.message}`
 
 					Alert.alert("rotateAnim.stopAnimation", err, [
 						{
@@ -254,7 +254,7 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 			if (loopUpdateCursorPosition == 0) {
 				loopUpdateCursorPosition = 1
 				let err = "";
-				err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, updateCursorPosition, ${e.message}`
+				err = `OS: ${Platform.Version}, Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, updateCursorPosition, ${e.message}`
 
 				Alert.alert("updateCursorPosition", err, [
 					{
