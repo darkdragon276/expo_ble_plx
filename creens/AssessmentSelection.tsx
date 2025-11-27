@@ -56,13 +56,13 @@ const AssessmentSelection = () => {
 		const updateInfo2s = setInterval(() => {
 			if (BLEService.deviceId === null) {
 				clearInterval(updateInfo2s);
-				Alert.alert('No device connected', `Please connect device from Dashboard`, [
-					{
-						text: 'OK',
-						onPress: () => navigation.replace("Main"),
-					}
-				]);
-				return;
+				// Alert.alert('No device connected', `Please connect device from Dashboard`, [
+				// 	{
+				// 		text: 'OK',
+				// 		onPress: () => navigation.replace("Main"),
+				// 	}
+				// ]);
+				// return;
 			};
 		}, 1000);
 

@@ -12,6 +12,12 @@ import { coordinatesScaleMultiCircle } from '../../utils/helper';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
 
+//debug
+let loopSpring = 0;
+let loopRotate = 0;
+let loopScale = 0;
+let loopUpdateCursorPosition = 0;
+
 const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.RefObject<LiveHeadPositionProps | null>, reset: React.RefObject<boolean>, record: boolean, dataRefScale: React.RefObject<LiveHeadPositionProps | null> }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const animatedPos = useState(new Animated.ValueXY({ x: 0, y: 0 }))[0];
@@ -60,6 +66,11 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 		liveData();
 
 		return () => {
+			//debug
+			loopSpring = 0;
+			loopRotate = 0;
+			loopScale = 0;
+			loopUpdateCursorPosition = 0;
 			//clearInterval(interval);
 			try {
 				if (BLEService.getDevice() != null) {
@@ -151,50 +162,107 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 		let Circle_X = x;
 		let Circle_Y = y;
 
-		// if out of circle then scale again
-		// if (distance > CIRCLE_RADIUS - CURSOR_RADIUS) {
-		// 	const ratio = (CIRCLE_RADIUS - CURSOR_RADIUS) / distance;
-		// 	newX = x * ratio;
-		// 	newY = y * ratio;
-		// }
+		try {
+			// if out of circle then scale again
+			// if (distance > CIRCLE_RADIUS - CURSOR_RADIUS) {
+			// 	const ratio = (CIRCLE_RADIUS - CURSOR_RADIUS) / distance;
+			// 	newX = x * ratio;
+			// 	newY = y * ratio;
+			// }
 
-		const { scaleX, scaleY } = coordinatesScaleMultiCircle(Circle_X, Circle_Y)
-		Circle_X = scaleX;
-		Circle_Y = scaleY;
+			try {
+				const { scaleX, scaleY } = coordinatesScaleMultiCircle(Circle_X, Circle_Y)
+				Circle_X = scaleX;
+				Circle_Y = scaleY;
+			} catch (e: any) {
+				if (loopScale == 0) {
+					loopScale = 1
+					let err = "";
+					err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, coordinatesScaleMultiCircle, ${e.message}`
 
-		Animated.spring(animatedPos, {
-			toValue: { x: Circle_X, y: Circle_Y * (-1) },
-			useNativeDriver: false,
-			stiffness: 90,
-			damping: 20,
-			mass: 1,
-			overshootClamping: true,
-			restSpeedThreshold: 0.1,
-			restDisplacementThreshold: 0.1,
-		}).start();
+					Alert.alert("coordinatesScaleMultiCircle", err, [
+						{
+							text: 'OK',
+						}
+					]);
+				}
+			}
 
-		rotateAnim.stopAnimation(() => {
-			Animated.timing(rotateAnim, {
-				toValue: z,
-				duration: 120,
-				easing: Easing.linear,
-				useNativeDriver: false,
-			}).start();
-		})
+			try {
+				Animated.spring(animatedPos, {
+					toValue: { x: Circle_X, y: Circle_Y * (-1) },
+					useNativeDriver: false,
+					stiffness: 90,
+					damping: 20,
+					mass: 1,
+					overshootClamping: true,
+					restSpeedThreshold: 0.1,
+					restDisplacementThreshold: 0.1,
+				}).start();
+			} catch (e: any) {
+				if (loopSpring == 0) {
+					loopSpring = 1
+					let err = "";
+					err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, Animated.spring, ${e.message}`
 
-		dataRef.current = {
-			horizontal: newX,
-			vertical: newY,
-			rotate: z,
-			pst_txt: getCurrentPositionText(x, y)
-		};
+					Alert.alert("Animated.spring", err, [
+						{
+							text: 'OK',
+						}
+					]);
+				}
+			}
 
-		dataRefScale.current = {
-			horizontal: Circle_X,
-			vertical: Circle_Y,
-			rotate: z,
-			pst_txt: getCurrentPositionText(x, y)
-		};
+			try {
+				rotateAnim.stopAnimation(() => {
+					Animated.timing(rotateAnim, {
+						toValue: z,
+						duration: 120,
+						easing: Easing.linear,
+						useNativeDriver: false,
+					}).start()
+				})
+			} catch (e: any) {
+				if (loopRotate == 0) {
+					loopRotate = 1
+					let err = "";
+					err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, rotateAnim.stopAnimation, ${e.message}`
+
+					Alert.alert("rotateAnim.stopAnimation", err, [
+						{
+							text: 'OK',
+						}
+					]);
+				}
+			}
+
+			dataRef.current = {
+				horizontal: newX,
+				vertical: newY,
+				rotate: z,
+				pst_txt: getCurrentPositionText(x, y)
+			};
+
+			dataRefScale.current = {
+				horizontal: Circle_X,
+				vertical: Circle_Y,
+				rotate: z,
+				pst_txt: getCurrentPositionText(x, y)
+			};
+
+		} catch (e: any) {
+			if (loopUpdateCursorPosition == 0) {
+				loopUpdateCursorPosition = 1
+				let err = "";
+				err = `Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, updateCursorPosition, ${e.message}`
+
+				Alert.alert("updateCursorPosition", err, [
+					{
+						text: 'OK',
+					}
+				]);
+			}
+		}
 	};
 
 	const getCurrentPositionText = (x: number, y: number) => {
