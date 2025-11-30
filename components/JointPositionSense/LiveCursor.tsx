@@ -21,11 +21,11 @@ let loopUpdateCursorPosition = 0;
 const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.RefObject<LiveHeadPositionProps | null>, reset: React.RefObject<boolean>, record: boolean, dataRefScale: React.RefObject<LiveHeadPositionProps | null> }) => {
 	const navigation = useNavigation<NavigationProp>();
 	const animatedPos = useState(new Animated.ValueXY({ x: 0, y: 0 }))[0];
-	// const rotateAnim = useRef(new Animated.Value(0)).current;
-	// const rotate = rotateAnim.interpolate({
-	// 	inputRange: [-90, 90],
-	// 	outputRange: ['-90deg', '90deg'],
-	// });
+	const rotateAnim = useRef(new Animated.Value(0)).current;
+	const rotate = rotateAnim.interpolate({
+		inputRange: [-90, 90],
+		outputRange: ['-90deg', '90deg'],
+	});
 	const krossDevice = new KrossDevice();
 	const OffsetX = useRef<number | null>(null);
 	const OffsetY = useRef<number | null>(null);
@@ -213,28 +213,28 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 				}
 			}
 
-			// try {
-			// 	rotateAnim.stopAnimation(() => {
-			// 		Animated.timing(rotateAnim, {
-			// 			toValue: z,
-			// 			duration: 120,
-			// 			easing: Easing.linear,
-			// 			useNativeDriver: false,
-			// 		}).start()
-			// 	})
-			// } catch (e: any) {
-			// 	if (loopRotate == 0) {
-			// 		loopRotate = 1
-			// 		let err = "";
-			// 		err = `OS: ${Platform.Version}, Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, rotateAnim.stopAnimation, ${e.message}`
+			try {
+				rotateAnim.stopAnimation(() => {
+					Animated.timing(rotateAnim, {
+						toValue: z,
+						duration: 120,
+						easing: Easing.linear,
+						useNativeDriver: false,
+					}).start()
+				})
+			} catch (e: any) {
+				if (loopRotate == 0) {
+					loopRotate = 1
+					let err = "";
+					err = `OS: ${Platform.Version}, Circle_X: ${Circle_X}, Circle_Y: ${Circle_Y}, x: ${x}, y: ${y}, rotateAnim.stopAnimation, ${e.message}`
 
-			// 		Alert.alert("rotateAnim.stopAnimation", err, [
-			// 			{
-			// 				text: 'OK',
-			// 			}
-			// 		]);
-			// 	}
-			// }
+					Alert.alert("rotateAnim.stopAnimation", err, [
+						{
+							text: 'OK',
+						}
+					]);
+				}
+			}
 
 			dataRef.current = {
 				horizontal: newX,
@@ -318,7 +318,7 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 					transform: [
 						{ translateX: animatedPos.x },
 						{ translateY: animatedPos.y },
-						//{ rotate },
+						{ rotate },
 					],
 				},
 			]}
