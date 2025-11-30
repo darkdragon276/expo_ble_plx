@@ -11,7 +11,6 @@ import AssessmentHistorySessionRecent from "../components/AssessmentHistory/Asse
 import AssessmentHistoryTags from "../components/AssessmentHistory/AssessmentHistoryTags";
 import AssessmentHistorROMChart from "../components/AssessmentHistory/AssessmentHistorROMChart";
 import AssessmentHistoryJPSChart from "../components/AssessmentHistory/AssessmentHistoryJPSChart";
-import { useDatabase } from '../db/useDatabase';
 import { DB_SELECT_ALL_ASM_CSV, DB_SELECT_ALL_ROM } from '../db/dbQuery';
 import type { DataHistory, ComboboxFilter, DataAssessmentCSV } from "../model/AssessmentHistory";
 import { TimeOptions as timeOptions, MetricOptions as metricOptions } from '../dummy/masterData'
@@ -26,7 +25,6 @@ const LuDownload = styled(LucideDownload);
 const AssessmentHistory = () => {
 	const navigation = useNavigation<NavigationProp>();
 	const [data, setData] = useState<DataHistory[]>([])
-	const db = useDatabase("headx.db");
 
 	const [formData, setFormData] = useState<ComboboxFilter>({
 		metric: metricOptions[0],
@@ -74,6 +72,9 @@ const AssessmentHistory = () => {
 
 	useEffect(() => {
 		const selectData = async () => {
+
+			const db = await SQLite.openDatabaseAsync('headx.db');
+
 			try {
 				if (!db) {
 					return;
@@ -90,14 +91,17 @@ const AssessmentHistory = () => {
 
 			} catch (error) {
 				console.log(error);
+
+			} finally {
+				if (db) {
+					db.closeAsync();
+				}
 			}
 		};
 
-		if (db) {
-			selectData();
-		}
+		selectData();
 
-	}, [db, formData.metric, formData.time])
+	}, [formData.metric, formData.time])
 
 	const filerConditionSearch = (result: DataHistory[]) => {
 		const time = formData.time.prop;
@@ -212,8 +216,9 @@ const AssessmentHistory = () => {
 			return result;
 		}
 
+		const db = await SQLite.openDatabaseAsync('headx.db');
+
 		try {
-			const db = await SQLite.openDatabaseAsync('headx.db');
 			if (!db) {
 				return;
 			}
@@ -272,6 +277,10 @@ const AssessmentHistory = () => {
 
 		} catch (error) {
 			//console.log(error);
+		} finally {
+			if (db) {
+				db.closeAsync();
+			}
 		}
 	}
 

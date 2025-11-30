@@ -1,14 +1,13 @@
 import React, { memo, useEffect, useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import { LucideHistory, LucideTrendingUp, LucideTrash2 } from "lucide-react-native";
-import { useDatabase } from "../../db/useDatabase";
 import { DB_SELECT_RECENT, DB_DELETE_BY_KEY_ROM, DB_DELETE_BY_KEY_JPS, DB_DELETE_BY_KEY_JPS_RECORD } from "../../db/dbQuery";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../../model/RootStackParamList";
 import { styled } from 'nativewind';
 import useConvertDateTime from "../../utils/convertDateTime";
-import { SQLiteDatabase } from "expo-sqlite";
+import * as SQLite from 'expo-sqlite';
 
 const LuTrendUp = styled(LucideTrendingUp);
 const LucHistory = styled(LucideHistory);
@@ -62,32 +61,39 @@ const SessionItem = memo(({ item, gotoSummary, delAsm }: { item: Session, gotoSu
 });
 
 export default function MainRecentSession() {
-	let db = useDatabase("headx.db");
 	const [init, setInit] = useState(false);
 	const [data, setData] = useState<Session[]>([]);
 	const navigation = useNavigation<NavigationProp>();
 
 	useEffect(() => {
 		const selectAllSession = async () => {
-			if (!db) {
-				return;
-			}
+			const db = await SQLite.openDatabaseAsync('headx.db');
+			try {
+				if (!db) {
+					return;
+				}
+				const rs = await db.getAllAsync<Session>(DB_SELECT_RECENT);
+				if (rs) {
+					setData(rs);
+					setInit(true);
+				}
 
-			const rs = await db.getAllAsync<Session>(DB_SELECT_RECENT);
-			if (rs) {
-				setData(rs);
-				setInit(true);
+			} catch (err: any) {
+
+			} finally {
+				if (db) {
+					db.closeAsync();
+				}
 			}
 		};
 
-		if (db) selectAllSession();
+		selectAllSession();
 
 		return () => {
-			db = null;
 			setInit(false)
 		}
 
-	}, [db])
+	}, [])
 
 	const gotoSummary = (item: Session) => {
 		if (item.type == "JPS") {
@@ -106,19 +112,26 @@ export default function MainRecentSession() {
 	}
 
 	const delROM = async (item: Session) => {
-		if (!db) {
-			return;
-		}
+		const del = async () => {
+			const db = await SQLite.openDatabaseAsync('headx.db');
+			try {
+				if (!db) {
+					return;
+				}
 
-		const del = async (db: SQLiteDatabase) => {
-			await db.runAsync(DB_DELETE_BY_KEY_ROM, [item.key])
-			setData(prev => prev.filter(items => items.key !== item.key));
+				await db.runAsync(DB_DELETE_BY_KEY_ROM, [item.key])
+				setData(prev => prev.filter(items => items.key !== item.key));
+			} finally {
+				if (db) {
+					db.closeAsync();
+				}
+			}
 		}
 
 		Alert.alert("", "Are you sure?", [
 			{
 				text: "Yes",
-				onPress: () => { del(db!) }
+				onPress: () => { del() }
 			},
 			{
 				text: "No",
@@ -127,23 +140,30 @@ export default function MainRecentSession() {
 	};
 
 	const delJPS = async (item: Session) => {
-		if (!db) {
-			return;
-		}
+		const del = async () => {
+			const db = await SQLite.openDatabaseAsync('headx.db');
+			try {
+				if (!db) {
+					return;
+				}
 
-		const del = async (db: SQLiteDatabase) => {
-			await db.withTransactionAsync(async () => {
-				await db.runAsync(DB_DELETE_BY_KEY_JPS, [item.key])
-				await db.runAsync(DB_DELETE_BY_KEY_JPS_RECORD, [item.key])
-			});
+				await db.withTransactionAsync(async () => {
+					await db.runAsync(DB_DELETE_BY_KEY_JPS, [item.key])
+					await db.runAsync(DB_DELETE_BY_KEY_JPS_RECORD, [item.key])
+				});
 
-			setData(prev => prev.filter(items => items.key !== item.key));
+				setData(prev => prev.filter(items => items.key !== item.key));
+			} finally {
+				if (db) {
+					db.closeAsync();
+				}
+			}
 		}
 
 		Alert.alert("", "Are you sure?", [
 			{
 				text: "Yes",
-				onPress: () => { del(db!) }
+				onPress: () => { del() }
 			},
 			{
 				text: "No",

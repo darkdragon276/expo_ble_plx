@@ -6,7 +6,7 @@ import { runOnJS, SharedValue, useAnimatedReaction, useDerivedValue } from 'reac
 import { styled } from 'nativewind';
 import { LucideTarget } from 'lucide-react-native';
 import { JPSDataHistory } from '../../model/AssessmentHistory';
-import { useDatabase } from '../../db/useDatabase';
+import * as SQLite from 'expo-sqlite';
 import { DB_SELECT_JPS_RECORD_CHART } from '../../db/dbQuery';
 
 const LuTarget = styled(LucideTarget);
@@ -56,8 +56,6 @@ const ActiveValueIndicator = ({
 };
 
 const AssessmentHistoryJPSChart = ({ timeFilter }: { timeFilter: string }) => {
-
-	const db = useDatabase("headx.db");
 	const font = useFont(require("../../assets/fonts/calibrii.ttf"), 12);
 	const { state, isActive } = useChartPressState({ x: 0, y: { angular: 0 } });
 	const [data, setData] = useState<JPSDataHistory[]>([])
@@ -75,6 +73,9 @@ const AssessmentHistoryJPSChart = ({ timeFilter }: { timeFilter: string }) => {
 
 	useEffect(() => {
 		const selectData = async () => {
+
+			const db = await SQLite.openDatabaseAsync('headx.db');
+
 			try {
 				if (!db) {
 					return;
@@ -91,14 +92,16 @@ const AssessmentHistoryJPSChart = ({ timeFilter }: { timeFilter: string }) => {
 
 			} catch (error) {
 				console.log(error);
+			} finally {
+				if (db) {
+					db.closeAsync();
+				}
 			}
 		};
 
-		if (db) {
-			selectData();
-		}
+		selectData();
 
-	}, [db, timeFilter])
+	}, [timeFilter])
 
 	const valToolTipDate = useDerivedValue((): string => {
 		let date = "";

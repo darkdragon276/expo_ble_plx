@@ -8,7 +8,7 @@ import { styled } from 'nativewind';
 import { LucideCheck, LucideTarget, LucideX, PenLine, RotateCcw } from 'lucide-react-native';
 import type { DataHistory } from "../../model/AssessmentHistory";
 import useConvertDateTime from '../../utils/convertDateTime';
-import { useDatabase } from '../../db/useDatabase';
+import * as SQLite from 'expo-sqlite';
 import { DB_UPDATE_BY_KEY_JPS, DB_UPDATE_BY_KEY_ROM } from '../../db/dbQuery';
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -22,7 +22,6 @@ const TitleSummary = ({ title, dataKey, type }: { title: string, dataKey: string
 	const [text, setText] = useState(title)
 	const [oldtext, setOldText] = useState(title)
 	const [edit, setEditText] = useState(false)
-	const db = useDatabase("headx.db");
 
 	useEffect(() => {
 		setText(title)
@@ -35,6 +34,9 @@ const TitleSummary = ({ title, dataKey, type }: { title: string, dataKey: string
 	}
 
 	const saveTitle = async () => {
+
+		const db = await SQLite.openDatabaseAsync('headx.db');
+
 		try {
 			if (!db) {
 				return;
@@ -51,6 +53,9 @@ const TitleSummary = ({ title, dataKey, type }: { title: string, dataKey: string
 			setOldText(text);
 		} catch (error) {
 		} finally {
+			if (db) {
+				db.closeAsync();
+			}
 			setEditText(false)
 		}
 	}
