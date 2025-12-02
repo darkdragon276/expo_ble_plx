@@ -54,8 +54,7 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
         <View className="bg-white rounded-2xl p-4 shadow">
             <View className="flex-row items-center space-x-2 mb-2">
                 <Text className="text-gray-700 font-semibold">Device Status</Text>
-                <View className="w-20"></View>
-                <View className="flex-row justify-end items-center space-x-2">
+                <View className="flex-1 justify-end items-center space-x-2">
                     {/* Battery icon */}
                     {
                         dvInfo && dvInfo?.battery
