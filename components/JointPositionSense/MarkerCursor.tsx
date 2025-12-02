@@ -32,8 +32,8 @@ export default MarkerCursor
 const styles = StyleSheet.create({
 	cursor: {
 		position: 'absolute',
-		width: 0.2,
-		height: 0.2,
+		width: 2,
+		height: 2,
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
