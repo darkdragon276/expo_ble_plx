@@ -52,9 +52,9 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
 
     return (
         <View className="bg-white rounded-2xl p-4 shadow">
-            <View className="flex-row items-center space-x-2 mb-2">
-                <Text className="text-gray-700 font-semibold">Device Status</Text>
-                <View className="flex-1 justify-end items-center space-x-2">
+            <View className="flex-row items-center justify-between mb-2">
+                <Text className="text-gray-700 font-semibold"> Device Status</Text>
+                <View className="flex-row items-center space-x-2">
                     {/* Battery icon */}
                     {
                         dvInfo && dvInfo?.battery
@@ -80,7 +80,7 @@ const MainDeviceStatus = ({ deviceId, setOpen }: { deviceId: string, setOpen: an
                                 {/* <Icon name="battery-half-outline" className={`text-${dvInfo.color}-600`} size={18} />
                                 <Text className={`text-${dvInfo.color}-600`}>{dvInfo?.battery}%</Text> */}
                                 <View className="w-2.5 h-2.5 rounded-xl bg-green-500 ml-2" />
-                                <Text className="text-green-600 font-medium">{dvInfo?.status}</Text>
+                                <Text className="text-green-600 font-bold">{dvInfo?.status}</Text>
                             </View>
                             :
                             <></>
