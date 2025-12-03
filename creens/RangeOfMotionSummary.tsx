@@ -240,6 +240,10 @@ const RangeOfMotionSummary = () => {
 
 			const htmlTemplate = await FileSystem.readAsStringAsync(template.localUri || "");
 
+			if (template.localUri) {
+				await FileSystem.deleteAsync(template.localUri, { idempotent: true });
+			}
+
 			// loaded data to html template
 			const html = htmlTemplate
 				.replace('{{title}}', data?.title || "")
@@ -296,6 +300,10 @@ const RangeOfMotionSummary = () => {
 				await FileSystem.writeAsStringAsync(fileUri, base64 ?? "", {
 					encoding: FileSystem.EncodingType.Base64,
 				});
+			}
+
+			if (uri) {
+				await FileSystem.deleteAsync(uri, { idempotent: true });
 			}
 		} catch (error) {
 			Alert.alert("Generating PDF", (error as Error).message, [

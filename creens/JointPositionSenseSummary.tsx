@@ -139,6 +139,10 @@ const JointPositionSenseSummary = () => {
 
 		const htmlTemplate = await FileSystem.readAsStringAsync(template.localUri || "");
 
+		if (template.localUri) {
+			await FileSystem.deleteAsync(template.localUri, { idempotent: true });
+		}
+
 		let cursors: any[] = [];
 		let _cursor =
 			`	
@@ -236,6 +240,10 @@ const JointPositionSenseSummary = () => {
 			await FileSystem.writeAsStringAsync(fileUri, base64 ?? "", {
 				encoding: FileSystem.EncodingType.Base64,
 			});
+		}
+
+		if (uri) {
+			await FileSystem.deleteAsync(uri, { idempotent: true });
 		}
 	};
 
