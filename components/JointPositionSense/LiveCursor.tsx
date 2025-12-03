@@ -248,6 +248,8 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 				styles.cursor,
 				{
 					transform: [
+						{ translateX: -1 },
+						{ translateY: -1 },
 						{ translateX: animatedPos.x },
 						{ translateY: animatedPos.y },
 						{ rotate },

@@ -11,6 +11,8 @@ const MarkerCursor = ({ id, x, y, z }: { id: string, x: number, y: number, z: nu
 				styles.cursor,
 				{
 					transform: [
+						{ translateX: -1 },
+						{ translateY: -1 },
 						{ translateX: x },
 						{ translateY: y * (-1) },
 						{ rotate: rotate }
