@@ -22,7 +22,7 @@ const AssessmentLLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 			}
 
 			let alpha = normalizeAngle(Math.round(data * 10) / 10 - Offset.current);
-			setPos(Math.round((alpha <= 0 ? -alpha : 0) * 10) / 10);
+			setPos(Math.round((alpha <= 0 ? -alpha : 0)));
 			setPosMax((pos > posMax) ? pos : posMax);
 		});
 
