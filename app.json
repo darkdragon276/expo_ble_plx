@@ -2,7 +2,7 @@
   "expo": {
     "name": "HeadX Duo",
     "slug": "HeadX Duo",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "orientation": "portrait",
     "icon": "./assets/HeadX-adaptive-icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.HeadX.app",
-      "version": "1.0.12",
+      "version": "1.0.14",
       "buildNumber": "1",
       "infoPlist": {
         "CFBundleDisplayName": "HeadX Duo",

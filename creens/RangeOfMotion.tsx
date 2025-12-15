@@ -173,9 +173,11 @@ const RangeOfMotion = () => {
             let data = krossDevice.onDataReceived(KrossDevice.decodeBase64(char?.value ?? ""));
             if (data) {
                 krossDevice.unpack(data);
-                bleEventEmitter.emit('BleDataRoll', krossDevice.angle.roll);
-                bleEventEmitter.emit('BleDataPitch', krossDevice.angle.pitch);
-                bleEventEmitter.emit('BleDataYaw', krossDevice.angle.yaw);
+
+                // new request => Use "Math.round" to only accept integers
+                bleEventEmitter.emit('BleDataRoll', Math.round(krossDevice.angle.roll));
+                bleEventEmitter.emit('BleDataPitch', Math.round(krossDevice.angle.pitch));
+                bleEventEmitter.emit('BleDataYaw', Math.round(krossDevice.angle.yaw));
                 count++;
             }
             //console.log("Monitor: ", char?.value);
