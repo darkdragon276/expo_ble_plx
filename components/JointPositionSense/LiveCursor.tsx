@@ -143,27 +143,14 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 
 	// limits within a circle
 	const updateCursorPosition = (x: number, y: number, z: number) => {
-		//const distance = Math.sqrt(x * x + y * y);
 
 		let newX = x;
 		let newY = y;
 
-		let Circle_X = x;
-		let Circle_Y = y;
-
-		// if out of circle then scale again
-		// if (distance > CIRCLE_RADIUS - CURSOR_RADIUS) {
-		// 	const ratio = (CIRCLE_RADIUS - CURSOR_RADIUS) / distance;
-		// 	newX = x * ratio;
-		// 	newY = y * ratio;
-		// }
-
-		const { scaleX, scaleY } = coordinatesScaleMultiCircle(Circle_X, Circle_Y)
-		Circle_X = scaleX;
-		Circle_Y = scaleY;
+		let { scaleX, scaleY } = coordinatesScaleMultiCircle(x, y);
 
 		Animated.spring(animatedPos, {
-			toValue: { x: Circle_X, y: Circle_Y * (-1) },
+			toValue: { x: scaleX, y: scaleY * (-1) },
 			useNativeDriver: false,
 			stiffness: 90,
 			damping: 20,
@@ -190,8 +177,8 @@ const LiveCursor = ({ dataRef, reset, record, dataRefScale }: { dataRef: React.R
 		};
 
 		dataRefScale.current = {
-			horizontal: Circle_X,
-			vertical: Circle_Y,
+			horizontal: scaleX,
+			vertical: scaleY,
 			rotate: z,
 			pst_txt: getCurrentPositionText(x, y)
 		};

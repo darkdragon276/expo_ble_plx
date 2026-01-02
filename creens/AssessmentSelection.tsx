@@ -6,6 +6,7 @@ import {
 	Pressable,
 	TouchableOpacity,
 	ScrollView,
+	Image,
 	FlatList,
 	Alert,
 } from "react-native";
@@ -94,14 +95,7 @@ const AssessmentSelection = () => {
 		});
 	}, [navigation]);
 
-	const renderFeature = ({ item }: { item: Feature }) => (
-		<View className="flex-row items-start gap-3 my-1">
-			<LuCircleCheckBig size={15} className="font-semibold text-green-500"></LuCircleCheckBig>
-			<Text className="text-sm text-muted">{item.text}</Text>
-		</View>
-	);
-
-	const onPressGotoAssessment = () => {
+	const onPressGotoROM = () => {
 		const title = titleRef.current?.getValue() || "";
 		navigation.replace("RangeOfMotion", { title: title })
 	}
@@ -115,7 +109,7 @@ const AssessmentSelection = () => {
 		<ScrollView className="flex-1 bg-gray-50 p-4">
 			<View className="w-full">
 				<View className="items-center mb-6">
-					<Text className="text-lg font-semibold mb-1">
+					<Text className="text-xl font-semibold mb-1">
 						Assessment Selection
 					</Text>
 					<Text className="text-sm text-gray-500 text-center">
@@ -124,144 +118,71 @@ const AssessmentSelection = () => {
 				</View>
 
 				{/* Session name input */}
-				<View className="flex-row items-center bg-white rounded-xl px-3 py-2 mb-6 shadow">
-					<LuPenLine size={20} className="text-blue-500"></LuPenLine>
-					{/* <TextInput
-						value={title}
-						onChangeText={setTitle}
-						placeholder="Session Name (Optional)"
-						placeholderTextColor="black"
-						className="w-full rounded-xl px-4 py-4 text-base"
-					/> */}
+				<View className="mb-6">
+					<View className="flex-row items-center mb-2">
+						<LuPenLine size={16} className="text-blue-500"></LuPenLine>
+						<Text className="ml-2 text-sm font-regular text-black-700">Session Name (Optional)</Text>
+					</View>
 					<AssessmentTitle
 						ref={titleRef}
 					></AssessmentTitle>
 				</View>
 
-				{/* ROM Card */}
-				<View className="bg-white rounded-xl p-5 shadow-md">
-					<View className="flex-row items-center">
-						{/* Icon circle */}
-						<View className="w-12 h-12 rounded-xl bg-blue-200 items-center justify-center mr-3">
-							{/* small rotation icon */}
-							<LuRotateCcw size={22} className="text-blue-500"></LuRotateCcw>
-						</View>
-						<Text className="text-xl">Range of Motion (ROM)</Text>
-
-					</View>
-
-					{/* Start button */}
-					<View className="mt-5">
-						<TouchableOpacity
-							onPress={onPressGotoAssessment}
-							className="rounded-lg overflow-hidden"
-							activeOpacity={0.9}>
-							<LinearGradient
-								colors={['#0a66ff', '#0066ff']}
-								start={[0, 0]}
-								end={[1, 0]}
-								className="rounded-lg"
-								style={{ paddingVertical: 14, alignItems: 'center' }}
+				<View className="flex-row justify-center gap-4 mb-6">
+					<Pressable onPress={onPressGotoJPS} className="flex-1">
+						{({ pressed }) => (
+							<View
+								className="border-2 border-blue-300 rounded-2xl p-4 items-center aspect-square justify-center"
+								style={{ backgroundColor: pressed ? '#DBEAFE' : 'transparent' }}
 							>
+								<Text className="text-sm font-semibold text-gray-800 mb-3 text-center">
+									Joint Position Sense
+								</Text>
 
-								<View className="flex-row items-center gap-2">
-									<LuRotateCcw size={18} className="" color="white"></LuRotateCcw>
-									<Text className="text-white font-semibold">Start ROM Assessment</Text>
-								</View>
-							</LinearGradient>
-						</TouchableOpacity>
-					</View>
-
-					<View className="flex-1 py-2">
-						<Text className="text-md text-gray-400 mt-1">
-							Assess cervical spine mobility across all planes of movement with real-time visualization and precise angular measurements.
-						</Text>
-					</View>
-
-					{/* Features list */}
-					<View className="space-y-3">
-						<FlatList
-							data={romFeatures}
-							keyExtractor={(i) => i.id}
-							renderItem={renderFeature}
-							scrollEnabled={false}
-						/>
-						{/* <View className="flex-row items-center gap-2">
-							<LuClock size={15} className="text-xs" color="gray"></LuClock>
-							<Text className="text-xs text-gray-500 text-muted">Duration: ~10-12 minutes</Text>
-						</View> */}
-					</View>
-				</View>
-
-				{/* JPS Card */}
-				<View className="bg-white rounded-xl p-5 shadow-md mt-5">
-					<View className="flex-row items-center">
-						{/* Icon circle */}
-						<View className="w-12 h-12 rounded-xl bg-gray-200 items-center justify-center mr-3">
-							{/* small rotation icon */}
-							<LuTarget size={22} className="text-gray-500"></LuTarget>
-						</View>
-						<Text className="text-xl">Joint Position Sense (JPS)</Text>
-
-					</View>
-
-					{/* Start button */}
-					<View className="mt-5">
-						<TouchableOpacity
-							onPress={onPressGotoJPS}
-							className="rounded-lg overflow-hidden"
-							activeOpacity={0.9}>
-							<LinearGradient
-								colors={['#45556c', '#45556c']}
-								start={[0, 0]}
-								end={[1, 0]}
-								className="rounded-lg"
-								style={{ paddingVertical: 14, alignItems: 'center' }}
+								<Image
+									source={require("../assets/JPSIcon.png")}
+									className="w-20 h-20"
+									resizeMode="contain"
+								/>
+							</View>
+						)}
+					</Pressable>
+					<Pressable onPress={onPressGotoROM} className="flex-1">
+						{({ pressed }) => (
+							<View
+								className="border-2 border-purple-300 rounded-2xl p-4 items-center aspect-square justify-center"
+								style={{ backgroundColor: pressed ? '#F3E8FF' : 'transparent' }}
 							>
+								<Text className="text-sm font-semibold text-gray-800 mb-3 text-center">
+									Range of Motion
+								</Text>
 
-								<View className="flex-row items-center gap-2">
-									<LuRotateCcw size={18} className="" color="white"></LuRotateCcw>
-									<Text className="text-white font-semibold">Start JPS Assessment</Text>
-								</View>
-							</LinearGradient>
-						</TouchableOpacity>
-					</View>
-
-					<View className="flex-1 py-2">
-						<Text className="text-md text-gray-400 mt-1">
-							Evaluate proprioceptive accuracy by measuring the patient's ability to return to target positions with eyes closed.
-						</Text>
-					</View>
-
-					{/* Features list */}
-					<View className="space-y-3">
-						<FlatList
-							data={jpsFeatures}
-							keyExtractor={(i) => i.id}
-							renderItem={renderFeature}
-							scrollEnabled={false}
-						/>
-						{/* <View className="flex-row items-center gap-2">
-							<LuClock size={15} className="text-xs" color="gray"></LuClock>
-							<Text className="text-xs text-gray-500 text-muted">Duration: ~10-12 minutes</Text>
-						</View> */}
-					</View>
+								<Image
+									source={require("../assets/ROMIcon.png")}
+									className="w-20 h-20"
+									resizeMode="contain"
+								/>
+							</View>
+						)}
+					</Pressable>
 				</View>
-
-				<View className="bg-white p-4 rounded-xl shadow mt-4">
-					<View className="flex-row items-center mb-3">
-						<View className="w-10 h-10 rounded-xl bg-blue-200 items-center justify-center mr-4">
+				{/* Instructions Box */}
+				<View className="bg-white p-3 rounded-xl shadow mt-4">
+					<View className="flex-row items-start gap-2">
+						{/* Left column - Icon */}
+						<View className="w-8 h-8 rounded-lg bg-blue-100 items-center justify-center mt-1 flex-shrink-0">
 							<LuCircleCheckBig size={20} className="text-blue-500"></LuCircleCheckBig>
 						</View>
-						<Text className="mb-3 text-xl">Before You Begin</Text>
-					</View>
 
-					<View className="rounded-xl p-1 ml-10 ">
-						<View className="flex-1 space-y-1">
-							<Text className="text-xs text-muted-foreground space-y-1">• Ensure HeadX device is properly positioned</Text>
-							<Text className="text-xs text-muted-foreground space-y-1">• Patient seated comfortably with good posture</Text>
-							<Text className="text-xs text-muted-foreground space-y-1">• Device calibrated (Settings if needed)</Text>
-							<Text className="text-xs text-muted-foreground space-y-1">• Results automatically saved</Text>
+						{/* Right column - Header and Details */}
+						<View className="flex-1">
+							<Text className="text-base font-semibold mb-3">Before You Begin</Text>
+							<View className="">
+								<Text className="text-sm text-gray-500">• Ensure HeadX device is properly positioned</Text>
+								<Text className="text-sm text-gray-500">• Patient seated comfortably with good posture</Text>
+								<Text className="text-sm text-gray-500">• Device calibrated (Settings if needed)</Text>
+								<Text className="text-sm text-gray-500">• Results automatically saved</Text>
+							</View>
 						</View>
 					</View>
 				</View>

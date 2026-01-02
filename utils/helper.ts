@@ -57,31 +57,17 @@ const numberToMmss = (seconds: number): string => {
     return `${mm}:${ss}`;
 }
 
-// scale JPS circle
-const coordinatesScaleConvert = (coordinates: number, sign: number = 1): number => {
-    let convert = 0;
-
-    convert = coordinates * sign;
-    coordinates = Math.abs(coordinates);
-
-    if (coordinates < CIRCLE_LIMIT) {
-        convert = convert * SCALE_PERCENT;
-    }
-
-    return Math.round(convert * 10) / 10;
-}
-
 // scale JPS multi circle
 const coordinatesScaleMultiCircle = (x: number, y: number) => {
 
     const r = Math.sqrt(x * x + y * y);
     let r2;
     if (r > CIRCLE_LIMIT) {
-        r2 = 100.0
+        r2 = 124.0
     } else if (r > 6) {
-        r2 = 60.0 + ((100 - 60) / (20 - 6)) * (r - 6.0);
+        r2 = 74.0 + ((124.0 - 74.0) / (20 - 6)) * (r - 6.0);
     } else if (r > 0) {
-        r2 = 10.0 * r;
+        r2 = (74.0 / 6.0) * r;
     } else {
         r2 = 0;
     }
@@ -94,4 +80,4 @@ const coordinatesScaleMultiCircle = (x: number, y: number) => {
 
 
 
-export { normalizeAngle, loadImg, numberToMmss, coordinatesScaleConvert, coordinatesScaleMultiCircle }
+export { normalizeAngle, loadImg, numberToMmss, coordinatesScaleMultiCircle }

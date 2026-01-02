@@ -98,11 +98,11 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 	return (
 		<View className="space-y-6">
 
-			<View className="bg-white p-4 space-y-6 rounded-2xl items-center shadow-md mt-4">
+			<View className="bg-white rounded-2xl items-center shadow-md mt-4">
 
-				<View className="flex-row items-center justify-center space-x-2 mb-4">
+				<View className="ml-6 mt-4 w-full flex-row items-center justify-start space-x-2 mb-4">
 					<LuTarget size={15} className="text-gray-500"></LuTarget>
-					<Text className="text-lg font-semibold">Live Head Position Preview</Text>
+					<Text className="text-sm font-regular">Live Head Position Preview</Text>
 				</View>
 
 				<HeadPosition dataRef={refPosition}></HeadPosition>
@@ -113,27 +113,29 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 					<MakerCursorList mode={"LIVE"} getData={() => refMarkerCursor ? refMarkerCursor.current : []} subscribe={subscribe} data={[]}></MakerCursorList>
 				</PositionCoordinates>
 
-				<View className="flex-row space-x-3 mt-3">
-					<View className="flex-row items-center">
-						<View className="w-3 h-3 bg-black rounded-full mr-1" />
-						<Text className="text-gray-600 text-sm">Neutral</Text>
+				<View className="ml-6 mb-4 w-full justify-start flex-row mt-3">
+					<View className="flex-row items-center mr-10">
+						<View className="w-2 h-2 bg-black rounded-full mr-1" />
+						<Text className="text-gray-600 text-xs">Neutral</Text>
 					</View>
 					{
 						!record
 							?
-							<View className="flex-row items-center">
-								<View className="w-3 h-3 bg-blue-700 rounded-full mr-1" />
-								<Text className="text-gray-600 text-sm">Live Position</Text>
+							<View className="flex-row items-center mr-10">
+								<View className="w-2 h-2 bg-blue-700 rounded-full mr-1" />
+								<Text className="text-gray-600 text-xs">Live Position</Text>
 							</View>
 							:
-							<View className="flex-row space-x-5">
-								<View className="flex-row items-center">
-									<View className="w-3 h-3 bg-red-700 rounded-full mr-1" />
-									<Text className="text-gray-600 text-sm">Live Position</Text>
+							<View className="flex-row">
+								<View className="flex-row items-center mr-10">
+									<View className="w-2 h-2 bg-red-700 rounded-full mr-1" />
+									<Text className="text-gray-600 text-xs">Live Position</Text>
 								</View>
-								<View className="flex-row items-center">
-									<View className="w-3 h-1 bg-purple-700 mr-1" />
-									<Text className="text-gray-600 text-sm">Recorded</Text>
+								<View className="flex-row items-center mr-10">
+									<View className="w-4 h-4 bg-purple-700 rounded-full items-center justify-center mr-1">
+										<View className="w-2 h-1 bg-white" />
+									</View>
+									<Text className="text-gray-600 text-xs">Recorded</Text>
 								</View>
 							</View>
 					}
@@ -143,7 +145,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 			{
 				record
 					?
-					<View className="flex-row space-x-2 h-20">
+					<View className="flex-row space-x-2 h-14">
 						<TouchableOpacity
 							onPress={onPressRecord}
 							activeOpacity={0.9}
@@ -154,7 +156,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 								end={[1, 0]}
 								className="flex-row items-center justify-center h-full"
 							>
-								<LuCircle size={20} color="white"></LuCircle>
+								<LuCircle size={16} color="white"></LuCircle>
 								<Text className="text-white font-semibold p-3">Record Position</Text>
 							</LinearGradient>
 						</TouchableOpacity>
@@ -169,7 +171,7 @@ const LiveHeadPosition = ({ isReset, refDuration, record, baseInfo }: { isReset:
 								end={[1, 0]}
 								className="flex-row items-center justify-center h-full"
 							>
-								<LuCircleCheckBig size={20} className="text-gray-500"></LuCircleCheckBig>
+								<LuCircleCheckBig size={16} className="text-gray-500"></LuCircleCheckBig>
 								<Text className="text-gray-500 font-semibold p-3">Finish</Text>
 							</LinearGradient>
 						</TouchableOpacity>

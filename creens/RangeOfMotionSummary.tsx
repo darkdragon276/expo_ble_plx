@@ -100,13 +100,13 @@ const TitleSummary = ({ title, dataKey }: { title: string, dataKey: string }) =>
 				!edit
 					?
 					<>
-						<Text className="w-rounded-xl font-bold px-2 py-2 text-lg">{text}</Text>
+						<Text className="w-rounded-xl font-regular px-2 py-2 text-base">{text}</Text>
 						<LuPenLine size={20} color="gray" onPress={() => setEditText(true)}></LuPenLine>
 					</>
 					:
 					<>
 						<TextInput
-							className="w-rounded-xl font-bold px-2 py-2 text-lg"
+							className="w-rounded-xl font-regular px-2 py-2 text-base"
 							defaultValue={text}
 							onChangeText={newText => setText(newText)}
 							placeholderTextColor="black"
@@ -332,21 +332,20 @@ const RangeOfMotionSummary = () => {
 					<View className="flex-row items-center py-4">
 
 						<View className="items-center justify-center mr-2">
-
-							<LuRotateCcw size={22} className="text-gray-400"></LuRotateCcw>
+							<LuRotateCcw size={16} className="text-black-400"></LuRotateCcw>
 						</View>
-						<Text className="text-xl">Range of Motion Summary</Text>
+						<Text className="text-base">Range of Motion Summary</Text>
 					</View>
 
 					<View className="flex-row flex-wrap py-4">
 						<View className="w-1/2">
 							<Text className="text-xs text-muted-foreground mb-1 text-gray-400">Date & Time</Text>
-							<Text className="font-medium text-sm">{dateConvert?.date_MM_dd_yyyy_hh_mm_ss_ampm}</Text>
+							<Text className="font-medium text-xs">{dateConvert?.date_MM_dd_yyyy_hh_mm_ss_ampm}</Text>
 						</View>
 
 						<View className="w-1/2">
 							<Text className="text-xs text-muted-foreground mb-1 text-gray-400">Duration</Text>
-							<Text className="font-medium text-sm">
+							<Text className="font-medium text-xs">
 								{
 									(data && data.duration >= 60)
 										? (Math.trunc(data.duration / 60)) + " min " + (data.duration % 60) + "s"
@@ -365,125 +364,38 @@ const RangeOfMotionSummary = () => {
 							{/* small rotation icon */}
 							<LuRotateCcw size={22} className="text-blue-500"></LuRotateCcw>
 						</View>
-						<Text className="text-xl">Range of Motion Visualisation</Text>
+						<Text className="text-base">Range of Motion Visualisation</Text>
 					</View>
 
-					<View className="flex-row flex-wrap">
-						{/* Extension */}
-						<View className="w-1/3">
-							<View className="text-center space-y-3 items-center">
-								{/* Icon + description */}
-								<View className="items-center bg-blue-50/80 border border-blue-200 rounded-xl p-4 w-4/5">
-									<Image
-										className="w-16 h-16"
-										source={ExtensionSrcImage}
-									/>
-								</View>
-
-								{/* Value + Max */}
-								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-blue-700 text-sm">Extension</Text>
-									<Text className="text-lg font-bold text-blue-600">{data ? data.extension : 0.0}°</Text>
-								</View>
-							</View>
-						</View>
-
-						{/* Flexion */}
-						<View className="w-1/3">
-							<View className="text-center space-y-3 items-center">
-								{/* Icon + description */}
-								<View className="items-center bg-green-50/80 border border-green-200 rounded-xl p-4 w-4/5">
-									<Image
-										className="w-16 h-16"
-										source={FlexionSrcImage}
-									/>
-								</View>
-
-								{/* Value + Max */}
-								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-green-700 text-sm">Flexion</Text>
-									<Text className="text-lg font-bold text-green-600">{data ? data.flexion : 0.0}°</Text>
+					<View className="flex-row flex-wrap justify-between px-4">
+						{[
+							{ label: "Extension", value: data?.extension, image: ExtensionSrcImage, color: "blue" },
+							{ label: "Flexion", value: data?.flexion, image: FlexionSrcImage, color: "green" },
+							{ label: "Left Rotation", value: data?.l_rotation, image: LeftRotationSrcImage, color: "purple", rotate: '180deg' },
+							{ label: "Right Rotation", value: data?.r_rotation, image: RightRotationSrcImage, color: "orange", rotate: '180deg' },
+							{ label: "Left Lateral", value: data?.l_lateral, image: LeftLateralSrcImage, color: "teal" },
+							{ label: "Right Lateral", value: data?.r_lateral, image: RightLateralSrcImage, color: "pink" },
+						].map(({ label, value, image, color, rotate }) => (
+							<View className="w-1/2 px-2 mb-4" key={label}>
+								<View className="items-center space-y-2">
+									<View className={`items-center bg-${color}-50/80 border border-${color}-200 rounded-xl px-4 py-6 w-full`}>
+										<Image
+											className="w-14 h-14"
+											style={rotate ? { transform: [{ rotate }] } : {}}
+											source={image}
+										/>
+									</View>
+									<View className="items-center">
+										<Text className={`font-semibold text-${color}-700 text-sm`}>
+											{label}
+										</Text>
+										<Text className={`text-lg font-bold text-${color}-600`}>
+											{value ?? 0.0}°
+										</Text>
+									</View>
 								</View>
 							</View>
-						</View>
-
-						{/* Left Rotation */}
-						<View className="w-1/3">
-							<View className="text-center space-y-3 items-center">
-								{/* Icon + description */}
-								<View className="items-center bg-purple-50/80 border border-purple-200 rounded-xl p-4 w-4/5">
-									<Image
-										className="w-16 h-16"
-										style={{ transform: [{ rotate: '180deg' }] }}
-										source={LeftRotationSrcImage}
-									/>
-								</View>
-
-								{/* Value + Max */}
-								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-purple-700 text-sm">Left Rotation</Text>
-									<Text className="text-lg font-bold text-purple-600">{data ? data.l_rotation : 0.0}°</Text>
-								</View>
-							</View>
-						</View>
-
-						{/* Right Rotation */}
-						<View className="w-1/3">
-							<View className="text-center space-y-3 items-center">
-								{/* Icon + description */}
-								<View className="items-center bg-orange-50/80 border border-orange-200 rounded-xl p-4 w-4/5">
-									<Image
-										className="w-16 h-16"
-										style={{ transform: [{ rotate: '180deg' }] }}
-										source={RightRotationSrcImage}
-									/>
-								</View>
-
-								{/* Value + Max */}
-								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-orange-700 text-sm">Right Rotation</Text>
-									<Text className="text-lg font-bold text-orange-600">{data ? data.r_rotation : 0.0}°</Text>
-								</View>
-							</View>
-						</View>
-
-						{/* Left Lateral */}
-						<View className="w-1/3">
-							<View className="text-center space-y-3 items-center">
-								{/* Icon + description */}
-								<View className="items-center bg-teal-50/80 border border-teal-200 rounded-xl p-4 w-4/5">
-									<Image
-										className="w-16 h-16"
-										source={LeftLateralSrcImage}
-									/>
-								</View>
-
-								{/* Value + Max */}
-								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-teal-700 text-sm">Left Lateral</Text>
-									<Text className="text-lg font-bold text-teal-600">{data ? data.l_lateral : 0.0}°</Text>
-								</View>
-							</View>
-						</View>
-
-						{/* Right Lateral */}
-						<View className="w-1/3">
-							<View className="text-center space-y-3 items-center">
-								{/* Icon + description */}
-								<View className="items-center bg-pink-50/80 border border-pink-200 rounded-xl p-4 w-4/5">
-									<Image
-										className="w-16 h-16"
-										source={RightLateralSrcImage}
-									/>
-								</View>
-
-								{/* Value + Max */}
-								<View className="flex-column items-center justify-between mb-2">
-									<Text className="font-semibold text-pink-700 text-sm">Right Lateral</Text>
-									<Text className="text-lg font-bold text-pink-600">{data ? data.r_lateral : 0.0}°</Text>
-								</View>
-							</View>
-						</View>
+						))}
 					</View>
 				</View>
 
@@ -494,53 +406,38 @@ const RangeOfMotionSummary = () => {
 						activeOpacity={0.8}
 						className="bg-green-600 rounded-xl py-4 items-center justify-center shadow-lg">
 						<View className="flex-row items-center">
-							<Text className="text-white text-base font-semibold mr-3">✓</Text>
-							<Text className="text-white text-base font-semibold">Finish & Return Home</Text>
+							<Text className="text-white text-sm font-semibold mr-3">✓</Text>
+							<Text className="text-white text-sm font-semibold">Finish & Return Home</Text>
 						</View>
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						activeOpacity={0.8}
 						onPress={gotoAssessmentHistory}
-						className="mt-3 bg-white border border-gray-300 rounded-xl py-4 items-center justify-center">
+						className="mt-3 border border-gray-300 rounded-xl py-2 items-center justify-center">
 						<View className="flex-row items-center">
-							<LuChartColumn size={20} color="gray" className="mr-2"></LuChartColumn>
-							<Text className="text-gray-700 text-base">View History</Text>
+							<LuChartColumn size={20} color="black" className="mr-2"></LuChartColumn>
+							<Text className="text-black-700 text-sm font-regular">View History</Text>
 						</View>
 					</TouchableOpacity>
 				</View>
 
 				<View className="h-4"></View>
 
-				{/* Card */}
+				{/* Clinical Considerations Card */}
 				<View className="bg-white rounded-xl p-4 shadow-md">
 					<View className="flex-row items-center">
-						<View className="w-8 h-8 rounded-full items-center justify-center mr-3">
-							<LuCircleAlert size={20} color="gray"></LuCircleAlert>
-						</View>
-						<Text className="text-lg font-semibold text-gray-800">Clinical Considerations</Text>
+						<LuCircleAlert size={20} color="black" className="mr-3" />
+						<Text className="text-base font-regular text-black flex-1">Clinical Considerations</Text>
 					</View>
 
-					{/* Inner blue note box */}
+					{/* Notes Box */}
 					<View className="mt-4 bg-blue-50 border border-blue-100 rounded-lg p-4">
-						<Text className="text-sm font-semibold text-blue-800 mb-2">Range of Motion Assessment Notes:</Text>
-
-						<View className="pl-2">
-							<View className="flex-row items-start mb-1">
-								<Text className="text-sm text-blue-800 flex-1">• Values shown represent maximum achievable ranges in each direction</Text>
-							</View>
-
-							{/* <View className="flex-row items-start mb-1">
-								<Text className="text-sm text-blue-800 flex-1">• Symmetry index compares left/right movement patterns</Text>
-							</View> */}
-
-							<View className="flex-row items-start mb-1">
-								<Text className="text-sm text-blue-800 flex-1">• Consider pain levels and patient comfort during interpretation</Text>
-							</View>
-
-							<View className="flex-row items-start">
-								<Text className="text-sm text-blue-800 flex-1">• Compare with age-matched normative data and previous assessments</Text>
-							</View>
+						<Text className="text-sm font-semibold text-blue-800 mb-3">Range of Motion Assessment Notes:</Text>
+						<View className="gap-2  ml-2">
+							<Text className="text-xs text-blue-800">• Values shown represent maximum achievable ranges in each direction</Text>
+							<Text className="text-xs text-blue-800">• Consider pain levels and patient comfort during interpretation</Text>
+							<Text className="text-xs text-blue-800">• Compare with age-matched normative data and previous assessments</Text>
 						</View>
 					</View>
 				</View>

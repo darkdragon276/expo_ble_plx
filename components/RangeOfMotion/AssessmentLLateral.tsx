@@ -41,8 +41,8 @@ const AssessmentLLateral = forwardRef<ChildROMRef, AssessmentCardProps>(({ recor
 	return (
 		<>
 			<View className="flex-row items-center justify-between mb-2">
-				<Text className="text-3xl font-bold text-teal-600 leading-none">{pos}°</Text>
-				<Text className="text-md text-gray-400">Max: {posMax}°</Text>
+				<Text className="text-2xl font-black text-teal-600 leading-none">{pos}°</Text>
+				<Text className="text-xs text-gray-400">Max: {posMax}°</Text>
 			</View>
 
 			{/* Progress bar */}

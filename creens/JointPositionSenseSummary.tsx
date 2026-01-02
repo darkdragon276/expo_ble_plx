@@ -144,18 +144,18 @@ const JointPositionSenseSummary = () => {
 		}
 
 		let cursors: any[] = [];
-		let _cursor =
-			`	
-				<div class="absolute" style="transform: translate({{x}}px, {{y}}px) rotate({{z}}deg);">
-					<div class="absolute w-5 h-0.5 bg-purple-600 opacity-75 -translate-x-1/2 -translate-y-1/2">
-					</div>
-					<div class="absolute h-5 w-0.5 bg-purple-600 opacity-75 -translate-x-1/2 -translate-y-1/2">
-					</div>
-					<div class="absolute -top-6 left-1/2 -translate-x-1/2">
-						<div class="bg-purple-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">{{id_record}}
-						</div>
+		let _cursor = `
+			<div class="absolute" 
+				style="transform: 
+					translate(-1px, -1px) 
+					translate({{x}}px, {{y}}px) 
+					rotate({{z}}deg);">
+				<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+					<div class="border-2 border-gray-100 bg-purple-600 text-white text-xs px-1.5 py-0.5 rounded-full font-medium shadow-sm">
+						{{id_record}}
 					</div>
 				</div>
+			</div>
 		`;
 
 		cursorPDF?.forEach((cur: any) => {
@@ -263,41 +263,43 @@ const JointPositionSenseSummary = () => {
 			<View className="flex flex-col bg-white rounded-xl [&:last-child]:pb-6 mb-2">
 				<View className="flex-row items-center p-4">
 					<View className="items-center justify-center mr-2">
-						<LuTarget size={22} className="text-orange-500"></LuTarget>
+						<LuTarget size={18} className="text-orange-500"></LuTarget>
 					</View>
-					<Text className="text-xl">Target Analysis</Text>
+					<Text className="text-base">Target Analysis</Text>
 				</View>
 
 
 				{/* svg */}
-				<View className="bg-gray-50 mx-3">
+				<View className="bg-gray-50 items-center">
 					<PositionCoordinates>
 						<MakerCursorList mode={"SUMMARY"} getData={() => undefined} subscribe={() => { }} data={cursor}></MakerCursorList>
 					</PositionCoordinates>
 
-					<View className="flex-row justify-center space-x-3">
-						<View className="flex-row items-center">
-							<View className="w-3 h-3 bg-black rounded-full mr-1" />
-							<Text className="text-gray-600 text-sm">Neutral</Text>
+					<View className="w-full justify-center flex-row mb-4">
+						<View className="flex-row items-center mr-10">
+							<View className="w-2 h-2 bg-black rounded-full mr-1" />
+							<Text className="text-gray-600 text-xs">Neutral</Text>
 						</View>
-						<View className="flex-row items-center">
-							<View className="w-3 h-1 bg-purple-700 mr-1" />
-							<Text className="text-gray-600 text-sm">Recorded</Text>
+						<View className="flex-row items-center mr-10">
+							<View className="w-4 h-4 bg-purple-700 rounded-full items-center justify-center mr-1">
+								<View className="w-2 h-1 bg-white" />
+							</View>
+							<Text className="text-gray-600 text-xs">Recorded</Text>
 						</View>
 					</View>
 				</View>
 
 				<View className="flex-1 items-center p-2">
-					<Text className="mt-4 text-xs text-muted-foreground text-center opacity-75">
-						<Text className="text-sm font-semibold">How to read this chart:</Text> Each numbered point represents a repositioning attempt. Centre indicates perfect accuracy. Closer points show better proprioceptive performance.
+					<Text className="mt-1 text-xs text-muted-foreground text-center opacity-75">
+						<Text className="text-xs font-semibold">How to read this chart:</Text> Each numbered point represents a repositioning attempt. Centre indicates perfect accuracy. Closer points show better proprioceptive performance.
 					</Text>
 				</View>
 			</View>
 
 			{/* jps record list */}
-			<View className="flex-1 bg-white rounded-2xl px-6 py-2">
+			<View className="flex-1 bg-white rounded-2xl px-6 py-4">
 				<View>
-					<Text className="text-muted-foreground text-md font-bold mb-3">
+					<Text className="text-muted-foreground text-md font-regular mb-3">
 						Recorded Positions ({cursor ? cursor.length : 0})
 					</Text>
 				</View>
@@ -317,8 +319,8 @@ const JointPositionSenseSummary = () => {
 					activeOpacity={0.8}
 					className="bg-green-600 rounded-xl py-4 items-center justify-center shadow-lg">
 					<View className="flex-row items-center">
-						<Text className="text-white text-base font-semibold mr-3">✓</Text>
-						<Text className="text-white text-base font-semibold">Finish & Return Home</Text>
+						<Text className="text-white text-sm font-semibold mr-3">✓</Text>
+						<Text className="text-white text-sm font-semibold">Finish & Return Home</Text>
 					</View>
 				</TouchableOpacity>
 
@@ -327,8 +329,8 @@ const JointPositionSenseSummary = () => {
 					onPress={() => navigation.replace("AssessmentHistory")}
 					className="mt-3 bg-white border border-gray-300 rounded-xl py-4 items-center justify-center">
 					<View className="flex-row items-center">
-						<LuChartColumn size={20} color="gray" className="mr-2"></LuChartColumn>
-						<Text className="text-gray-700 text-base">View History</Text>
+						<LuChartColumn size={20} color="gray" className="text-sm mr-2"></LuChartColumn>
+						<Text className="text-gray-700 text-sm">View History</Text>
 					</View>
 				</TouchableOpacity>
 			</View>
@@ -337,16 +339,15 @@ const JointPositionSenseSummary = () => {
 				{/* Title */}
 				<View className="flex-row items-center mb-3">
 					<LuCircleAlert size={20} color="gray" className="mr-2"></LuCircleAlert>
-					<Text className="text-xl font-semibold">Clinical Considerations</Text>
+					<Text className="text-base font-regular">Clinical Considerations</Text>
 				</View>
 
 				{/* Content Box */}
-				<View className="bg-blue-50 p-4 rounded-xl border border-blue-200">
-					<Text className="text-base text-blue-800 font-semibold mb-2">
+				<View className="bg-blue-50 rounded-xl border border-blue-200 p-3">
+					<Text className="text-base text-blue-800 font-medium mb-2">
 						Joint Position Sense Assessment Notes:
 					</Text>
-
-					<View className="space-y-2">
+					<View className="ml-4">
 						<Text className="text-sm text-blue-800">• Lower error values indicate better proprioceptive function</Text>
 						<Text className="text-sm text-blue-800">• Lower variability suggests more consistent responses</Text>
 						<Text className="text-sm text-blue-800">• Consider fatigue effects and learning curve in interpretation</Text>

@@ -13,9 +13,9 @@ const AssessmentTitle = forwardRef<ChildInputRef>((props, ref) => {
 		<TextInput
 			value={title}
 			onChangeText={setTitle}
-			placeholder="Session Name (Optional)"
-			placeholderTextColor="black"
-			className="w-full rounded-xl px-4 py-4 text-base"
+			placeholder="Enter session name..."
+			placeholderTextColor="gray"
+			className="w-full rounded-lg px-4 py-2 text-base bg-white"
 		/>
 	)
 });

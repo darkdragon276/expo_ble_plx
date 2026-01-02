@@ -18,23 +18,38 @@ const HeadPosition = ({ dataRef }: { dataRef: React.RefObject<LiveHeadPositionPr
 
 	return (
 		<>
-			<View className="flex-row justify-between w-full mb-3 px-4">
+			<View className="flex-row justify-between w-full px-10 mb-1">
 				<View className="items-center">
-					<Text className="text-2xl font-bold text-black-600">
+					<Text className="text-2xl font-black text-black-600"
+						style={{
+							fontVariant: ['tabular-nums'],
+							minWidth: 100,
+							textAlign: 'center'
+						}}>
 						{position.horizontal.toFixed(1)}°
 					</Text>
-					<Text className="text-gray-500 text-sm">Horizontal</Text>
+					<Text className="text-gray-500 text-xs">Horizontal</Text>
 				</View>
 
 				<View className="items-center">
-					<Text className="text-2xl font-bold text-black-600">
+					<Text className="text-2xl font-black text-black-600"
+						style={{
+							fontVariant: ['tabular-nums'],
+							minWidth: 100,
+							textAlign: 'center'
+						}}>
 						{position.vertical.toFixed(1)}°
 					</Text>
-					<Text className="text-gray-500 text-sm">Vertical</Text>
+					<Text className="text-gray-500 text-xs">Vertical</Text>
 				</View>
 			</View>
 
-			<Text className="text-gray-700">Current: {position.pst_txt}</Text>
+			<Text className="text-gray-500"
+				style={{
+					fontVariant: ['tabular-nums'],
+					minWidth: 120,
+					textAlign: 'center'
+				}}>Current: {position.pst_txt}</Text>
 		</>
 	)
 }

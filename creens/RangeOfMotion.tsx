@@ -230,51 +230,47 @@ const RangeOfMotion = () => {
     return (
         <ScrollView key={key} className="flex-1 p-4 space-y-6">
             <View className="items-center">
-                <Text className="text-lg font-semibold mb-1">
+                <Text className="text-base font-regular mb-1">
                     Range of Motion Assessment
                 </Text>
                 <Text className="text-sm text-gray-500 text-center">
                     Live data capture from all cervical movements
                 </Text>
             </View>
+            <View className="bg-blue-50 rounded-2xl px-4 py-3 shadow-sm items-center border border-blue-200">
+                <View className="flex-row items-center mb-2">
+                    {/* <LuUsers size={18} color="#2563eb" /> */}
+                    <Text className="ml-2 font-regular text-black-700 text-sm">
+                    Instructions
+                    </Text>
+                </View>
 
-            <View className="flex-1 space-y-6">
-                {/* Card Instructions */}
-                <View className="bg-blue-50 rounded-xl px-4 py-3 shadow-sm">
-                    {/* Header */}
-                    {/* <View className="flex-row items-center justify-center">
-                        <LuUsers size={20}></LuUsers>
-                        <Text className="ml-2 font-semibold text-blue-700">Instructions</Text>
-                    </View> */}
+                <View className="space-y-1.5 w-full">
+                    <View className="flex-row items-start">
+                    <Text className="w-4 h-4 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2 flex-shrink-0">
+                        1
+                    </Text>
+                    <Text className="flex-1 text-xs text-blue-700">
+                        Position patient seated, looking straight ahead
+                    </Text>
+                    </View>
 
-                    {/* List Steps */}
-                    <View className="space-y-2">
-                        <View className="flex-row items-start">
-                            <Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
-                                1
-                            </Text>
-                            <Text className="flex-1 text-sm text-blue-700">
-                                Position patient seated, looking straight ahead
-                            </Text>
-                        </View>
+                    <View className="flex-row items-start">
+                    <Text className="w-4 h-4 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2 flex-shrink-0">
+                        2
+                    </Text>
+                    <Text className="flex-1 text-xs text-blue-700">
+                        Start recording and guide through all 6 movements
+                    </Text>
+                    </View>
 
-                        <View className="flex-row items-start">
-                            <Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
-                                2
-                            </Text>
-                            <Text className="flex-1 text-sm text-blue-700">
-                                Start recording and guide through all 6 movements
-                            </Text>
-                        </View>
-
-                        <View className="flex-row items-start">
-                            <Text className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2">
-                                3
-                            </Text>
-                            <Text className="flex-1 text-sm text-blue-700">
-                                Stop recording when complete to view results
-                            </Text>
-                        </View>
+                    <View className="flex-row items-start">
+                    <Text className="w-4 h-4 rounded-full bg-blue-100 text-blue-600 text-xs font-bold text-center mr-2 flex-shrink-0">
+                        3
+                    </Text>
+                    <Text className="flex-1 text-xs text-blue-700">
+                        Stop recording when complete to view results
+                    </Text>
                     </View>
                 </View>
             </View>
@@ -427,6 +423,8 @@ const RangeOfMotion = () => {
                     </View>
                 </View>
             </View>
+            
+            <View className="h-4"></View>
         </ScrollView>
     )
 }

@@ -9,39 +9,45 @@ type HeadPositionRecordedChildProps = {
 
 const SessionItem = memo(({ item }: { item: LiveRecorded }) => {
 	return (
-		<View className="flex-row justify-between items-center my-1">
-			<View className="flex-row space-x-2 w-3/7">
-				<View className="w-7 h-5 justify-between items-center rounded-xl bg-purple-50 border-purple-200">
-					<Text className="text-md text-purple-700 font-semibold">#{item.id}</Text>
+		<View className="flex-row justify-between items-center mb-2">
+			<View className="flex-row w-3/7">
+				<View className="w-8 h-5 justify-between items-center rounded-xl bg-purple-50 border border-purple-200">
+					<Text className="text-xs text-purple-700 font-black">#{item.id}</Text>
 				</View>
-				<Text className="text-md font-semibold">{item.pst_txt}</Text>
+				<Text className="text-sm font-medium ml-2">{item.pst_txt}</Text>
 			</View>
 
-			<View className="flex-column w-4/7">
-				<View className="flex-row items-center justify-items-center">
-					<View className="w-1/9 p-1">
-						<Text className="text-md font-semibold">H:</Text>
-					</View>
-					<View className="w-3/9 p-1">
-						<Text className="text-md font-semibold">{item.horizontal.toFixed(1)}°</Text>
-					</View>
-					<View className="w-1/9 p-1">
-						<Text className="text-md font-semibold">|</Text>
-					</View>
-					<View className="w-1/9 p-1">
-						<Text className="text-md font-semibold">V:</Text>
-					</View>
-					<View className="w-3/9 p-1">
-						<Text className="text-md font-semibold">{item.vertical.toFixed(1)}°</Text>
-					</View>
-				</View>
-				<View className="items-end">
-					<Text className="text-md font-semibold">
-						{item.angular}
+			<View className="flex-row items-center">
+				<Text className="text-2xl font-bold"
+					style={{
+						fontVariant: ['tabular-nums'],
+						minWidth: 60,
+						textAlign: 'right'
+					}}>
+					{item.angular}°
+				</Text>
+				<View className="w-0.5 h-6 bg-gray-500 mx-2" />
+				<View className="justify-center">
+					<Text className="text-xs font-regular text-gray-500"
+						style={{
+							fontVariant: ['tabular-nums'],
+							minWidth: 55,
+							textAlign: 'left'
+						}}>
+						V: {item.vertical.toFixed(1)}°
+					</Text>
+					<Text className="text-xs font-regular text-gray-500"
+						style={{
+							fontVariant: ['tabular-nums'],
+							minWidth: 55,
+							textAlign: 'left'
+						}}>
+						H: {item.horizontal.toFixed(1)}°
 					</Text>
 				</View>
 			</View>
 		</View>
+
 	);
 });
 

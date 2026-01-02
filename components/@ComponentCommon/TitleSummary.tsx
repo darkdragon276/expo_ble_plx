@@ -42,13 +42,13 @@ const TitleSummary = ({ title, callback }: { title: string, callback: (text: str
 				!edit
 					?
 					<>
-						<Text className="w-rounded-xl font-bold px-2 py-2 text-lg">{text}</Text>
-						<LuPenLine size={20} color="gray" onPress={() => setEditText(true)}></LuPenLine>
+						<Text className="w-rounded-xl font-regular px-2 py-2 text-base">{text}</Text>
+						<LuPenLine size={16} color="gray" onPress={() => setEditText(true)}></LuPenLine>
 					</>
 					:
 					<>
 						<TextInput
-							className="w-rounded-xl font-bold px-2 py-2 text-lg"
+							className="w-rounded-xl font-regular px-2 py-2 text-base"
 							defaultValue={text}
 							onChangeText={newText => setText(newText)}
 							placeholderTextColor="black"
@@ -56,12 +56,12 @@ const TitleSummary = ({ title, callback }: { title: string, callback: (text: str
 						<View className="flex-row items-space-between">
 							<TouchableOpacity onPress={saveTitle}>
 								<View className="border border-green-500 rounded-md py-1 mr-2 z-10">
-									<LuCheck size={20} className="text-green-500 px-6"></LuCheck>
+									<LuCheck size={16} className="text-green-500 px-4"></LuCheck>
 								</View>
 							</TouchableOpacity>
 							<TouchableOpacity onPress={rollbackTitle}>
 								<View className="border border-red-500 rounded-md py-1 mr-2 z-10">
-									<LuUnCheck size={20} className="text-red-500 px-6"></LuUnCheck>
+									<LuUnCheck size={16} className="text-red-500 px-4"></LuUnCheck>
 								</View>
 							</TouchableOpacity>
 						</View>
