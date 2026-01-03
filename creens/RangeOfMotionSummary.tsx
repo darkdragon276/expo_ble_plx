@@ -369,16 +369,16 @@ const RangeOfMotionSummary = () => {
 
 					<View className="flex-row flex-wrap justify-between px-4">
 						{[
-							{ label: "Extension", value: data?.extension, image: ExtensionSrcImage, color: "blue" },
-							{ label: "Flexion", value: data?.flexion, image: FlexionSrcImage, color: "green" },
-							{ label: "Left Rotation", value: data?.l_rotation, image: LeftRotationSrcImage, color: "purple", rotate: '180deg' },
-							{ label: "Right Rotation", value: data?.r_rotation, image: RightRotationSrcImage, color: "orange", rotate: '180deg' },
-							{ label: "Left Lateral", value: data?.l_lateral, image: LeftLateralSrcImage, color: "teal" },
-							{ label: "Right Lateral", value: data?.r_lateral, image: RightLateralSrcImage, color: "pink" },
-						].map(({ label, value, image, color, rotate }) => (
+							{ label: "Extension", value: data?.extension, image: ExtensionSrcImage, borderColor: "border-blue-300", bgColor: "bg-blue-50/80", textColor: "blue" },
+							{ label: "Flexion", value: data?.flexion, image: FlexionSrcImage, borderColor: "border-green-300", bgColor: "bg-green-50/80", textColor: "green" },
+							{ label: "Left Rotation", value: data?.l_rotation, image: LeftRotationSrcImage, borderColor: "border-purple-300", bgColor: "bg-purple-50/80", textColor: "purple", rotate: '180deg' },
+							{ label: "Right Rotation", value: data?.r_rotation, image: RightRotationSrcImage, borderColor: "border-orange-300", bgColor: "bg-orange-50/80", textColor: "orange", rotate: '180deg' },
+							{ label: "Left Lateral", value: data?.l_lateral, image: LeftLateralSrcImage, borderColor: "border-teal-300", bgColor: "bg-teal-50/80", textColor: "teal" },
+							{ label: "Right Lateral", value: data?.r_lateral, image: RightLateralSrcImage, borderColor: "border-pink-300", bgColor: "bg-pink-50/80", textColor: "pink" },
+						].map(({ label, value, image, borderColor, rotate, textColor, bgColor }) => (
 							<View className="w-1/2 px-2 mb-4" key={label}>
 								<View className="items-center space-y-2">
-									<View className={`items-center bg-${color}-50/80 border border-${color}-200 rounded-xl px-4 py-6 w-full`}>
+									<View className={`items-center ${bgColor} border ${borderColor} rounded-xl px-4 py-6 w-full`}>
 										<Image
 											className="w-14 h-14"
 											style={rotate ? { transform: [{ rotate }] } : {}}
@@ -386,10 +386,10 @@ const RangeOfMotionSummary = () => {
 										/>
 									</View>
 									<View className="items-center">
-										<Text className={`font-semibold text-${color}-700 text-sm`}>
+										<Text className={`font-semibold text-${textColor}-600 text-sm`}>
 											{label}
 										</Text>
-										<Text className={`text-lg font-bold text-${color}-600`}>
+										<Text className={`text-lg font-bold text-${textColor}-600`}>
 											{value ?? 0.0}°
 										</Text>
 									</View>
