@@ -13,6 +13,7 @@ export class KrossDevice {
         MAGNET_CALIB_START: 0x1003,
         MAGNET_CALIB_STOP: 0x1004,
         GET_MAPPING_AXIS: 0x1005,
+        DEVICE_RENAME: 0x1006,
         // For monitor notification - OUT_UUID
         GET_DATA: 0x060C,
         GET_MAPPING: 0x060D
@@ -324,7 +325,7 @@ export class KrossDevice {
     }
 
     private msgId: number = 0;
-    pack(cmd: number): Uint8Array {
+    pack(cmd: number, dataString?: string): Uint8Array {
         this.msgId = (this.msgId + 1) & 0x7FF;
 
         const msgId = this.msgId;
@@ -363,6 +364,13 @@ export class KrossDevice {
                 txBuff[11] = KrossDevice.CODE_MAP[magnetMapping.x] ?? 0;
                 txBuff[12] = KrossDevice.CODE_MAP[magnetMapping.y] ?? 0;
                 txBuff[13] = KrossDevice.CODE_MAP[magnetMapping.z] ?? 0;
+                break;
+            case KrossDevice.Cmd.DEVICE_RENAME:
+                const nameBytes = new TextEncoder().encode(dataString || "Default");
+                dataLength = nameBytes.length;
+                for (let i = 0; i < dataLength; i++) {
+                    txBuff[5 + i] = nameBytes[i];
+                }
                 break;
             default:
                 return new Uint8Array(0);

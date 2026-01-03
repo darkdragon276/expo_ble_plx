@@ -76,6 +76,21 @@ class BLEServiceInstance {
 		this.manager.setLogLevel(LogLevel.Verbose)
 	}
 
+	renameDevice = async (id: DeviceId, newName: string, krossDevice: KrossDevice) => {
+		await this.connectToDevice(id);
+		await this.discoverAllServicesAndCharacteristicsForDevice();
+
+		return new Promise<void>((resolve) => {
+			BLEService.writeCharacteristicWithResponseForDevice(
+				BLEService.SERVICE_UUID,
+				BLEService.DATA_IN_UUID,
+				KrossDevice.encodeCmd(krossDevice.pack(KrossDevice.Cmd.DEVICE_RENAME, newName))
+			);
+			this.deviceId = newName;
+			resolve();
+		})
+	}
+
 	setDeviceById = (id: DeviceId) => {
 		//console.log("Set device by id: " + id);
 		if (this.deviceId !== id) {

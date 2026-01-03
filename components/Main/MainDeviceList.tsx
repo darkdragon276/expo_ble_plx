@@ -18,6 +18,7 @@ import { styled } from 'nativewind';
 
 import MainDeviceStatus from './MainDeviceStatus';
 import { BLEService } from '../../ble/BLEService';
+import { KrossDevice } from '../../ble/KrossDevice';
 
 const LuCheck = styled(LucideCheck);
 const LuUnCheck = styled(LucideX);
@@ -116,7 +117,8 @@ const MainDeviceList = () => {
 	const [editMode, setEditMode] = useState(false);
 	const [editingDevice, setEditingDevice] = useState<string | null>(null);
 	const [editText, setEditText] = useState('');
-
+	const krossDevice = new KrossDevice();
+	
 	useEffect(() => {
 		let updateInfo2s: NodeJS.Timeout | undefined;
 		let alertShown = false;
@@ -175,6 +177,7 @@ const MainDeviceList = () => {
 						: device
 				)
 			);
+			await BLEService.renameDevice(editingDevice, trimmedName, krossDevice);
 		} catch (error) {
 			console.error('Failed to update device name:', error);
 			Alert.alert('Error', 'Failed to update device name');
